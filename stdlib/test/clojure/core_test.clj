@@ -1,0 +1,10 @@
+
+(assert (= 1))
+(assert (= 1 1))
+(assert (= 1 1 1))
+(assert (= 1 1 1 1))
+(assert (not (= 1 2)))
+(assert (not (= 1 2 1)))
+(assert (not (= 1 1 2)))
+(assert (not (= 1 1 2 1)))
+(assert (not (= 1 1 1 2)))
