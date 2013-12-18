@@ -1,1 +1,0 @@
-([:dependencies ([org.clojure/clojure "1.5.1"] [org.clojure/tools.reader "0.8.0"] [org.clojure/tools.analyzer "0.0.1-SNAPSHOT"] [org.clojure/tools.nrepl "0.2.3" :exclusions ([org.clojure/clojure])] [clojure-complete/clojure-complete "0.2.3" :exclusions ([org.clojure/clojure])] [com.aphyr/prism "0.1.1"])])

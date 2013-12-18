@@ -1,9 +1,12 @@
 (ns clojure.ruby.emitter
   (:require [clojure.string :refer [join]]))
 
-(def ^:dynamic *indent-level* 0)
+(defmulti -emit (fn [{:keys [op] :as ast}]
+                  op))
 
-(defmulti -emit (fn [{:keys [op]}] op))
+(defmethod -emit nil [ast]
+  (println "nil ast")
+  (prn ast))
 
 (defmethod -emit :do [{:keys [statements ret]}]
   (let [emitted-statements (vec (map -emit statements))]
@@ -16,45 +19,55 @@
           (-emit then)
           (-emit else)))
 
-(defmulti -invoke (fn [{:keys [fn]}] (:form fn)))
+;(defmulti -invoke (fn [{:keys [fn]}] (:form fn)))
+;
+;(defmethod -invoke '+ [{:keys [args]}]
+;  (if (= (count args) 1)
+;    (str (-emit (first args)))
+;    (reduce
+;      (fn [expr arg]
+;        (format "(%s + %s)" expr (-emit arg)))
+;      (-emit (first args))
+;      (rest args))))
+;
+;(defn- -emit= [x y]
+;  (format "(%s == %s)" (-emit x) (-emit y)))
 
-(defmethod -invoke '+ [{:keys [args]}]
-  (if (= (count args) 1)
-    (str (-emit (first args)))
-    (reduce
-      (fn [expr arg]
-        (format "(%s + %s)" expr (-emit arg)))
-      (-emit (first args))
-      (rest args))))
+;(defmethod -invoke '=* [{:keys [args]}]
+;  (format "Clojure::Lang.special(\"=*\").invoke(%s)"
+;          (clojure.string/join ", " (map -emit args))))
+;
+;(defmethod -invoke 'not [{:keys [args]}]
+;  (format "!%s" (-emit (first args))))
+;
+;(defmethod -invoke 'assert [{:keys [args]}]
+;  (format "(raise RuntimeError.new(\"%s\") unless %s)"
+;          (format "%s is not true" (:form (first args)))
+;          (-emit (first args))))
 
-(defmethod -invoke '=* [{:keys [args]}]
+(defn -emit-sym [name]
+  (format "Clojure::Lang::Symbol.new(\"%s\")" name))
+
+(def specials #{'ns '=*})
+
+(defmethod -emit :maybe-class [{:keys [form] :as ast}]
   (cond
-    (= (count args) 0)
-    (str "true")
-    (= (count args) 1)
-    (str "true")
-    (= (count args) 2)
-    (format "(%s == %s)" (-emit (first args)) (-emit (second args)))
+    (specials form)
+    (format "Clojure::Lang.special(\"%s\")" form)
+    (symbol? form)
+    (-emit-sym form)
     :else
-    (loop [[x y & more] args comparisons []]
-      (if (empty? more)
-        (format "(%s)"
-                (clojure.string/join " && "
-                                     (conj (vec comparisons)
-                                           (format "(%s == %s)" (-emit x) (-emit y)))))
-        (recur (cons y more)
-               (conj (vec comparisons) (format "(%s == %s)" (-emit x) (-emit y))))))))
+    (throw (Exception. "wat"))))
 
-(defmethod -invoke 'not [{:keys [args]}]
-  (format "!%s" (-emit (first args))))
+(defmethod -emit :def [{:keys [name init] :as ast}]
+  (format "Clojure::RT.current_ns.intern(%s).set_root(%s)"
+          (-emit-sym name)
+          (-emit init)))
 
-(defmethod -invoke 'assert [{:keys [args]}]
-  (format "(raise RuntimeError.new(\"%s\") unless %s)"
-          (format "%s is not true" (:form (first args)))
-          (-emit (first args))))
-
-(defmethod -emit :invoke [ast]
-  (-invoke ast))
+(defmethod -emit :invoke [{:keys [fn args]}]
+  (format "%s.invoke(%s)"
+          (-emit fn)
+          (clojure.string/join ", " (map -emit args))))
 
 (defmethod -emit :const [{:keys [form]}]
   (str form))
