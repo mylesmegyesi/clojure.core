@@ -26,7 +26,7 @@ $ cd compiler
 $ lein test
 ```
 
-3. Run the tests for the stdlib
+4. Run the tests for the stdlib
 
 ```bash
 $ cd compiler
