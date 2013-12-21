@@ -20,7 +20,6 @@
 
 (defn eval-ast [ast]
   (let [code (emit ast)]
-    (prn code)
     (.runScriptlet (-> ast :env :runtime) code)))
 
 (defmulti parse (fn [[op & rest] env] op))

@@ -31,7 +31,7 @@
 
 (defn- files-in-dir [directory]
   (let [f-dir (file directory)
-        abs-dir (.getCanonicalPath f-dir)]
+        abs-dir (str (.getCanonicalPath f-dir) "/")]
     (map
       (fn [f]
         (let [abs (.getCanonicalPath f)]
@@ -62,10 +62,11 @@
   (doseq [{:keys [relative-path absolute-path]} (only-clj (files-in-dir directory))]
     (let [input-file        (file absolute-path)
           output-file-name  (replace-extension relative-path "rb")
+          relative-out      (str output "/" output-file-name)
           output-file (file (str (.getCanonicalPath (file output)) "/" output-file-name))]
       (.mkdirs (file (.getParent output-file)))
       (binding [*file* absolute-path]
-        (println (format "Compiling file: %s" relative-path))
+        (println (format "Compiling %s -> %s" relative-path relative-out))
         (spit
           output-file
           (compile (str "(do " (slurp input-file) ")") (initial-env)))))))
