@@ -69,7 +69,7 @@
         (println (format "Compiling %s -> %s" relative-path relative-out))
         (spit
           output-file
-          (compile (str "(do " (slurp input-file) ")") (initial-env)))))))
+          (compile (str "(do" (slurp input-file) ")") (initial-env)))))))
 
 (defn -main [& args]
   (let [{:keys [output-directory input-directories]} (parse-args args)]

@@ -41,25 +41,8 @@
     )
 
   (testing "=*"
-    (is "true"
-        (compile "(=*)"))
-    (is "true"
-        (compile "(=* 1)"))
-    (is "(1 == 2)"
-        (compile "(=* 1 2)"))
-    (is "((1 == 2) && (2 == 3))"
-        (compile "(=* 1 2 3)"))
-    (is "((1 == 2) && (2 == 3) && (3 == 4))"
-        (compile "(=* 1 2 3 4)"))
-    (is "((1 == 2) && (2 == 3) && (3 == 4) && (4 == 5))"
-        (compile "(=* 1 2 3 4 5)"))
-    )
-
-  (testing "=*"
-    (is "true"
-        (compile "(=*)"))
-    (is "true"
-        (compile "(=* 1)"))
+    ;(is "true"
+    ;    (compile "(=* 1)"))
     (is "(1 == 2)"
         (compile "(=* 1 2)"))
     (is "((1 == 2) && (2 == 3))"

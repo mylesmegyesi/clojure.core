@@ -1,14 +1,11 @@
 (ns clojure.ruby.analyzer
-  (:refer-clojure :exclude [macroexpand-1])
-  (:require [clojure.tools.analyzer       :as ana :refer [analyze-fn-method empty-env]]
-            [clojure.tools.analyzer.utils :refer [resolve-var]]
-            [clojure.ruby.emitter         :refer [emit]])
-  (:import [org.jruby.embed ScriptingContainer LocalContextScope]))
+  (:refer-clojure :exclude [macroexpand-1 var?])
+  (:require [clojure.tools.analyzer       :as ana :refer [analyze-fn-method empty-env analyze-in-env]]
+            [clojure.tools.analyzer.utils :refer [resolve-var ctx]]
+            [clojure.ruby.emitter         :refer [emit]]
+            [clojure.ruby.runtime         :refer :all]))
 
 (declare analyze)
-
-(defn analyzer-runtime []
-  (ScriptingContainer. LocalContextScope/SINGLETHREAD))
 
 (def current-ns (atom 'user))
 
@@ -16,11 +13,10 @@
   (swap! current-ns (fn [old] sym)))
 
 (defn initial-env []
-  (assoc (empty-env) :runtime (analyzer-runtime)))
+  (assoc (empty-env) :runtime (new-runtime)))
 
-(defn eval-ast [ast]
-  (let [code (emit ast)]
-    (.runScriptlet (-> ast :env :runtime) code)))
+(defn eval-ast [{:keys [env] :as ast}]
+  (eval-in-runtime (:runtime env) (emit ast)))
 
 (defmulti parse (fn [[op & rest] env] op))
 
@@ -74,34 +70,43 @@
     (eval-ast ast)
     ast))
 
-(defmethod parse 'create-ns [[_ name :as form] env]
-  (let [ast {:op   :create-ns
+(defmethod parse 'in-ns [[_ name :as form] env]
+  (set-ns! name)
+  (let [ast {:op   :in-ns
              :env  env
              :name name
              :form form}]
     (eval-ast ast)
     ast))
 
-(defmethod parse 'in-ns [[_ name :as form] env]
-  (set-ns! name)
-  {:op   :in-ns
+(defmethod parse '=* [[_ & args :as form] env]
+  {:op   :=*
    :env  env
-   :name name
-   :form form})
-
-(defmethod parse 'rb-class* [[_ name :as form] env]
-  {:op   :rb-class*
-   :env  env
-   :name name
+   :args (mapv (analyze-in-env (ctx env :expr)) args)
    :form form})
 
 (defmethod parse 'def [form env]
-  (let [ast (ana/-parse form env)]
-    (eval-ast ast)
-    ast))
+  (let [{:keys [env name] :as ast} (ana/-parse form env)
+        {:keys [ns namespaces]} env
+        var (eval-ast ast)]
+    (swap! namespaces assoc-in [ns :mappings name] var)
+    (assoc ast :var var)))
 
 (defmethod parse :default [form env]
   (ana/-parse form env))
+
+(defn desugar-host-expr [form env]
+  (cond
+    (seq? form)
+    (let [[op & expr] form]
+      (if (symbol? op)
+        (let [opname (name op)]
+          (cond
+            (= (last opname) \.) ;; (class. ..)
+            (list* 'new (symbol (subs opname 0 (dec (count opname)))) expr)
+            :else form))))
+
+    :else form))
 
 (defn macroexpand-1 [form env]
   (if (seq? form)
@@ -117,12 +122,8 @@
         (apply v form env (rest form))
 
         :else
-        form))
-    form))
-
-(defn create-var
-  [sym _]
-  sym)
+        (desugar-host-expr form env)))
+    (desugar-host-expr form env)))
 
 (defn- wrap-current-ns [parser]
   (fn [form env]
@@ -130,6 +131,7 @@
 
 (defn analyze [form env]
   (binding [ana/macroexpand-1 macroexpand-1
-            ana/create-var    create-var
-            ana/parse         (wrap-current-ns parse)]
+            ana/create-var    (fn [sym _] sym)
+            ana/parse         (wrap-current-ns parse)
+            ana/var?          runtime-var?]
     (ana/analyze form env)))
