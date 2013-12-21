@@ -1,83 +1,136 @@
 (ns clojure.ruby.analyzer
   (:refer-clojure :exclude [macroexpand-1])
-  (:require [clojure.tools.analyzer                         :as ana]
-            [clojure.tools.analyzer.utils                   :refer [ctx maybe-var]]
-            [clojure.tools.analyzer.passes                  :refer [walk prewalk postwalk cycling]]
-            [clojure.tools.analyzer.passes.source-info      :refer [source-info]]
-            [clojure.tools.analyzer.passes.trim-do          :refer [trim-do]]
-            [clojure.tools.analyzer.passes.cleanup          :refer [cleanup]]
-            [clojure.tools.analyzer.passes.elide-meta       :refer [elide-meta]]
-            [clojure.tools.analyzer.passes.constant-lifter  :refer [constant-lift]]
-            [clojure.tools.analyzer.passes.warn-earmuff     :refer [warn-earmuff]]
-            [clojure.tools.analyzer.passes.collect          :refer [collect]]
-            [clojure.tools.analyzer.passes.add-binding-atom :refer [add-binding-atom]]
-            [clojure.tools.analyzer.passes.uniquify         :refer [uniquify-locals]]))
+  (:require [clojure.tools.analyzer       :as ana :refer [analyze-fn-method empty-env]]
+            [clojure.tools.analyzer.utils :refer [resolve-var]]
+            [clojure.ruby.emitter         :refer [emit]])
+  (:import [org.jruby.embed ScriptingContainer LocalContextScope]))
 
-(def specials ana/specials)
+(declare analyze)
+
+(defn analyzer-runtime []
+  (ScriptingContainer. LocalContextScope/SINGLETHREAD))
+
+(def current-ns (atom 'user))
+
+(defn set-ns! [sym]
+  (swap! current-ns (fn [old] sym)))
+
+(defn initial-env []
+  (assoc (empty-env) :runtime (analyzer-runtime)))
+
+(defn eval-ast [ast]
+  (let [code (emit ast)]
+    (prn code)
+    (.runScriptlet (-> ast :env :runtime) code)))
 
 (defmulti parse (fn [[op & rest] env] op))
 
-(defmethod parse :default
-  [form env]
+(defn analyze-method-impls
+  [[name [this & params :as args] & body :as form] env]
+  {:pre [(symbol? name)
+         (vector? args)
+         this]}
+  (let [meth (cons params body)
+        this-expr {:name  this
+                   :env   env
+                   :form  this
+                   :op    :binding
+                   :tag   (:this env)
+                   :local :this}
+        env (assoc-in (dissoc env :this) [:locals this] this-expr)
+        method (analyze-fn-method meth env)]
+    (assoc (dissoc method :variadic?)
+           :op       :method
+           :form     form
+           :this     this-expr
+           :name     (symbol (clojure.core/name name))
+           :children (into [:this] (:children method)))))
+
+(defn- maybe-class [thing]
+  thing)
+
+(defmethod parse 'deftype* [[_ name fields _ interfaces & methods :as form] env]
+  (let [interfaces (disj (set (mapv maybe-class interfaces)) Object)
+        fields-expr (mapv (fn [name]
+                            {:env     env
+                             :form    name
+                             :name    name
+                             :local   :field
+                             :op      :binding})
+                          fields)
+        menv (assoc env
+                    :context :expr
+                    :locals (zipmap fields fields-expr)
+                    :this name)
+        methods* (mapv #(assoc (analyze-method-impls % menv) :interfaces interfaces) methods)
+        ast {:op         :deftype
+             :env        env
+             :form       form
+             :name       name
+             :fields     fields-expr
+             :methods    methods*
+             :interfaces interfaces
+             :children   [:fields :methods]}]
+
+    (eval-ast ast)
+    ast))
+
+(defmethod parse 'create-ns [[_ name :as form] env]
+  (let [ast {:op   :create-ns
+             :env  env
+             :name name
+             :form form}]
+    (eval-ast ast)
+    ast))
+
+(defmethod parse 'in-ns [[_ name :as form] env]
+  (set-ns! name)
+  {:op   :in-ns
+   :env  env
+   :name name
+   :form form})
+
+(defmethod parse 'rb-class* [[_ name :as form] env]
+  {:op   :rb-class*
+   :env  env
+   :name name
+   :form form})
+
+(defmethod parse 'def [form env]
+  (let [ast (ana/-parse form env)]
+    (eval-ast ast)
+    ast))
+
+(defmethod parse :default [form env]
   (ana/-parse form env))
 
-(defn desugar-host-expr [form env]
-  form)
+(defn macroexpand-1 [form env]
+  (if (seq? form)
+    (let [op (first form)
+          v (resolve-var op env)
+          m (meta v)
+          local? (-> env :locals (get op))
+          macro? (and (not local?) (:macro m))
+          ]
+      (cond
 
-(defn macroexpand-1 [form env] form)
+        macro?
+        (apply v form env (rest form))
 
-(defn create-var [sym {:keys [ns] :as what-is-this}]
-  (keyword sym))
+        :else
+        form))
+    form))
 
-(defn run-passes
-  "Applies the following passes in the correct order to the AST:
-   * uniquify
-   * add-binding-atom
-   * cleanup
-   * source-info
-   * elide-meta
-   * constant-lifter
-   * warn-earmuff
-   * collect"
-  [ast]
-  (-> ast
+(defn create-var
+  [sym _]
+  sym)
 
-    uniquify-locals
-    add-binding-atom
+(defn- wrap-current-ns [parser]
+  (fn [form env]
+    (parser form (assoc env :ns @current-ns))))
 
-    (prewalk #(-> %
-                trim-do
-                warn-earmuff
-                source-info
-                elide-meta))
-
-    (postwalk
-      (comp (fn [ast]
-              (when-let [atom (:atom ast)]
-                (swap! atom dissoc :dirty?))
-              ast)
-            (cycling constant-lift)))
-
-    ((collect {:what       #{:constants
-                             :callsites
-                             :closed-overs}
-               :where      #{:deftype :reify :fn}
-               :top-level? false}))
-
-
-    (prewalk cleanup)
-    ))
-
-(defn analyze
-  "Returns an AST for the form that's compatible with what tools.emitter.jvm requires.
-
-   Binds tools.analyzer/{macroexpand-1,create-var,parse} to
-   tools.analyzer.jvm/{macroexpand-1,create-var,parse} and calls
-   tools.analyzer/analyzer on form.
-
-   Calls `run-passes` on the AST."
-  [form env]
+(defn analyze [form env]
   (binding [ana/macroexpand-1 macroexpand-1
             ana/create-var    create-var
-            ana/parse         parse]
-    (run-passes (ana/analyze form env))))
+            ana/parse         (wrap-current-ns parse)]
+    (ana/analyze form env)))

@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [compile])
   (:require [clojure.pprint :refer [pprint]]
             [clojure.ruby.compiler :refer [compile]]
+            [clojure.ruby.analyzer :refer [initial-env]]
             [clojure.java.io       :refer [file]])
   (:import [org.apache.commons.io FilenameUtils FileUtils]))
 
@@ -27,11 +28,6 @@
                (update-in results
                           [:input-directories]
                           #(conj (vec %) current-arg)))))))
-
-(def empty-env
-  {:context :expr
-   :locals {}
-   :namespaces (atom {})})
 
 (defn- files-in-dir [directory]
   (let [f-dir (file directory)
@@ -72,7 +68,7 @@
         (println (format "Compiling file: %s" relative-path))
         (spit
           output-file
-          (compile (str "(do " (slurp input-file) ")") empty-env))))))
+          (compile (str "(do " (slurp input-file) ")") (initial-env)))))))
 
 (defn -main [& args]
   (let [{:keys [output-directory input-directories]} (parse-args args)]

@@ -1,12 +1,8 @@
-(ns clojure.core)
+(create-ns clojure.core)
+(in-ns     clojure.core)
 
-(def = =*)
+(deftype* Symbol [ns name str])
+(deftype* Var [sym root])
 
-;(defn =
-;  ([x] true)
-;  ([x y] (clojure.lang.Util/equiv x y))
-;  ([x y & more]
-;   (if (clojure.lang.Util/equiv x y)
-;     (if (next more)
-;       (recur y (first more) (next more))
-;       (clojure.lang.Util/equiv y (first more)))
+(def Symbol (rb-class* Symbol))
+(def Var    (rb-class* Var))
