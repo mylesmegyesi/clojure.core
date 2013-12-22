@@ -4,6 +4,15 @@
             [clojure.ruby.runtime         :refer [var->constant lookup-var-in-module]]
             [clojure.ruby.util            :refer :all]))
 
+(defn- endl-separate [exprs]
+  (clojure.string/join "\n" exprs))
+
+(defn- indent [s]
+  (endl-separate
+    (map
+      #(str "  " %)
+      (clojure.string/split s #"\n"))))
+
 (defn- comma-separate [exprs]
   (clojure.string/join ", " exprs))
 
@@ -15,16 +24,6 @@
 
 (defn- wrap-quotes [s]
   (format "\"%s\"" s))
-
-(defn- endl-separate [exprs]
-  (clojure.string/join "\n" exprs))
-
-(defn- module-eval [ns body]
-  (if (and ns (not= 'user ns) (not= "" body))
-    (format "%s.module_eval do\n%s\nend"
-            (namespace->module (name ns))
-            body)
-    body))
 
 (defmulti -emit (fn [{:keys [op] :as ast}] op))
 
@@ -44,13 +43,15 @@
   (let [arg-names (map :name fields)
         arglist (clojure.string/join ", " arg-names)
         ivar   #(format "@%s = %s" % %)
+        ivars (endl-separate (map ivar arg-names))
         attr-reader #(format "attr_reader :%s" %)
-        ivars  (endl-separate (map ivar arg-names))
         attr-readers (endl-separate (map attr-reader arg-names))
-        constructor (format "def initialize(%s)\n%s\nend" arglist ivars)
-        body (endl-separate [attr-readers constructor])
-        module (namespace->module (clojure.core/name ns))]
-    (format "%s.const_set(\"%s\", Class.new do\n%s\nend)" module name body)))
+        constructor (format "def initialize(%s)\n%s\nend" arglist (indent ivars))
+        body (endl-separate [attr-readers constructor])]
+    (format "%s.const_set(\"%s\", Class.new do\n%s\nend)"
+            (namespace->module (clojure.core/name ns))
+            name
+            (indent body))))
 
 (defmethod -emit :deftype [{:keys [name fields methods interfaces env] :as ast}]
   (emit-type (:ns env) name fields interfaces methods))
@@ -73,7 +74,9 @@
   (format "%s.const_set(\"%s\", Class.new do\n%s\nend.new)"
           (namespace->module (name (:ns env)))
           (clojure.string/upper-case (name (gensym "fn")))
-          (format "def invoke(*args)\n%s\nend" (-emit (first methods)))))
+          (indent
+            (format "def invoke(*args)\n%s\nend"
+                    (indent (-emit (first methods)))))))
 
 (defmethod -emit :local [{:keys [name] :as ast}]
   (str name))
@@ -100,10 +103,15 @@
           (comma-separate (map -emit args))))
 
 (defmethod -emit :if [{:keys [test then else] :as ast}]
-  (format "if %s\n%s\nelse\n%s\nend"
-          (-emit test)
-          (-emit then)
-          (-emit else)))
+  (let [else-expr (-emit else)]
+    (if (= "" else-expr)
+      (format "if %s\n%s\nend"
+              (-emit test)
+              (indent (-emit then)))
+      (format "if %s\n%s\nelse\n%s\nend"
+              (-emit test)
+              (indent (-emit then))
+              (indent else-expr)))))
 
 (defmethod -emit :do [{:keys [statements ret env] :as ast}]
   (endl-separate (map -emit (conj (vec statements) ret))))
@@ -147,19 +155,5 @@
 (defmethod -emit :in-ns [{:keys [name]}]
   (emit-module-declaration (clojure.core/name name)))
 
-(defn- wrap-emit-in-module-eval [emitter]
-  (fn [{:keys [op env] :as ast}]
-    (let [body (emitter ast)]
-      (if (= op :create-ns)
-        body
-        (module-eval (:ns env) body)))))
-
-(defn- wrap-emit-source-comment [emitter]
-  (fn [{:keys [form] :as ast}]
-    (format "# %s\n%s" form (emitter ast))))
-
-(def emitter (-> -emit
-               wrap-emit-source-comment))
-
 (defn emit [ast]
-  (emitter ast))
+  (-emit ast))
