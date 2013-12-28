@@ -1,4 +1,6 @@
-(ns clojure.lang.meta)
+(ns clojure.lang.meta
+  (:refer-clojure :only [defprotocol]))
 
 (defprotocol Meta
-  (-meta [this]))
+  (meta [this])
+  (with-meta [this new-meta]))

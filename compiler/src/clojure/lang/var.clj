@@ -1,20 +1,21 @@
 (ns clojure.lang.var
-  (:require [clojure.lang.meta       :refer [Meta -meta]]
-            [clojure.lang.namespaced :refer [Namespaced -namespace]]))
+  (:require [clojure.lang.meta  :refer [Meta]]
+            [clojure.lang.named :refer [Named]]))
 
 (deftype Unbound [var]
   Meta
-  (-meta [this] {}))
+  (meta [this] {}))
 
 (defn make-unbound [var]
   (Unbound. var))
 
 (deftype Var [meta ns sym root]
   Meta
-  (-meta [this] meta)
+  (meta [this] meta)
 
-  Namespaced
-  (-namespace [this] ns))
+  Named
+  (namespace [this] (str ns))
+  (name      [this] (str sym)))
 
 (defn make-var [meta ns sym root]
   (Var. meta ns sym root))

@@ -1,13 +1,17 @@
-(in-ns clojure.core) ; make me (in-ns 'clojure.core)
 
-(deftype* Symbol [ns name str])
-(deftype* Var [sym root])
+(let* [keyword-type  (create-type* Keyword [name])
+       make-keyword  (fn* [name] (new keyword-type name))
 
-(def Symbol Symbol)
-(def Var    Var)
+       hash-map-type (create-type* PersistentHashMap [things])
+       make-map      (fn* [& things] (new hash-map-type things))
 
-(def = (fn* [x y] (=* x y)))
+       symbol-type   (create-type* Symbol [name])
+       make-sym      (fn* [name] (new symbol-type name))
 
-(def not (fn* [x] (if x false true)))
-
-(def assert (fn* [value] (if (not value) (throw (Exception. "false")))))
+       -create-ns (fn* [namespaces ns-sym]
+                    (-assoc namespaces ns-sym (make-map (make-keyword "mappings") (make-map)
+                                                        (make-keyword "aliases")  (make-map)
+                                                        (make-keyword "ns")       ns-sym)))
+       namespaces (make-map)
+       namespaces (-create-ns namespaces (make-sym "clojure.core"))]
+  namespaces)

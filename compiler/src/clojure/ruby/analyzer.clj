@@ -1,6 +1,6 @@
 (ns clojure.ruby.analyzer
   (:refer-clojure :exclude [macroexpand-1 var?])
-  (:require [clojure.tools.analyzer       :as ana :refer [analyze-fn-method empty-env analyze-in-env]]
+  (:require [clojure.tools.analyzer       :as ana :refer [analyze-fn-method empty-env analyze-in-env -analyze]]
             [clojure.tools.analyzer.utils :refer [resolve-var ctx]]
             [clojure.ruby.emitter         :refer [emit]]
             [clojure.ruby.runtime         :refer :all]))
@@ -20,80 +20,42 @@
 
 (defmulti parse (fn [[op & rest] env] op))
 
-(defn analyze-method-impls
-  [[name [this & params :as args] & body :as form] env]
-  {:pre [(symbol? name)
-         (vector? args)
-         this]}
-  (let [meth (cons params body)
-        this-expr {:name  this
-                   :env   env
-                   :form  this
-                   :op    :binding
-                   :tag   (:this env)
-                   :local :this}
-        env (assoc-in (dissoc env :this) [:locals this] this-expr)
-        method (analyze-fn-method meth env)]
-    (assoc (dissoc method :variadic?)
-           :op       :method
-           :form     form
-           :this     this-expr
-           :name     (symbol (clojure.core/name name))
-           :children (into [:this] (:children method)))))
+(defmethod parse 'do [form env]
+  (ana/-parse form env))
 
-(defn- maybe-class [thing]
-  thing)
+(defmethod parse 'fn* [form env]
+  (ana/-parse form env))
 
-(defmethod parse 'deftype* [[_ name fields _ interfaces & methods :as form] env]
-  (let [interfaces (disj (set (mapv maybe-class interfaces)) Object)
-        fields-expr (mapv (fn [name]
+(defmethod parse 'create-type* [[_ name fields :as form] env]
+  (let [fields-expr (mapv (fn [name]
                             {:env     env
                              :form    name
                              :name    name
                              :local   :field
                              :op      :binding})
-                          fields)
-        menv (assoc env
-                    :context :expr
-                    :locals (zipmap fields fields-expr)
-                    :this name)
-        methods* (mapv #(assoc (analyze-method-impls % menv) :interfaces interfaces) methods)
-        ast {:op         :deftype
-             :env        env
-             :form       form
-             :name       name
-             :fields     fields-expr
-             :methods    methods*
-             :interfaces interfaces
-             :children   [:fields :methods]}]
+                          fields)]
+    {:op         :create-type
+     :env        env
+     :form       form
+     :name       name
+     :fields     fields-expr
+     :children   [:fields]}))
 
-    (eval-ast ast)
-    ast))
-
-(defmethod parse 'in-ns [[_ name :as form] env]
-  (set-ns! name)
-  (let [ast {:op   :in-ns
-             :env  env
-             :name name
-             :form form}]
-    (eval-ast ast)
-    ast))
-
-(defmethod parse '=* [[_ & args :as form] env]
-  {:op   :=*
-   :env  env
-   :args (mapv (analyze-in-env (ctx env :expr)) args)
-   :form form})
-
-(defmethod parse 'def [form env]
-  (let [{:keys [env name] :as ast} (ana/-parse form env)
-        {:keys [ns namespaces]} env
-        var (eval-ast ast)]
-    (swap! namespaces assoc-in [ns :mappings name] var)
-    (assoc ast :var var)))
-
-(defmethod parse :default [form env]
-  (ana/-parse form env))
+(defmethod parse :default [[f & args :as form] env]
+  (if-not f
+    (-analyze :const form env)
+    (let [e (ctx env :expr)
+          fn-expr (analyze f e)
+          args-expr (mapv (analyze-in-env e) args)
+          m (meta form)]
+      (merge {:op   :invoke
+              :form form
+              :env  env
+              :fn   fn-expr
+              :args args-expr}
+             (when m
+               {:meta m}) ;; this implies it's not going to be evaluated
+             {:children [:args :fn]}))))
 
 (defn desugar-host-expr [form env]
   (cond
@@ -108,22 +70,40 @@
 
     :else form))
 
+(defn -let*
+  [form env bindings & body]
+  {:pre [(vector? bindings)
+         (even? (count bindings))]}
+  (loop [[binding & more] (reverse (seq (partition 2 bindings)))
+         body body]
+    (if-let [[name init] binding]
+      (recur more (list (list* 'fn* [name] body) init))
+      body)))
+
+(def analyzer-macros {'let* -let*})
+
 (defn macroexpand-1 [form env]
   (if (seq? form)
-    (let [op (first form)
-          v (resolve-var op env)
-          m (meta v)
-          local? (-> env :locals (get op))
-          macro? (and (not local?) (:macro m))
-          ]
-      (cond
+    (if-let [m (get analyzer-macros (first form))]
+      (apply m form env (rest form))
+      form)
+    form))
 
-        macro?
-        (apply v form env (rest form))
+  ;(if (seq? form)
+  ;  (let [op (first form)
+  ;        v (resolve-var op env)
+  ;        m (meta v)
+  ;        local? (-> env :locals (get op))
+  ;        macro? (and (not local?) (:macro m))
+  ;        ]
+  ;    (cond
 
-        :else
-        (desugar-host-expr form env)))
-    (desugar-host-expr form env)))
+  ;      macro?
+  ;      (apply v form env (rest form))
+
+  ;      :else
+  ;      (desugar-host-expr form env)))
+  ;  (desugar-host-expr form env)))
 
 (defn- wrap-current-ns [parser]
   (fn [form env]
