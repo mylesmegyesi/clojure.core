@@ -1,10 +1,10 @@
 (ns clojure.lang.symbol
   (:refer-clojure :only [deftype defn defn- str let require defmacro list* list and = nil? not declare cond compare not= delay assoc if-let last butlast first count]
                   :rename {compare core-compare})
-  (:require [clojure.lang.hash     :refer [Hash]]
-            [clojure.lang.meta     :refer [Meta]]
-            [clojure.lang.named    :refer [Named name namespace]]
-            [clojure.lang.platform :refer [instance? platform-symbol-methods symbol-hash-code]]
+  (:require [clojure.lang.hash      :refer [Hash]]
+            [clojure.lang.meta      :refer [Meta]]
+            [clojure.lang.named     :refer [Named name namespace]]
+            [clojure.lang.platform  :refer [instance? platform-symbol-methods symbol-hash-code]]
             [clojure.string]))
 
 (declare equals compare make-symbol)
@@ -31,40 +31,37 @@
 (defn symbol? [obj]
   (instance? Symbol obj))
 
-(defn- delay-equals [x y x-name y-name x-ns y-ns]
-  (and (symbol? x)
-       (symbol? y)
-       (= @x-name @y-name)
-       (= @x-ns @y-ns)))
+(defn- loosely-equal? [x-name y-name x-ns y-ns]
+  (and (= x-name y-name)
+       (= x-ns y-ns)))
 
 (defn equals [x y]
-  (delay-equals x y
-                (delay (name x))
-                (delay (name y))
-                (delay (namespace x))
-                (delay (namespace y))))
+  (loosely-equal? (name x)
+                  (name y)
+                  (namespace x)
+                  (namespace y)))
 
 (defn- compare [x y]
-  (let [x-name (delay (name x))
-        y-name (delay (name y))
-        x-ns   (delay (namespace x))
-        y-ns   (delay (namespace y))]
+  (let [x-name (name x)
+        y-name (name y)
+        x-ns   (namespace x)
+        y-ns   (namespace y)]
     (cond
-      (delay-equals x y x-name y-name x-ns y-ns)
+      (loosely-equal? x-name y-name x-ns y-ns)
       0
-      (and (nil? @x-ns)
-           (not (nil? @y-ns)))
+      (and (nil? x-ns)
+           (not (nil? y-ns)))
       -1
-      (not (nil? @x-ns))
+      (not (nil? x-ns))
       (cond
-        (nil? @y-ns) 1
+        (nil? y-ns) 1
         :else
-        (let [num (core-compare @x-ns
-                                @y-ns)]
+        (let [num (core-compare x-ns
+                                y-ns)]
           (if (not= 0 num)
             num
-            (core-compare @x-name
-                          @y-name)))))))
+            (core-compare x-name
+                          y-name)))))))
 
 (defn symbol
   ([name]
