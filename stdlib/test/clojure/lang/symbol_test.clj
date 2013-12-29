@@ -1,14 +1,14 @@
 (ns clojure.lang.symbol-test
   (:refer-clojure :only [let get nil? defn str])
-  (:require [clojure.test            :refer :all]
-            [clojure.lang.assertions :refer :all]
-            [clojure.lang.hash       :refer [hash]]
-            [clojure.lang.keyword    :refer [keyword]]
-            [clojure.lang.meta       :refer [meta with-meta]]
-            [clojure.lang.named      :refer [name namespace]]
-            [clojure.lang.operators  :refer [= not not= ==]]
-            [clojure.lang.platform   :refer [identical?]]
-            [clojure.lang.symbol     :refer :all]))
+  (:require [clojure.test                 :refer :all]
+            [clojure.lang.assertions      :refer :all]
+            [clojure.lang.hash            :refer [hash]]
+            [clojure.lang.keyword         :refer [keyword]]
+            [clojure.lang.meta            :refer [meta with-meta]]
+            [clojure.lang.named           :refer [name namespace]]
+            [clojure.lang.operators       :refer [= not not= ==]]
+            [clojure.lang.platform.object :refer [identical?]]
+            [clojure.lang.symbol          :refer :all]))
 
 (deftest symbol-test
   (testing "creates a symbol given just a name"
@@ -108,13 +108,13 @@
     (is (not= nil (symbol "sym")))
     (is (not= (symbol "sym") nil)))
 
-  (testing "not equal if either is not a symbol"
+  (testing "not equal if either does not implement the Named protocol"
     (is (not= 1 (symbol "sym")))
     (is (not= (symbol "sym") 1)))
 
-  (testing "loosely equal to keywords"
-    (is (== (symbol "kwd") (keyword "kwd")))
-    (is (== (keyword "kwd") (symbol "kwd"))))
+  (testing "can be equal to other Named types"
+    (is (= (symbol "kwd") (keyword "kwd")))
+    (is (= (keyword "kwd") (symbol "kwd"))))
 
   (testing "returns 0 if the symbols are equal"
     (let [lhs (symbol "sym")

@@ -1,11 +1,12 @@
 (ns clojure.lang.keyword
   (:refer-clojure :only [defmacro deftype defn + let list* list str compare zero?])
-  (:require [clojure.lang.hash     :refer [Hash hash]]
-            [clojure.lang.meta     :refer [Meta]]
-            [clojure.lang.named    :refer [Named name namespace]]
-            [clojure.lang.operators :refer [==]]
-            [clojure.lang.platform :refer [platform-keyword-methods instance?]]
-            [clojure.lang.symbol   :refer [symbol]]))
+  (:require [clojure.lang.hash             :refer [Hash hash]]
+            [clojure.lang.meta             :refer [Meta]]
+            [clojure.lang.named            :refer [Named name namespace]]
+            [clojure.lang.operators        :refer [==]]
+            [clojure.lang.platform.object  :refer [instance?]]
+            [clojure.lang.platform.keyword :refer [platform-keyword-methods]]
+            [clojure.lang.symbol           :refer [symbol]]))
 
 (defmacro defkeyword [type]
   (list* 'deftype type ['ns 'name 'str 'hash 'meta 'sym]

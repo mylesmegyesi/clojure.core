@@ -1,4 +1,5 @@
 (ns clojure.lang.var
+  (:refer-clojure :only [deftype defn str reset!])
   (:require [clojure.lang.meta  :refer [Meta]]
             [clojure.lang.named :refer [Named]]))
 

@@ -1,10 +1,12 @@
 (ns clojure.lang.symbol
-  (:refer-clojure :only [deftype defn defn- str let require defmacro list* list and = nil? not declare cond compare not= delay assoc if-let last butlast first count]
+  (:refer-clojure :only [defmacro deftype satisfies? defn defn- str let list* list and nil? declare cond compare last butlast first count]
                   :rename {compare core-compare})
-  (:require [clojure.lang.hash      :refer [Hash]]
-            [clojure.lang.meta      :refer [Meta]]
-            [clojure.lang.named     :refer [Named name namespace]]
-            [clojure.lang.platform  :refer [instance? platform-symbol-methods symbol-hash-code]]
+  (:require [clojure.lang.hash            :refer [Hash]]
+            [clojure.lang.meta            :refer [Meta]]
+            [clojure.lang.named           :refer [Named name namespace]]
+            [clojure.lang.operators       :refer [= not not=]]
+            [clojure.lang.platform.object :refer [instance?]]
+            [clojure.lang.platform.symbol :refer [platform-symbol-methods symbol-hash-code]]
             [clojure.string]))
 
 (declare equals compare make-symbol)
@@ -36,10 +38,12 @@
        (= x-ns y-ns)))
 
 (defn equals [x y]
-  (loosely-equal? (name x)
-                  (name y)
-                  (namespace x)
-                  (namespace y)))
+  (if (satisfies? Named y)
+    (loosely-equal? (name x)
+                    (name y)
+                    (namespace x)
+                    (namespace y))
+    false))
 
 (defn- compare [x y]
   (let [x-name (name x)

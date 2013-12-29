@@ -1,14 +1,14 @@
 (ns clojure.lang.keyword-test
   (:refer-clojure :only [let + str defmacro])
-  (:require [clojure.test            :refer :all]
-            [clojure.lang.assertions :refer :all]
-            [clojure.lang.hash       :refer [hash]]
-            [clojure.lang.meta       :refer [meta with-meta]]
-            [clojure.lang.named      :refer [name namespace]]
-            [clojure.lang.operators  :refer [= not not= ==]]
-            [clojure.lang.platform   :refer [identical?]]
-            [clojure.lang.symbol     :refer [symbol]]
-            [clojure.lang.keyword    :refer :all]))
+  (:require [clojure.test                 :refer :all]
+            [clojure.lang.assertions      :refer :all]
+            [clojure.lang.hash            :refer [hash]]
+            [clojure.lang.meta            :refer [meta with-meta]]
+            [clojure.lang.named           :refer [name namespace]]
+            [clojure.lang.operators       :refer [= not not= == not===]]
+            [clojure.lang.platform.object :refer [identical?]]
+            [clojure.lang.symbol          :refer [symbol]]
+            [clojure.lang.keyword         :refer :all]))
 
 (deftest keyword-test
   (testing "creates a keyword from a name"
@@ -101,13 +101,17 @@
     (is (not= nil (keyword "kwd")))
     (is (not= (keyword "kwd") nil)))
 
-  (testing "not equal if either is not a keyword"
-    (is (not= (symbol "kwd") (keyword "kwd")))
-    (is (not= (keyword "kwd") (symbol "kwd"))))
+  (testing "not equal if either is not Named"
+    (is (not= 1 (keyword "kwd")))
+    (is (not= (keyword "kwd") 1)))
 
   (testing "loosely equal to symbols"
-    (is (== (symbol "kwd") (keyword "kwd")))
-    (is (== (keyword "kwd") (symbol "kwd"))))
+    (is (= (symbol "kwd") (keyword "kwd")))
+    (is (= (keyword "kwd") (symbol "kwd"))))
+
+  (testing "but not strictly equal to symbols"
+    (is (not=== (symbol "kwd") (keyword "kwd")))
+    (is (not=== (keyword "kwd") (symbol "kwd"))))
 
   (testing "loosely equal to vars")
 
