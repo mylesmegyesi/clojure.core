@@ -1,35 +1,25 @@
 # clojure-ruby
 
-An experiment to compile Clojure to Ruby.
+## Goals
+
+1. Compile Clojure to Ruby.
+2. Reimplement clojure.lang package in Clojure
+3. Reimplement stdlib (clojure.core and associated) as modular components
+4. Make clojure.lang and clojure stdlib host agnostic
+5. Maintain as much backwards compatibility as possible
 
 ## Development
 
-1. Install the Clojure analyzer
+### Standard library
 
 ```bash
-$ git clone git@github.com:clojure/tools.analyzer.git
-$ cd tools.analyzer
-$ lein install
+$ cd stdlib
+$ lein test
 ```
 
-2. Clone this repo
-
-```bash
-$ git clone git@github.com:mylesmegyesi/clojure-ruby.git
-$ cd clojure-ruby
-```
-
-3. Run the tests for the compiler
+### Clojure -> Ruby compiler
 
 ```bash
 $ cd compiler
 $ lein test
-```
-
-4. Run the tests for the stdlib
-
-```bash
-$ cd compiler
-$ lein run -- -o "out" ../stdlib/src ../stdlib/test
-$ ruby main.rb
 ```
