@@ -10,5 +10,6 @@
                    :plugins [[com.aphyr/prism "0.1.1"]]}}
 
   :source-paths ["src/clj" "src/jvm"]
+  :test-paths   ["test/clj" "test/jvm"]
 
   )

@@ -5,7 +5,7 @@
             [clojure.lang.hash            :refer [hash]]
             [clojure.lang.meta            :refer [meta with-meta]]
             [clojure.lang.named           :refer [name namespace]]
-            [clojure.lang.operators       :refer [= not not= == not===]]
+            [clojure.lang.operators       :refer [= not not= == not==]]
             [clojure.lang.platform.object :refer [identical?]]
             [clojure.lang.symbol          :refer [symbol]]
             [clojure.lang.keyword         :refer :all]))
@@ -110,8 +110,8 @@
     (is (= (keyword "kwd") (symbol "kwd"))))
 
   (testing "but not strictly equal to symbols"
-    (is (not=== (symbol "kwd") (keyword "kwd")))
-    (is (not=== (keyword "kwd") (symbol "kwd"))))
+    (is (not== (symbol "kwd") (keyword "kwd")))
+    (is (not== (keyword "kwd") (symbol "kwd"))))
 
   (testing "loosely equal to vars")
 

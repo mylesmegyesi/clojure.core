@@ -3,7 +3,7 @@
   (:require [clojure.lang.hash             :refer [Hash hash]]
             [clojure.lang.meta             :refer [Meta]]
             [clojure.lang.named            :refer [Named name namespace]]
-            [clojure.lang.operators        :refer [==]]
+            [clojure.lang.operators        :refer [=]]
             [clojure.lang.platform.object  :refer [instance?]]
             [clojure.lang.platform.keyword :refer [platform-keyword-methods]]
             [clojure.lang.symbol           :refer [symbol]]))
