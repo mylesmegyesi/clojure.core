@@ -1,8 +1,9 @@
 (ns clojure.lang.namespace
-  (:refer-clojure :only [defn defn- assoc get-in if-let str let assoc-in atom or reduce fn val key -> not select-keys doseq when-not contains? format apply dissoc get set concat keys update-in])
+  (:refer-clojure :only [defn defn- assoc get-in if-let let assoc-in atom or reduce fn val key -> not select-keys doseq when-not contains? format apply dissoc get set concat keys update-in])
   (:require [clojure.lang.equivalence :refer [=]]
             [clojure.lang.named       :refer [namespace name]]
             [clojure.lang.meta        :refer [meta with-meta]]
+            [clojure.lang.show        :refer [str]]
             [clojure.lang.symbol      :refer [symbol]]
             [clojure.lang.var         :refer [-alter-var-root make-var make-unbound]]))
 

@@ -1,5 +1,5 @@
 (ns clojure.lang.platform.object
-  (:refer-clojure :only [defn])
+  (:refer-clojure :only [defn reduce concat cons fn let key val])
   (:import [clojure.lang Util]))
 
 (defn instance? [cls obj]
@@ -16,3 +16,12 @@
 
 (defn hash-combine [hash1 hash2]
   (Util/hashCombine hash1 hash2))
+
+(defn expand-methods [methods]
+  (reduce
+    (fn [acc entry]
+      (let [protocol (key entry)]
+        (concat (cons protocol (val entry))
+                acc)))
+    []
+    methods))

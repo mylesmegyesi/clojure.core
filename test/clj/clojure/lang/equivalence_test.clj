@@ -1,9 +1,9 @@
-(ns clojure.lang.equals-test
+(ns clojure.lang.equivalence-test
   (:refer-clojure :only [constantly let])
-  (:require [clojure.test                 :refer :all]
-            [clojure.lang.equals-helper   :refer :all]
-            [clojure.lang.equals          :refer :all]
-            [clojure.lang.platform.object :refer [identical?]]))
+  (:require [clojure.test                    :refer :all]
+            [clojure.lang.equivalence-helper :refer :all]
+            [clojure.lang.equivalence        :refer :all]
+            [clojure.lang.platform.object    :refer [identical?]]))
 
 (def always-equal (constantly true))
 (def always-inequal (constantly false))

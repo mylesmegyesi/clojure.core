@@ -1,5 +1,5 @@
 (ns clojure.lang.platform.equivalence
-  (:refer-clojure :only [defmacro defprotocol deftype extend-protocol extend-type defmulti defmethod fn defn list ->])
+  (:refer-clojure :only [defmacro defprotocol deftype extend-protocol extend-type defmulti defmethod fn defn list -> update-in cons])
   (:require [clojure.lang.iequivalence    :refer [IEquivalence]]
             [clojure.lang.platform.object :refer [type instance?]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
@@ -255,19 +255,23 @@
 (defmethod ops-combine [BigDecimalOps BigIntegerOps] [ops1 ops2] ops1)
 (defmethod ops-combine [BigDecimalOps BigDecimalOps] [ops1 ops2] ops1)
 
-(extend-protocol Equivalence
+(extend-protocol IEquivalence
   Object
-  (equivalent? [this other]
+  (-equivalent? [this other]
     (.equals this other))
 
   Number
-  (equivalent? [this other]
+  (-equivalent? [this other]
     (if (instance? Number other)
       (-> (ops-combine (make-ops this) (make-ops other))
         (ops-equals this other))
       false)))
 
-(defn platform-equals-method []
-  ['Object
-   (list 'equals ['this 'other]
-         (list 'clojure.lang.iequivalence/-equivalent? 'this 'other))])
+(defn platform-equals-method [methods]
+  (update-in methods
+             ['Object]
+             (fn [old]
+               (cons
+                 (list 'equals ['this 'other]
+                       (list 'clojure.lang.iequivalence/-equivalent? 'this 'other))
+                 old))))

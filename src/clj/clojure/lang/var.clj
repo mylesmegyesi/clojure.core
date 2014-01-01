@@ -1,22 +1,23 @@
 (ns clojure.lang.var
-  (:refer-clojure :only [deftype defn str reset!])
-  (:require [clojure.lang.meta  :refer [Meta]]
-            [clojure.lang.named :refer [Named]]))
+  (:refer-clojure :only [deftype defn reset!])
+  (:require [clojure.lang.imeta  :refer [IMeta]]
+            [clojure.lang.inamed :refer [INamed]]
+            [clojure.lang.show   :refer [str]]))
 
 (deftype Unbound [var]
-  Meta
-  (meta [this] {}))
+  IMeta
+  (-meta [this] {}))
 
 (defn make-unbound [var]
   (Unbound. var))
 
 (deftype Var [meta ns sym root]
-  Meta
-  (meta [this] meta)
+  IMeta
+  (-meta [this] meta)
 
-  Named
-  (namespace [this] (str ns))
-  (name      [this] (str sym)))
+  INamed
+  (-namespace [this] (str ns))
+  (-name      [this] (str sym)))
 
 (defn make-var [meta ns sym root]
   (Var. meta ns sym root))

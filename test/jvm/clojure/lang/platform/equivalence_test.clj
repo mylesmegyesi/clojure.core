@@ -1,7 +1,7 @@
 (ns clojure.lang.platform.equivalence-test
   (:refer-clojure :only [defmacro])
-  (:require [clojure.test        :refer :all]
-            [clojure.lang.equals :refer [= not=]])
+  (:require [clojure.test             :refer :all]
+            [clojure.lang.equivalence :refer [= not=]])
   (:import [java.lang Byte Short Integer Float Double]
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]))

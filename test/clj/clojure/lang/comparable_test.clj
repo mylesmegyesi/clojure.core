@@ -1,8 +1,8 @@
-(ns clojure.lang.compare-test
+(ns clojure.lang.comparable-test
   (:refer-clojure :only [])
-  (:require [clojure.test         :refer :all]
-            [clojure.lang.compare :refer [compare]]
-            [clojure.lang.equals  :refer [=]]))
+  (:require [clojure.test             :refer :all]
+            [clojure.lang.comparable  :refer [compare]]
+            [clojure.lang.equivalence :refer [=]]))
 
 (deftest compare-test
   (testing "returns -1 if lhs is nil"
