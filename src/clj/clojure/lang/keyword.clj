@@ -1,28 +1,47 @@
 (ns clojure.lang.keyword
-  (:refer-clojure :only [defmacro deftype defn + let list* list str compare zero?])
-  (:require [clojure.lang.hash             :refer [Hash hash]]
-            [clojure.lang.meta             :refer [Meta]]
-            [clojure.lang.named            :refer [Named name namespace]]
-            [clojure.lang.operators        :refer [=]]
-            [clojure.lang.platform.object  :refer [instance?]]
-            [clojure.lang.platform.keyword :refer [platform-keyword-methods]]
-            [clojure.lang.symbol           :refer [symbol]]))
+  (:refer-clojure :only [deftype defmacro defn defn- + let list* list str zero? concat])
+  (:require [clojure.lang.compare              :refer [compare]]
+            [clojure.lang.equals               :refer [=]]
+            [clojure.lang.equivalence          :refer [Equivalence equivalent?]]
+            [clojure.lang.hash                 :refer [Hash hash]]
+            [clojure.lang.meta                 :refer [Meta]]
+            [clojure.lang.named                :refer [Named name namespace]]
+            [clojure.lang.ordered              :refer [Ordered compare-to]]
+            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
+            [clojure.lang.platform.hash        :refer [platform-hash-method]]
+            [clojure.lang.platform.object      :refer [instance? hash-combine]]
+            [clojure.lang.platform.ordered     :refer [platform-compare-to-method]]
+            [clojure.lang.symbol               :refer [symbol]]))
+
+(defn- platform-keyword-methods []
+  (concat
+    (platform-compare-to-method)
+    (platform-hash-method)
+    (platform-equals-method)))
 
 (defmacro defkeyword [type]
-  (list* 'deftype type ['ns 'name 'str 'hash 'meta 'sym]
-        'Hash
-        (list 'hash ['this] 'hash)
+  (list*
+    'deftype type ['ns 'name 'str 'hash 'meta 'sym]
 
-        'Meta
-        (list 'meta ['this] 'meta)
-        (list 'with-meta ['this 'new-meta]
-              (list 'new type 'ns 'name 'str 'hash 'new-meta 'sym))
+    'Ordered
+    (list 'compare-to ['this 'other] ('compare 'sym 'other))
 
-        'Named
-         (list 'name ['this] 'name)
-         (list 'namespace ['this] 'ns)
+    'Equivalence
+    (list 'equivalent? ['this 'other] ('= 'sym 'other))
 
-         (platform-keyword-methods)))
+    'Hash
+    (list 'hash ['this] 'hash)
+
+    'Meta
+    (list 'meta ['this] 'meta)
+    (list 'with-meta ['this 'new-meta]
+          (list 'new type 'ns 'name 'str 'hash 'new-meta 'sym))
+
+    'Named
+    (list 'name ['this] 'name)
+    (list 'namespace ['this] 'ns)
+
+    (platform-keyword-methods)))
 
 (defkeyword Keyword)
 

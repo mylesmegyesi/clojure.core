@@ -1,11 +1,11 @@
 (ns clojure.lang.keyword-test
   (:refer-clojure :only [let + str defmacro])
   (:require [clojure.test                 :refer :all]
+            [clojure.lang.equals          :refer [= not not= == not==]]
             [clojure.lang.assertions      :refer :all]
             [clojure.lang.hash            :refer [hash]]
             [clojure.lang.meta            :refer [meta with-meta]]
             [clojure.lang.named           :refer [name namespace]]
-            [clojure.lang.operators       :refer [= not not= == not==]]
             [clojure.lang.platform.object :refer [identical?]]
             [clojure.lang.symbol          :refer [symbol]]
             [clojure.lang.keyword         :refer :all]))

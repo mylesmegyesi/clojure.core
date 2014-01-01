@@ -13,3 +13,6 @@
 
 (defn type [obj]
   (.getClass obj))
+
+(defn hash-combine [hash1 hash2]
+  (Util/hashCombine hash1 hash2))
