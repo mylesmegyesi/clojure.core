@@ -1,5 +1,5 @@
 (ns clojure.lang.keyword
-  (:refer-clojure :only [deftype defmacro defn defn- + let list* list zero? concat ->])
+  (:refer-clojure :only [deftype defmacro defn defn- + let list* list concat ->])
   (:require [clojure.lang.comparable           :refer [compare]]
             [clojure.lang.equivalence          :refer [=]]
             [clojure.lang.hash                 :refer [hash]]
