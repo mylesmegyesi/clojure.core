@@ -1,7 +1,10 @@
 (ns clojure.lang.named
-  (:refer-clojure :only [defprotocol]))
+  (:refer-clojure :only [defn])
+  (:require [clojure.lang.inamed :refer [-name -namespace]]
+            [clojure.lang.platform.named]))
 
-(defprotocol Named
-  (name [this])
-  (namespace [this]))
+(defn name [obj]
+  (-name obj))
 
+(defn namespace [obj]
+  (-namespace obj))

@@ -1,9 +1,7 @@
 (ns clojure.lang.hash
-  (:refer-clojure :only [defprotocol extend-type fn]))
+  (:refer-clojure :only [defn])
+  (:require [clojure.lang.ihash :refer [-hash]]
+            [clojure.lang.platform.hash]))
 
-(defprotocol Hash
-  (hash [this]))
-
-(extend-type nil
-  Hash
-  (hash [this] 0))
+(defn hash [obj]
+  (-hash obj))

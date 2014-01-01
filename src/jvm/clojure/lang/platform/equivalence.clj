@@ -1,6 +1,6 @@
 (ns clojure.lang.platform.equivalence
   (:refer-clojure :only [defmacro defprotocol deftype extend-protocol extend-type defmulti defmethod fn defn list ->])
-  (:require [clojure.lang.equivalence     :refer [Equivalence]]
+  (:require [clojure.lang.iequivalence    :refer [IEquivalence]]
             [clojure.lang.platform.object :refer [type instance?]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
@@ -270,4 +270,4 @@
 (defn platform-equals-method []
   ['Object
    (list 'equals ['this 'other]
-         (list 'equivalent? 'this 'other))])
+         (list 'clojure.lang.iequivalence/-equivalent? 'this 'other))])

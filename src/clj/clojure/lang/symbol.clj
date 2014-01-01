@@ -1,16 +1,17 @@
 (ns clojure.lang.symbol
-  (:refer-clojure :only [defmacro deftype satisfies? defn defn- str let list* list and nil? declare cond last butlast first count concat zero?])
-  (:require [clojure.lang.ordered              :refer [Ordered compare-to]]
-            [clojure.lang.compare              :refer [compare]]
-            [clojure.lang.equals               :refer [= not not=]]
-            [clojure.lang.equivalence          :refer [Equivalence equivalent?]]
-            [clojure.lang.hash                 :refer [Hash hash]]
-            [clojure.lang.meta                 :refer [Meta]]
-            [clojure.lang.named                :refer [Named name namespace]]
-            [clojure.lang.platform.hash        :refer [platform-hash-method]]
+  (:refer-clojure :only [defmacro deftype satisfies? defn defn- str let list* list and nil? declare cond last butlast first count concat])
+  (:require [clojure.lang.equivalence          :refer [= not]]
+            [clojure.lang.hash                 :refer [hash]]
+            [clojure.lang.icomparable          :refer [IComparable]]
+            [clojure.lang.iequivalence         :refer [IEquivalence]]
+            [clojure.lang.ihash                :refer [IHash]]
+            [clojure.lang.imeta                :refer [IMeta]]
+            [clojure.lang.inamed               :refer [INamed]]
+            [clojure.lang.named                :refer [name namespace]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.platform.ordered     :refer [platform-compare-to-method]]
+            [clojure.lang.platform.hash        :refer [platform-hash-method]]
             [clojure.lang.platform.object      :refer [instance? hash-combine]]
+            [clojure.lang.platform.ordered     :refer [platform-compare-to-method]]
             [clojure.string]))
 
 (defn- platform-symbol-methods []
@@ -47,7 +48,7 @@
         (nil? y-ns) 1
         :else
         (let [num (compare x-ns y-ns)]
-          (if (zero? num)
+          (if (= num 0)
             (compare x-name y-name)
             num))))))
 
@@ -55,24 +56,25 @@
   (list*
     'deftype type ['ns 'name '-str '-hash 'meta]
 
-    'Equivalence
-    (list 'equivalent? ['this 'other]
+    'IEquivalence
+    (list '-equivalent? ['this 'other]
           (list 'equiv? 'this 'other))
 
-    'Hash
-    (list 'hash ['this] '-hash)
+    'IHash
+    (list '-hash ['this] '-hash)
 
-    'Meta
-    (list 'meta ['this] 'meta)
-    (list 'with-meta ['this 'new-meta]
+    'IMeta
+    (list '-meta ['this] 'meta)
+    (list '-with-meta ['this 'new-meta]
           (list 'new type 'ns 'name '-str '-hash 'new-meta))
 
-    'Named
-    (list 'name ['this] 'name)
-    (list 'namespace ['this] 'ns)
+    'INamed
+    (list '-name ['this] 'name)
+    (list '-namespace ['this] 'ns)
 
-    'Ordered
-    (list 'compare-to ['this 'other] (list 'named-compare 'this 'other))
+    'IComparable
+    (list '-compare-to ['this 'other]
+          (list 'named-compare 'this 'other))
 
     (platform-symbol-methods)))
 
