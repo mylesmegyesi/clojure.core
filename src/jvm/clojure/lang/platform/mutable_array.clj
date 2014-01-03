@@ -1,4 +1,4 @@
-(ns clojure.lang.platform.array
+(ns clojure.lang.platform.mutable-array
   (:refer-clojure :only [defn let loop inc prn int])
   (:require [clojure.lang.platform.equivalence :refer [->int]])
   (:import [java.lang.reflect Array]
