@@ -4,7 +4,6 @@
 (defprotocol IPersistentMap
   (-assoc     [this k v])
   (-contains? [this k])
-  (-count     [this])
   (-dissoc    [this k])
   (-lookup    [this k])
   (-seq       [this]))
