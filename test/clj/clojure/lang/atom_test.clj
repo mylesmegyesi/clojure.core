@@ -1,9 +1,9 @@
 (ns clojure.lang.atom-test
-  (:refer-clojure :only [and first let -])
+  (:refer-clojure :only [str and apply assoc fn defn dorun dotimes first flatten let map nth partition pcalls range rand-int repeat sort vec - /])
   (:require [clojure.test             :refer :all]
             [clojure.lang.atom        :refer :all]
             [clojure.lang.deref       :refer [deref]]
-            [clojure.lang.equivalence :refer [not =]]))
+            [clojure.lang.equivalence :refer [not not= =]]))
 
 (deftest atom-test
   (testing "creates an atom which can be dereferenced"
@@ -47,4 +47,30 @@
       (is (and (= -3 (swap! atm - 1 2 3 4))
                (= -3 (deref atm))))))
 
+  (defn swap-items-in [atm v1 v2 i1 i2]
+    (swap! atm
+      (fn [integer-vecs]
+        (let [temp ((integer-vecs v1) i1)
+              updated-integer-vecs (assoc integer-vecs v1
+                                     (assoc (integer-vecs v1) i1 ((integer-vecs v2) i2)))]
+          (assoc updated-integer-vecs v2
+            (assoc (updated-integer-vecs v2) i2 temp))))))
+
+  (testing "swap! is an atomic operation"
+    (let [distinct-items 50
+          vec-size 10
+          integer-vecs (vec (map vec (partition vec-size (range distinct-items))))
+          atm (atom integer-vecs)
+          thread-count 10
+          iterations-per-thread 100]
+      (dorun
+        (apply pcalls
+          (repeat thread-count
+            #(dotimes [_ iterations-per-thread]
+              (let [v1 (rand-int (/ distinct-items vec-size))
+                    v2 (rand-int (/ distinct-items vec-size))
+                    i1 (rand-int vec-size)
+                    i2 (rand-int vec-size)]
+                (swap-items-in atm v1 v2 i1 i2))))))
+      (is (= (range distinct-items) (sort (flatten (deref atm)))))))
   )

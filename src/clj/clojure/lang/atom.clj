@@ -1,5 +1,5 @@
 (ns clojure.lang.atom
-  (:refer-clojure :only [apply defn deftype let into])
+  (:refer-clojure :only [apply defn deftype let loop into])
   (:require [clojure.lang.iatom                  :refer [IAtom -compare-and-set! -reset! -swap!]]
             [clojure.lang.ideref                 :refer [IDeref]]
             [clojure.lang.equivalence            :refer [=]]
@@ -13,9 +13,9 @@
 
 (defn swap!
   ([atm f] (-swap! atm f []))
-  ([atm f arg] (-swap! atm f [arg]))
-  ([atm f arg1 arg2] (-swap! atm f [arg1 arg2]))
-  ([atm f arg1 arg2 & args] (-swap! atm f (into [arg1 arg2] args))))
+  ([atm f x] (-swap! atm f [x]))
+  ([atm f x y] (-swap! atm f [x y]))
+  ([atm f x y & args] (-swap! atm f (into [x y] args))))
 
 (deftype Atom [-state]
   IDeref
@@ -31,11 +31,13 @@
       new-state))
 
   (-swap! [this f args]
-    (let [entity (ent/get-entity -state)
-          arg-list (into [entity] args)
-          updated-entity (apply f arg-list)]
-      (if (ent/compare-and-set-entity! -state entity updated-entity)
-        updated-entity)))
+    (loop []
+      (let [entity (ent/get-entity -state)
+            arg-list (into [entity] args)
+            updated-entity (apply f arg-list)]
+        (if (ent/compare-and-set-entity! -state entity updated-entity)
+          updated-entity
+          (recur)))))
 
   )
 
