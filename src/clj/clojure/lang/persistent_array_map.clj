@@ -53,9 +53,10 @@
       (arr/array-set! new-array 1 v)
       (make-array-map new-array new-size (/ new-size 2)))))
 
-(defn- array-map-lookup [arr size key]
-  (when-let [idx (index-of arr size key)]
-    (arr/array-get arr (inc idx))))
+(defn- array-map-lookup [arr size key not-found]
+  (if-let [idx (index-of arr size key)]
+    (arr/array-get arr (inc idx))
+    not-found))
 
 (defn- array-map-equals? [-seq -count other]
   (if (= -count (count other))
@@ -140,8 +141,8 @@
     (list '-dissoc ['this 'k]
           (list 'array-map-dissoc 'this '-arr '-size '-count 'k))
 
-    (list '-lookup ['this 'key]
-          (list 'array-map-lookup '-arr '-size 'key))
+    (list '-lookup ['this 'k 'not-found]
+          (list 'array-map-lookup '-arr '-size 'k 'not-found))
 
     (list '-seq ['this] '-seq)
 

@@ -136,6 +136,10 @@
     (let [m1 (array-map :k1 1)]
       (is (not (contains? m1 1)))))
 
+  (testing "returns a provided not-found value when using get"
+    (let [m1 (array-map)]
+      (is (= "not found" (get m1 :not-a-key "not found")))))
+
   )
 
 (deftest map-seq-test
