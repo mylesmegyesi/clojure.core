@@ -29,9 +29,9 @@
 
 (extend-type Short
   NumberCoercions
-  (->short [this] this)
-  (->int   [this] (.intValue this))
-  (->long  [this] (.longValue this))
+  (->short  [this] this)
+  (->int    [this] (.intValue this))
+  (->long   [this] (.longValue this))
   (->float  [this] (.floatValue this))
   (->double [this] (.doubleValue this))
   (->bigint [this] (BigInteger. (.toString this)))
@@ -73,7 +73,7 @@
 
 (extend-type Float
   NumberCoercions
-  (->float [this] this)
+  (->float  [this] this)
   (->double [this] (.doubleValue this))
   (->bigdec [this] (BigDecimal. (.doubleValue this))))
 
