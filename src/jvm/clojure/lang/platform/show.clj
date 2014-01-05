@@ -3,13 +3,13 @@
   (:require [clojure.lang.ishow :refer [IShow -show]])
   (:import [java.lang StringBuilder]))
 
-(defn platform-show-method [methods]
+(defn platform-show-method [methods init-macro]
   (update-in methods
              ['Object]
              (fn [old]
                (cons
                  (list 'toString ['this]
-                       (list 'clojure.lang.ishow/-show 'this))
+                       (list init-macro 'this))
                  old))))
 
 (extend-protocol IShow
@@ -19,6 +19,6 @@
 
 (defmacro build-string [strs]
   `(loop [sb# (StringBuilder. "") strs# ~strs]
-    (if (empty? strs#)
-      (.toString sb#)
-      (recur (.append sb# (-show (first strs#))) (rest strs#)))))
+     (if (empty? strs#)
+       (.toString sb#)
+       (recur (.append sb# (-show (first strs#))) (rest strs#)))))

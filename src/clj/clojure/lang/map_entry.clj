@@ -1,7 +1,6 @@
 (ns clojure.lang.map-entry
-  (:refer-clojure :refer [deftype defmacro defn defn- and list list* ->])
+  (:refer-clojure :refer [deftype defmacro defn defn- let and list list* ->])
   (:require [clojure.lang.equivalence          :refer [=]]
-            [clojure.lang.iequivalence         :refer [IEquivalence]]
             [clojure.lang.imap-entry           :refer [IMapEntry -key -val]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
             [clojure.lang.platform.object      :refer [expand-methods]]))
@@ -12,13 +11,21 @@
 (defn val [entry]
   (-val entry))
 
-(defn- map-entry-equals? [-key -val other]
-  (and (= -key (key other))
-       (= -val (val other))))
+(defmacro map-entry-equals?
+  {:private true}
+  [k v other]
+  `(let [other# ~other]
+     (and (= ~k (key other#))
+          (= ~v (val other#)))))
+
+(defmacro map-entry-equals?-init
+  {:private true}
+  [this-arg other-arg]
+  (list 'map-entry-equals? 'k 'v other-arg))
 
 (def platform-map-entry-methods
   (-> {}
-    platform-equals-method
+    (platform-equals-method 'map-entry-equals?-init)
     expand-methods))
 
 (defmacro defmapentry [type]
@@ -28,10 +35,6 @@
     'IMapEntry
     (list '-key ['this] 'k)
     (list '-val ['this] 'v)
-
-    'IEquivalence
-    (list '-equivalent? ['this 'other]
-      (list 'map-entry-equals? 'k 'v 'other))
 
   platform-map-entry-methods))
 

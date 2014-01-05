@@ -1,5 +1,5 @@
 (ns clojure.lang.atom-test
-  (:refer-clojure :only [str and apply assoc fn defn dorun dotimes first flatten let map nth partition pcalls range rand-int repeat sort vec - /])
+  (:refer-clojure :only [str and apply assoc fn defn dorun dotimes first flatten let map nth partition pcalls range rand-int repeat sort vec - / * inc])
   (:require [clojure.test             :refer :all]
             [clojure.lang.atom        :refer :all]
             [clojure.lang.deref       :refer [deref]]
@@ -73,4 +73,19 @@
                     i2 (rand-int vec-size)]
                 (swap-items-in atm v1 v2 i1 i2))))))
       (is (= (range distinct-items) (sort (flatten (deref atm)))))))
+
+  (defn pinc! [atm nthreads niters]
+    (dorun (apply pcalls
+                  (repeat nthreads
+                          #(dotimes [_ niters]
+                             (swap! atm inc))))))
+
+  (testing "swap! inc"
+    (let [atm1 (atom 0)
+          atm2 (atom 0)]
+      (pinc! atm1 10 100)
+      (is (= (* 10 100) (deref atm1)))
+      (pinc! atm2 20 200)
+      (is (= (* 20 200) (deref atm2)))))
+
   )

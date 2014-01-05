@@ -2,13 +2,13 @@
   (:refer-clojure :only [extend-protocol fn defn list update-in cons])
   (:require [clojure.lang.ihash :refer [IHash]]))
 
-(defn platform-hash-method [methods]
+(defn platform-hash-method [methods init-macro]
   (update-in methods
              ['Object]
              (fn [old]
                (cons
                  (list 'hashCode ['this]
-                       (list 'clojure.lang.ihash/-hash 'this))
+                       (list init-macro 'this))
                  old))))
 
 (extend-protocol IHash

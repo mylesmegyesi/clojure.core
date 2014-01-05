@@ -2,16 +2,14 @@
   (:refer-clojure :only [defmacro declare defn defn- deftype let + - dec or loop < / inc when when-let if-let even? format list list* and bit-and nil? ->])
   (:require [clojure.lang.counted                :refer [count]]
             [clojure.lang.equivalence            :refer [= not= not]]
-            [clojure.lang.iequivalence           :refer [IEquivalence]]
             [clojure.lang.icounted               :refer [ICounted]]
-            [clojure.lang.ihash                  :refer [IHash]]
             [clojure.lang.ipersistent-map        :refer [IPersistentMap]]
             [clojure.lang.iseq                   :refer [ISeq]]
             [clojure.lang.hash                   :refer [hash]]
             [clojure.lang.map-entry              :refer [make-map-entry key val]]
             [clojure.lang.persistent-map         :refer [get seq contains?]]
             [clojure.lang.platform.hash          :refer [platform-hash-method]]
-            [clojure.lang.platform.enumerable    :refer [platform-enumerable-methods]]
+            [clojure.lang.platform.enumerable    :refer [platform-enumerable-method]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.equivalence   :refer [platform-equals-method]]
             [clojure.lang.platform.mutable-array :as    arr]
@@ -64,25 +62,32 @@
     (loop [this-seq -seq]
       (if this-seq
         (let [first-entry (first this-seq)
-              key (key first-entry)
-              val (val first-entry)]
-          (if (and (contains? other key)
-                   (= (get other key) val))
+              k (key first-entry)
+              v (val first-entry)]
+          (if (and (contains? other k)
+                   (= (get other k) v))
             (recur (next this-seq))
             false))
         true))
     false))
 
-(defn- array-map-hash [-seq]
-  (loop [entries -seq
-         acc     0]
-    (if entries
-      (let [entry (first entries)]
-        (recur
-          (next entries)
-          (+ acc (bit-and (hash (key entry))
-                          (hash (val entry))))))
-      acc)))
+(defmacro array-map-equals?-init
+  {:private true}
+  [this-arg other-arg]
+  (list 'array-map-equals? '-seq '-count other-arg))
+
+(defmacro array-map-hash
+  {:private true}
+  [-seq]
+  `(loop [entries# ~-seq
+          acc#     0]
+     (if entries#
+       (let [entry# (first entries#)]
+         (recur
+           (next entries#)
+           (+ acc# (bit-and (hash (key entry#))
+                            (hash (val entry#))))))
+       acc#)))
 
 (declare make-array-map-seq)
 
@@ -105,12 +110,17 @@
                       (arr/array-get arr (inc position)))
       arr count next-count (+ position 2))))
 
+(defmacro array-map-hash-init
+  {:private true}
+  [_]
+  (list 'array-map-hash '-seq))
+
 (def platform-array-map-methods
   (-> {}
-    platform-hash-method
+    (platform-hash-method 'array-map-hash-init)
     ;platform-show-method
-    platform-enumerable-methods
-    platform-equals-method
+    platform-enumerable-method
+    (platform-equals-method 'array-map-equals?-init)
     expand-methods))
 
 (defmacro defpersistentarraymap [type]
@@ -134,14 +144,6 @@
           (list 'array-map-lookup '-arr '-size 'key))
 
     (list '-seq ['this] '-seq)
-
-    'IEquivalence
-    (list '-equivalent? ['this 'other]
-          (list 'array-map-equals? '-seq '-count 'other))
-
-    'IHash
-    (list '-hash ['this]
-          (list 'array-map-hash '-seq))
 
     platform-array-map-methods))
 

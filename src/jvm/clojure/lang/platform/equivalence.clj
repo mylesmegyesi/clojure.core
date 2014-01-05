@@ -267,11 +267,11 @@
         (ops-equals this other))
       false)))
 
-(defn platform-equals-method [methods]
+(defn platform-equals-method [methods init-macro]
   (update-in methods
              ['Object]
              (fn [old]
                (cons
                  (list 'equals ['this 'other]
-                       (list 'clojure.lang.iequivalence/-equivalent? 'this 'other))
+                       (list init-macro 'this 'other))
                  old))))

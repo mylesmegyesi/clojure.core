@@ -23,11 +23,13 @@
 (defn new-seq-iterator [-seq-atom]
   (SeqIterator. -seq-atom))
 
-(defn platform-enumerable-methods [methods]
+(defn platform-enumerable-method [methods]
   (update-in methods
              ['Iterable]
              (fn [old]
                (cons
                  (list 'iterator ['this]
-                       (list 'clojure.lang.platform.enumerable/new-seq-iterator (list 'clojure.core/atom '-seq)))
+                       (list 'clojure.lang.platform.enumerable/new-seq-iterator
+                             (list 'clojure.core/atom
+                                   (list 'clojure.lang.persistent-map/seq 'this))))
                  old))))

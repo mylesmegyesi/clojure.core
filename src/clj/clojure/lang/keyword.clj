@@ -3,12 +3,8 @@
   (:require [clojure.lang.comparable           :refer [compare]]
             [clojure.lang.equivalence          :refer [=]]
             [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.icomparable          :refer [IComparable]]
-            [clojure.lang.iequivalence         :refer [IEquivalence]]
-            [clojure.lang.ihash                :refer [IHash]]
             [clojure.lang.imeta                :refer [IMeta]]
             [clojure.lang.inamed               :refer [INamed]]
-            [clojure.lang.ishow                :refer [IShow]]
             [clojure.lang.named                :refer [name namespace]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
             [clojure.lang.platform.hash        :refer [platform-hash-method]]
@@ -18,40 +14,44 @@
             [clojure.lang.show                 :refer [str]]
             [clojure.lang.symbol               :refer [symbol]]))
 
+(defmacro keyword-compare-init
+  {:private true}
+  [_ other-arg]
+  (list 'compare '-sym other-arg))
+
+(defmacro keyword-hash-init
+  {:private true}
+  [_] '-hash-code)
+
+(defmacro keyword-str-init
+  {:private true}
+  [_] '-str)
+
+(defmacro keyword-equals?-init
+  {:private true}
+  [_ other-arg]
+  (list '= '-sym other-arg))
+
 (def platform-keyword-methods
   (-> {}
-    platform-compare-to-method
-    platform-hash-method
-    platform-show-method
-    platform-equals-method
+    (platform-compare-to-method 'keyword-compare-init)
+    (platform-hash-method 'keyword-hash-init)
+    (platform-show-method 'keyword-str-init)
+    (platform-equals-method 'keyword-equals?-init)
     expand-methods))
 
 (defmacro defkeyword [type]
   (list*
-    'deftype type ['ns 'name '-str 'hash 'meta 'sym]
-
-    'IComparable
-    (list '-compare-to ['this 'other]
-          (list 'compare 'sym 'other))
-
-    'IEquivalence
-    (list '-equivalent? ['this 'other]
-          (list '= 'sym 'other))
-
-    'IHash
-    (list '-hash ['this] 'hash)
+    'deftype type ['-ns '-name '-str '-hash-code '-meta '-sym]
 
     'IMeta
-    (list '-meta ['this] 'meta)
+    (list '-meta ['this] '-meta)
     (list '-with-meta ['this 'new-meta]
-          (list 'new type 'ns 'name '-str 'hash 'new-meta 'sym))
+          (list 'new type '-ns '-name '-str '-hash-code 'new-meta '-sym))
 
     'INamed
-    (list '-name ['this] 'name)
-    (list '-namespace ['this] 'ns)
-
-    'IShow
-    (list '-show ['this] '-str)
+    (list '-name ['this] '-name)
+    (list '-namespace ['this] '-ns)
 
     platform-keyword-methods))
 
@@ -66,5 +66,5 @@
      (keyword (namespace sym) (name sym))))
   ([ns name]
    (let [sym (symbol ns name)
-         hash (+ (hash sym) 0x9e3779b9)]
-     (Keyword. ns name (str ":" sym) hash {} sym))))
+         hash-code (hash (+ (hash sym) 0x9e3779b9))]
+     (Keyword. ns name (str ":" sym) hash-code {} sym))))

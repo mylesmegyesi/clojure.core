@@ -20,7 +20,7 @@
     (let [kwd (keyword "kwd")]
       (is (= nil (namespace kwd)))))
 
-  (testing "has a hash code similar to it symbol representation"
+  (testing "has a hash code similar to its symbol representation"
     (is (= (hash (keyword "kwd"))
            (+ (hash (symbol "kwd")) 0x9e3779b9)))
     (is (= (hash (keyword "kwd1"))
@@ -30,8 +30,10 @@
     (is (= "the-ns" (namespace (keyword "the-ns" "kwd")))))
 
   (testing "uses the namespace to create the hash"
-    (is (= (hash (keyword "the-ns" "kwd"))
-           (+ (hash (symbol "the-ns" "kwd")) 0x9e3779b9))))
+    (let [kwd (keyword "the-ns" "kwd")
+          sym (symbol "the-ns" "kwd")]
+    (is (= (hash kwd)
+           (hash (+ (hash sym) 0x9e3779b9))))))
 
   (testing "creates a keyword with a namespace-qualified name"
     (let [kwd (keyword "the-ns/kwd")]
