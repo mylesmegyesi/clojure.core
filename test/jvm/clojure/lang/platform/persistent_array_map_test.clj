@@ -1,11 +1,12 @@
 (ns clojure.lang.platform.persistent-array-map-test
   (:refer-clojure :only [let])
   (:require [clojure.test                      :refer :all]
-            [clojure.lang.equivalence          :refer [not =]]
+            [clojure.lang.comparison           :refer [=]]
             [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.seq                  :refer [first next]]
+            [clojure.lang.logical              :refer [not]]
             [clojure.lang.persistent-map       :refer [seq]]
-            [clojure.lang.persistent-array-map :refer [array-map]])
+            [clojure.lang.persistent-array-map :refer [array-map]]
+            [clojure.lang.seq                  :refer [first next]])
   (:import [java.util NoSuchElementException]))
 
 (deftest platform-equals-test

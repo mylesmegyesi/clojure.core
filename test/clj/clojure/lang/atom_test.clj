@@ -1,9 +1,10 @@
 (ns clojure.lang.atom-test
   (:refer-clojure :only [str and apply assoc fn defn dorun dotimes first flatten let map nth partition pcalls range rand-int repeat sort vec - / * inc])
-  (:require [clojure.test             :refer :all]
-            [clojure.lang.atom        :refer :all]
-            [clojure.lang.deref       :refer [deref]]
-            [clojure.lang.equivalence :refer [not not= =]]))
+  (:require [clojure.test            :refer :all]
+            [clojure.lang.atom       :refer :all]
+            [clojure.lang.comparison :refer [not= =]]
+            [clojure.lang.deref      :refer [deref]]
+            [clojure.lang.logical    :refer [not]]))
 
 (deftest atom-test
   (testing "creates an atom which can be dereferenced"

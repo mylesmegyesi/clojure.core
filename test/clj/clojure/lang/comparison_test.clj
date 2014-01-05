@@ -1,9 +1,28 @@
-(ns clojure.lang.equivalence-test
-  (:refer-clojure :only [constantly let])
-  (:require [clojure.test                    :refer :all]
-            [clojure.lang.equivalence-helper :refer :all]
-            [clojure.lang.equivalence        :refer :all]
-            [clojure.lang.platform.object    :refer [identical?]]))
+(ns clojure.lang.comparison-test
+  (:refer-clojure :only [deftype constantly let])
+  (:require [clojure.test                   :refer :all]
+            [clojure.lang.comparison        :refer :all]
+            [clojure.lang.comparison-helper :refer :all]
+            [clojure.lang.icomparable       :refer [IComparable]]
+            [clojure.lang.logical           :refer [not]]
+            [clojure.lang.platform.object   :refer [identical?]]))
+
+(deftype CApple []
+  IComparable
+  (-compare-to [this other]
+    10))
+
+(deftest compare-test
+  (testing "returns -1 if lhs is nil"
+    (is (= -1 (compare nil :something))))
+
+  (testing "returns 1 if rhs is nil"
+    (is (= 1 (compare :something nil))))
+
+  (testing "calls -compare-to on the lhs"
+    (is (= 10 (compare (CApple.) :something))))
+
+  )
 
 (def always-equal (constantly true))
 (def always-inequal (constantly false))
@@ -70,12 +89,3 @@
       (is (== item2 item1 item4 item5))))
 
   )
-
-(deftest not-test
-  (testing "returns true if falsy"
-    (is (= true (not false)))
-    (is (= true (not nil))))
-
-  (testing "returns false if truthy"
-    (is (= false (not true)))
-    (is (= false (not (new-apple nil nil))))))

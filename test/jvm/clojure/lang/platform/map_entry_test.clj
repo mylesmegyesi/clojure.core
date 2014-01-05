@@ -1,7 +1,7 @@
 (ns clojure.lang.platform.map-entry-test
   (:refer-clojure :only [let])
-  (:require [clojure.test :refer :all]
-            [clojure.lang.map-entry   :refer [make-map-entry]]))
+  (:require [clojure.test           :refer :all]
+            [clojure.lang.map-entry :refer [make-map-entry]]))
 
 (deftest map-entry-platform-test
 

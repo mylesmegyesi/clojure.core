@@ -2,9 +2,10 @@
   (:refer-clojure :only [let + defmacro])
   (:require [clojure.test                 :refer :all]
             [clojure.lang.assertions      :refer :all]
-            [clojure.lang.equivalence     :refer [= not not= == not==]]
+            [clojure.lang.comparison      :refer [= not= == not==]]
             [clojure.lang.hash            :refer [hash]]
             [clojure.lang.keyword         :refer :all]
+            [clojure.lang.logical         :refer [not]]
             [clojure.lang.meta            :refer [meta with-meta]]
             [clojure.lang.named           :refer [name namespace]]
             [clojure.lang.platform.object :refer [identical?]]

@@ -1,8 +1,9 @@
 (ns clojure.lang.platform.symbol-test
   (:refer-clojure :only [let])
   (:require [clojure.test             :refer :all]
+            [clojure.lang.comparison  :refer [=]]
             [clojure.lang.hash        :refer [hash]]
-            [clojure.lang.equivalence :refer [not =]]
+            [clojure.lang.logical     :refer [not]]
             [clojure.lang.symbol      :refer [symbol]]))
 
 (deftest platform-equals-test

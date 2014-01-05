@@ -1,13 +1,12 @@
 (ns clojure.lang.symbol
   (:refer-clojure :only [defmacro deftype satisfies? defn defn- let list* list and nil? cond last butlast first count ->])
-  (:require [clojure.lang.comparable           :refer [compare]]
-            [clojure.lang.equivalence          :refer [= not]]
+  (:require [clojure.lang.comparison           :refer [compare =]]
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.imeta                :refer [IMeta]]
             [clojure.lang.inamed               :refer [INamed]]
+            [clojure.lang.logical              :refer [not]]
             [clojure.lang.named                :refer [name namespace]]
-            [clojure.lang.platform.comparable  :refer [platform-compare-to-method]]
-            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
+            [clojure.lang.platform.comparison  :refer [platform-compare-to-method platform-equals-method]]
             [clojure.lang.platform.hash        :refer [platform-hash-method]]
             [clojure.lang.platform.object      :refer [instance? expand-methods hash-combine]]
             [clojure.lang.platform.show        :refer [platform-show-method]]

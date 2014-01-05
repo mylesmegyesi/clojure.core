@@ -2,7 +2,7 @@
   (:refer-clojure :only [apply defn deftype let loop into])
   (:require [clojure.lang.iatom                  :refer [IAtom -compare-and-set! -reset! -swap!]]
             [clojure.lang.ideref                 :refer [IDeref]]
-            [clojure.lang.equivalence            :refer [=]]
+            [clojure.lang.comparison             :refer [=]]
             [clojure.lang.platform.atomic-entity :as    ent]))
 
 (defn compare-and-set! [atm old-state new-state]

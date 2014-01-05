@@ -1,14 +1,14 @@
-(ns clojure.lang.platform.equivalence-test
+(ns clojure.lang.platform.comparison-test
   (:refer-clojure :only [defmacro])
-  (:require [clojure.test             :refer :all]
-            [clojure.lang.equivalence :refer [= not=]])
+  (:require [clojure.test            :refer :all]
+            [clojure.lang.comparison :refer [= not=]])
   (:import [java.lang Byte Short Integer Float Double]
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]))
 
 (defmacro number-equality-test [neg-one zero one]
   `(do
-    (testing "equality with another Byte"
+    (testing "equality with a Byte"
       (is (= ~neg-one (.byteValue (Byte. "-1"))))
       (is (= ~zero (Byte. "0")))
       (is (not= ~one :one))
@@ -26,11 +26,23 @@
       (is (not= ~one :one))
       (is (not= ~one (Integer. "2"))))
 
+    (testing "equality with an AtomicInteger"
+      (is (= ~neg-one (.intValue (AtomicInteger. (Integer. "-1")))))
+      (is (= ~zero (AtomicInteger. (Integer. "0"))))
+      (is (not= ~one :one))
+      (is (not= ~one (AtomicInteger. (Integer. "2")))))
+
     (testing "equality with a Long"
       (is (= ~neg-one (.longValue (Long. "-1"))))
       (is (= ~zero (Long. "0")))
       (is (not= ~one :one))
       (is (not= ~one (Long. "2"))))
+
+    (testing "equality with an AtomicLong"
+      (is (= ~neg-one (.get (AtomicLong. (Long. "-1")))))
+      (is (= ~zero (AtomicLong. (Long. "0"))))
+      (is (not= ~one :one))
+      (is (not= ~one (AtomicLong. (Long. "2")))))
 
     (testing "equality with a Float"
       (is (= ~neg-one (.floatValue (Float. "-1.0"))))

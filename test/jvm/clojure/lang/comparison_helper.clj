@@ -1,4 +1,4 @@
-(ns clojure.lang.equivalence-helper
+(ns clojure.lang.comparison-helper
   (:refer-clojure :only [deftype defn]))
 
 (deftype Apple [equals-fn compare-fn]
