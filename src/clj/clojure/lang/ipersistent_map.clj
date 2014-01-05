@@ -5,5 +5,5 @@
   (-assoc     [this k v])
   (-contains? [this k])
   (-dissoc    [this k])
-  (-lookup    [this k])
+  (-lookup    [this k not-found])
   (-seq       [this]))

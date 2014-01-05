@@ -11,8 +11,9 @@
 (defn dissoc [m k]
   (-dissoc m k))
 
-(defn get [m k]
-  (-lookup m k))
+(defn get
+  ([m k] (-lookup m k nil))
+  ([m k not-found] (-lookup m k not-found)))
 
 (defn seq [m]
   (-seq m))
