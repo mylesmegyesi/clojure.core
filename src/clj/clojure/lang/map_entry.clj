@@ -1,5 +1,5 @@
 (ns clojure.lang.map-entry
-  (:refer-clojure :refer [deftype defmacro defn defn- let and list list* ->])
+  (:refer-clojure :refer [deftype defmacro defn defn- let and list list* -> satisfies?])
   (:require [clojure.lang.equivalence          :refer [=]]
             [clojure.lang.imap-entry           :refer [IMapEntry -key -val]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
@@ -15,7 +15,8 @@
   {:private true}
   [k v other]
   `(let [other# ~other]
-     (and (= ~k (key other#))
+     (and (satisfies? IMapEntry other#)
+          (= ~k (key other#))
           (= ~v (val other#)))))
 
 (defmacro map-entry-equals?-init
