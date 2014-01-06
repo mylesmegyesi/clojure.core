@@ -2,9 +2,10 @@
   (:refer-clojure :only [apply assoc cons defn defn- deftype dissoc empty? first fn let loop if-not into rest second])
   (:require [clojure.lang.iatom                  :refer [IAtom -compare-and-set! -reset! -swap!]]
             [clojure.lang.ideref                 :refer [IDeref]]
-            [clojure.lang.comparison             :refer [=]]
             [clojure.lang.imeta                  :refer [IMeta]]
-            [clojure.lang.iref                   :refer [IRef]]
+            [clojure.lang.ivalidatable           :refer [IValidatable]]
+            [clojure.lang.iwatchable             :refer [IWatchable]]
+            [clojure.lang.comparison             :refer [=]]
             [clojure.lang.persistent-array-map   :refer [array-map]]
             [clojure.lang.persistent-map         :refer [get]]
             [clojure.lang.platform.atomic-entity :as    ent]
@@ -85,11 +86,12 @@
             updated-entity)
           (recur)))))
 
-  IRef
+  IValidatable
   (-get-validator [this] (ent/get-entity -validator))
 
   (-set-validator! [this f] (ent/set-entity! -validator f))
 
+  IWatchable
   (-add-watch [this k f]
     (do
       (ent/set-entity! -watches
