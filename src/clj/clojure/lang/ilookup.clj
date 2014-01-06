@@ -2,4 +2,5 @@
   (:refer-clojure :refer [defprotocol]))
 
 (defprotocol ILookup
-  (-lookup [this k]))
+  (-includes? [this k])
+  (-lookup [this k not-found]))

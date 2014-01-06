@@ -18,8 +18,6 @@
   (remove [this]
     (throw (UnsupportedOperationException. "What're you gonna do?"))))
 
-(def seq-iterator-type SeqIterator)
-
 (defn new-seq-iterator [-seq-atom]
   (SeqIterator. -seq-atom))
 
@@ -31,5 +29,5 @@
                  (list 'iterator ['this]
                        (list 'clojure.lang.platform.enumerable/new-seq-iterator
                              (list 'clojure.core/atom
-                                   (list 'clojure.lang.persistent-map/seq 'this))))
+                                   (list 'clojure.lang.seq/seq 'this))))
                  old))))

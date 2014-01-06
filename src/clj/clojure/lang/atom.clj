@@ -6,8 +6,8 @@
             [clojure.lang.ivalidatable           :refer [IValidatable]]
             [clojure.lang.iwatchable             :refer [IWatchable]]
             [clojure.lang.comparison             :refer [=]]
+            [clojure.lang.lookup                 :refer [get]]
             [clojure.lang.persistent-array-map   :refer [array-map]]
-            [clojure.lang.persistent-map         :refer [get]]
             [clojure.lang.platform.atomic-entity :as    ent]
             [clojure.lang.platform.exceptions    :refer [new-illegal-state-error]]))
 
