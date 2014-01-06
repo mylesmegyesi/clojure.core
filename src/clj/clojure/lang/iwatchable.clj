@@ -1,8 +1,6 @@
-(ns clojure.lang.iref
+(ns clojure.lang.iwatchable
   (:refer-clojure :only [defprotocol]))
 
-(defprotocol IRef
-  (-get-validator [this])
-  (-set-validator! [this validator-fn])
+(defprotocol IWatchable
   (-add-watch [this watch-key callback-fn])
   (-remove-watch [this watch-key]))
