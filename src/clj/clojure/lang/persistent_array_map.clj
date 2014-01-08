@@ -3,19 +3,21 @@
   (:require [clojure.lang.comparison             :refer [= not=]]
             [clojure.lang.counted                :refer [count]]
             [clojure.lang.icounted               :refer [ICounted]]
+            [clojure.lang.ilookup                :refer [ILookup]]
             [clojure.lang.ipersistent-map        :refer [IPersistentMap]]
             [clojure.lang.iseq                   :refer [ISeq]]
+            [clojure.lang.iseqable               :refer [ISeqable]]
             [clojure.lang.hash                   :refer [hash]]
             [clojure.lang.logical                :refer [not]]
+            [clojure.lang.lookup                 :refer [contains? get]]
             [clojure.lang.map-entry              :refer [make-map-entry key val]]
-            [clojure.lang.persistent-map         :refer [get seq contains?]]
             [clojure.lang.platform.hash          :refer [platform-hash-method]]
             [clojure.lang.platform.comparison    :refer [platform-equals-method]]
             [clojure.lang.platform.enumerable    :refer [platform-enumerable-method]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.mutable-array :as    arr]
             [clojure.lang.platform.object        :refer [expand-methods]]
-            [clojure.lang.seq                    :refer [first next]]))
+            [clojure.lang.seq                    :refer [first next seq]]))
 
 (defn- index-of [arr size value]
   (loop [i 0]
@@ -118,6 +120,7 @@
   (list 'array-map-hash '-seq))
 
 (def platform-array-map-methods
+  ^{:private true}
   (-> {}
     (platform-hash-method 'array-map-hash-init)
     ;platform-show-method
@@ -132,19 +135,21 @@
     'ICounted
     (list '-count ['this] '-count)
 
+    'ILookup
+    (list '-lookup ['this 'k 'not-found]
+          (list 'array-map-lookup '-arr '-size 'k 'not-found))
+
+    (list '-includes? ['this 'k]
+          (list 'array-map-contains? '-arr '-size 'k))
+
     'IPersistentMap
     (list '-assoc ['this 'k 'v]
           (list 'array-map-assoc 'this '-arr '-size '-count 'k 'v))
 
-    (list '-contains? ['this 'k]
-          (list 'array-map-contains? '-arr '-size 'k))
-
     (list '-dissoc ['this 'k]
           (list 'array-map-dissoc 'this '-arr '-size '-count 'k))
 
-    (list '-lookup ['this 'k 'not-found]
-          (list 'array-map-lookup '-arr '-size 'k 'not-found))
-
+    'ISeqable
     (list '-seq ['this] '-seq)
 
     platform-array-map-methods))

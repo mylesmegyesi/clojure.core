@@ -6,12 +6,13 @@
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.ihash                :refer [IHash]]
             [clojure.lang.logical              :refer [not]]
+            [clojure.lang.lookup               :refer [contains? get]]
             [clojure.lang.map-entry            :refer [key val]]
-            [clojure.lang.persistent-map       :refer [assoc dissoc get seq contains?]]
+            [clojure.lang.persistent-map       :refer [assoc dissoc]]
             [clojure.lang.persistent-array-map :refer :all]
             [clojure.lang.platform.object      :refer [identical?]]
             [clojure.lang.platform.exceptions  :refer [argument-error]]
-            [clojure.lang.seq                  :refer [first next]]))
+            [clojure.lang.seq                  :refer [first next seq]]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))

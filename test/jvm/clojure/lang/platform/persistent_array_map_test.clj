@@ -4,9 +4,8 @@
             [clojure.lang.comparison           :refer [=]]
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.logical              :refer [not]]
-            [clojure.lang.persistent-map       :refer [seq]]
             [clojure.lang.persistent-array-map :refer [array-map]]
-            [clojure.lang.seq                  :refer [first next]])
+            [clojure.lang.seq                  :refer [first next seq]])
   (:import [java.util NoSuchElementException]))
 
 (deftest platform-equals-test
