@@ -1,9 +1,8 @@
 (ns clojure.lang.platform.persistent-array-map-test
   (:refer-clojure :only [let])
   (:require [clojure.test                      :refer :all]
-            [clojure.lang.comparison           :refer [=]]
             [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.logical              :refer [not]]
+            [clojure.lang.operators            :refer [not =]]
             [clojure.lang.persistent-array-map :refer [array-map]]
             [clojure.lang.seq                  :refer [first next seq]])
   (:import [java.util NoSuchElementException]))

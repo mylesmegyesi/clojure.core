@@ -1,11 +1,10 @@
-(ns clojure.lang.comparison-test
+(ns clojure.lang.operators-test
   (:refer-clojure :only [deftype constantly let])
-  (:require [clojure.test                   :refer :all]
-            [clojure.lang.comparison        :refer :all]
-            [clojure.lang.comparison-helper :refer :all]
-            [clojure.lang.icomparable       :refer [IComparable]]
-            [clojure.lang.logical           :refer [not]]
-            [clojure.lang.platform.object   :refer [identical?]]))
+  (:require [clojure.test                  :refer :all]
+            [clojure.lang.operators        :refer :all]
+            [clojure.lang.operators-helper :refer :all]
+            [clojure.lang.icomparable      :refer [IComparable]]
+            [clojure.lang.platform.object  :refer [identical?]]))
 
 (deftype CApple []
   IComparable
@@ -89,3 +88,25 @@
       (is (== item2 item1 item4 item5))))
 
   )
+
+(deftest not-test
+  (testing "returns true if falsy"
+    (is (= true (not false)))
+    (is (= true (not nil))))
+
+  (testing "returns false if truthy"
+    (is (= false (not true)))
+    (is (= false (not :something)))))
+
+(deftest and-test
+  (testing "returns true with zero arguments"
+    (is (and)))
+
+  (testing "true if the expression is true"
+    (is (and true)))
+
+  (testing "returns false if the expressions is false"
+    (is (not (and false))))
+
+  (testing "does not evaulate unecessary expressions"
+    (is (not (and false (is false))))))

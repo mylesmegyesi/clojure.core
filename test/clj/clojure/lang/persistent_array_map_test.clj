@@ -1,13 +1,12 @@
 (ns clojure.lang.persistent-array-map-test
   (:refer-clojure :only [deftype defmacro let nil? list list*])
   (:require [clojure.test                      :refer :all]
-            [clojure.lang.comparison           :refer [= not=]]
             [clojure.lang.counted              :refer [count]]
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.ihash                :refer [IHash]]
-            [clojure.lang.logical              :refer [not]]
             [clojure.lang.lookup               :refer [contains? get]]
             [clojure.lang.map-entry            :refer [key val]]
+            [clojure.lang.operators            :refer [not not= =]]
             [clojure.lang.persistent-map       :refer [assoc dissoc]]
             [clojure.lang.persistent-array-map :refer :all]
             [clojure.lang.platform.object      :refer [identical?]]

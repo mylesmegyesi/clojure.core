@@ -1,7 +1,7 @@
 (ns clojure.lang.assertions
   (:refer-clojure :only [defmacro sort])
-  (:require [clojure.test             :refer [is]]
-            [clojure.lang.comparison  :refer [compare =]]))
+  (:require [clojure.test           :refer [is]]
+            [clojure.lang.operators :refer [compare =]]))
 
 (defmacro is-less-than [lhs rhs]
   `(do

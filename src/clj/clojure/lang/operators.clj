@@ -1,10 +1,17 @@
-(ns clojure.lang.comparison
-  (:refer-clojure :only [defmacro defn defn- apply nil? let cond and or])
+(ns clojure.lang.operators
+  (:refer-clojure :only [apply cond declare defmacro defn defn- if-let let nil? or true?])
   (:require [clojure.lang.icomparable     :refer [-compare-to]]
             [clojure.lang.iequivalence    :refer [-equivalent?]]
-            [clojure.lang.logical         :refer [not]]
-            [clojure.lang.platform.comparison]
-            [clojure.lang.platform.object :refer [type]]))
+            [clojure.lang.platform.object :refer [type]]
+            [clojure.lang.platform.comparison]))
+
+(defmacro and
+  "Returns true if all expressions are logically truthy, false otherwise."
+  ([] true)
+  ([x] x)
+  ([x & xs]
+    `(let [and-expr# ~x]
+       (if and-expr# (and ~@xs) and-expr#))))
 
 (defn compare [x y]
   (cond
@@ -46,6 +53,11 @@
   ([x] true)
   ([x y] (values-and-types-equal? x y))
   ([x y & more] (and (== x y) (apply == x more))))
+
+(defn not
+  "Returns true if x is logical false, false otherwise."
+  [x]
+  (if x false true))
 
 (defn not=
   "Same as (not (= obj1 obj2))."

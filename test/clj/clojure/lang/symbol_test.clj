@@ -2,12 +2,11 @@
   (:refer-clojure :only [let get nil? defn])
   (:require [clojure.test                 :refer :all]
             [clojure.lang.assertions      :refer :all]
-            [clojure.lang.comparison      :refer [= not= ==]]
             [clojure.lang.hash            :refer [hash]]
             [clojure.lang.keyword         :refer [keyword]]
-            [clojure.lang.logical         :refer [not]]
             [clojure.lang.meta            :refer [meta with-meta]]
             [clojure.lang.named           :refer [name namespace]]
+            [clojure.lang.operators       :refer [not not= = ==]]
             [clojure.lang.platform.object :refer [identical?]]
             [clojure.lang.show            :refer [str]]
             [clojure.lang.symbol          :refer :all]))

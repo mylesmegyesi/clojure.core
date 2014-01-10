@@ -1,8 +1,8 @@
 (ns clojure.lang.platform.arithmetic-test
   (:refer-clojure :only [defmacro let])
   (:require [clojure.test                 :refer :all]
-            [clojure.lang.comparison      :refer [=]]
             [clojure.lang.arithmetic      :refer [+ - * / mod exp]]
+            [clojure.lang.operators       :refer [=]]
             [clojure.lang.platform.object :refer [instance?]])
   (:import [java.lang Byte Short Integer Float Double]
            [java.math BigInteger BigDecimal]

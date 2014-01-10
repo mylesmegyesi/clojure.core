@@ -1,10 +1,9 @@
 (ns clojure.lang.platform.keyword-test
   (:refer-clojure :only [let])
   (:require [clojure.test            :refer :all]
-            [clojure.lang.comparison :refer [=]]
             [clojure.lang.hash       :refer [hash]]
             [clojure.lang.keyword    :refer [keyword]]
-            [clojure.lang.logical    :refer [not]]))
+            [clojure.lang.operators  :refer [not =]]))
 
 (deftest platform-equals-test
   (testing ".equals if ns and name are equal"
