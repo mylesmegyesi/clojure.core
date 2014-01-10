@@ -2,11 +2,10 @@
   (:refer-clojure :only [deftype first let next nil? sort])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.ihash               :refer [IHash]]
-            [clojure.lang.comparison          :refer [=]]
             [clojure.lang.counted             :refer [count]]
             [clojure.lang.hash                :refer [hash]]
-            [clojure.lang.logical             :refer [not]]
             [clojure.lang.lookup              :refer [contains? get]]
+            [clojure.lang.operators           :refer [not =]]
             [clojure.lang.persistent-set      :refer [conj difference disj intersection subset? superset? union]]
             [clojure.lang.persistent-hash-set :refer :all]
             [clojure.lang.seq                 :refer [seq]]))

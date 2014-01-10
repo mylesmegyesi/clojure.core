@@ -1,10 +1,9 @@
 (ns clojure.lang.platform.symbol-test
   (:refer-clojure :only [let])
-  (:require [clojure.test             :refer :all]
-            [clojure.lang.comparison  :refer [=]]
-            [clojure.lang.hash        :refer [hash]]
-            [clojure.lang.logical     :refer [not]]
-            [clojure.lang.symbol      :refer [symbol]]))
+  (:require [clojure.test           :refer :all]
+            [clojure.lang.hash      :refer [hash]]
+            [clojure.lang.operators :refer [not =]]
+            [clojure.lang.symbol    :refer [symbol]]))
 
 (deftest platform-equals-test
   (testing ".equals if ns and name are equal"

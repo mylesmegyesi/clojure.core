@@ -1,8 +1,7 @@
 (ns clojure.lang.platform.atomic-entity-test
   (:refer-clojure :only [and let])
   (:require [clojure.test                        :refer :all]
-            [clojure.lang.comparison             :refer [=]]
-            [clojure.lang.logical                :refer [not]]
+            [clojure.lang.operators              :refer [not =]]
             [clojure.lang.platform.atomic-entity :refer :all]))
 
 (deftest atomic-entity-test

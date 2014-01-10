@@ -2,10 +2,9 @@
   (:refer-clojure :only [and apply assoc fn defmacro defn dorun dotimes first flatten inc let list list* map nil? partition pcalls range rand-int repeat sort vec - / *])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.atom                :refer :all]
-            [clojure.lang.comparison          :refer [not= =]]
             [clojure.lang.deref               :refer [deref]]
-            [clojure.lang.logical             :refer [not]]
             [clojure.lang.meta                :refer [meta reset-meta! alter-meta!]]
+            [clojure.lang.operators           :refer [not not= =]]
             [clojure.lang.validatable         :refer [get-validator set-validator!]]
             [clojure.lang.watchable           :refer [add-watch remove-watch]]
             [clojure.lang.platform.exceptions :refer [illegal-state-error]]))

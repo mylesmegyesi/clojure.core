@@ -1,8 +1,8 @@
 (ns clojure.lang.map-entry-test
   (:refer-clojure :only [and let])
-  (:require [clojure.test            :refer :all]
-            [clojure.lang.comparison :refer [not= =]]
-            [clojure.lang.map-entry  :refer [make-map-entry key val]]))
+  (:require [clojure.test           :refer :all]
+            [clojure.lang.operators :refer [not= =]]
+            [clojure.lang.map-entry :refer [make-map-entry key val]]))
 
 (deftest map-entry-test
   (testing "it generates a new map entry with a key and value"
