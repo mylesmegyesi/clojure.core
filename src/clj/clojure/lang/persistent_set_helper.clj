@@ -57,7 +57,7 @@
     (platform-hash-method 'clojure.lang.persistent-set-helper/set-hash-init)
     expand-methods))
 
-(defmacro def-set [type gen-next]
+(defmacro defset [type gen-next]
   (list*
     'clojure.core/deftype type ['-map]
 
