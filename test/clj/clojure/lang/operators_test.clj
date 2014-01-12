@@ -1,10 +1,23 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [deftype constantly let])
+  (:refer-clojure :only [deftype constantly let nil?])
   (:require [clojure.test                  :refer :all]
             [clojure.lang.operators        :refer :all]
             [clojure.lang.operators-helper :refer :all]
             [clojure.lang.icomparable      :refer [IComparable]]
             [clojure.lang.platform.object  :refer [identical?]]))
+
+(deftest and-test
+  (testing "returns true with zero arguments"
+    (is (and)))
+
+  (testing "true if the expression is true"
+    (is (and true)))
+
+  (testing "returns false if the expressions is false"
+    (is (not (and false))))
+
+  (testing "does not evaulate unecessary expressions"
+    (is (not (and false (is false))))))
 
 (deftype CApple []
   IComparable
@@ -22,6 +35,28 @@
     (is (= 10 (compare (CApple.) :something))))
 
   )
+
+(deftest not-test
+  (testing "returns true if falsy"
+    (is (= true (not false)))
+    (is (= true (not nil))))
+
+  (testing "returns false if truthy"
+    (is (= false (not true)))
+    (is (= false (not :something)))))
+
+(deftest or-test
+  (testing "returns nil with zero arguments"
+    (is (nil? (or))))
+
+  (testing "true if the expression is true"
+    (is (or true)))
+
+  (testing "false if the expression is false"
+    (is (not (or false))))
+
+  (testing "does not evaluate unecessary expressions"
+    (is (or true (is false)))))
 
 (def always-equal (constantly true))
 (def always-inequal (constantly false))
@@ -88,25 +123,3 @@
       (is (== item2 item1 item4 item5))))
 
   )
-
-(deftest not-test
-  (testing "returns true if falsy"
-    (is (= true (not false)))
-    (is (= true (not nil))))
-
-  (testing "returns false if truthy"
-    (is (= false (not true)))
-    (is (= false (not :something)))))
-
-(deftest and-test
-  (testing "returns true with zero arguments"
-    (is (and)))
-
-  (testing "true if the expression is true"
-    (is (and true)))
-
-  (testing "returns false if the expressions is false"
-    (is (not (and false))))
-
-  (testing "does not evaulate unecessary expressions"
-    (is (not (and false (is false))))))
