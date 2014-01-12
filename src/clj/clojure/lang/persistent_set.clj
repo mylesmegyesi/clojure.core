@@ -1,8 +1,9 @@
 (ns clojure.lang.persistent-set
-  (:refer-clojure :only [and cons defn every? let not <= >=])
+  (:refer-clojure :only [cons defn every? <= >=])
   (:require [clojure.lang.ipersistent-set     :refer [-conj -difference -disj -intersection -union]]
             [clojure.lang.counted             :refer [count]]
             [clojure.lang.lookup              :refer [contains?]]
+            [clojure.lang.operators           :refer [and]]
             [clojure.lang.persistent-hash-set :refer [hash-set]]
             [clojure.lang.seq                 :refer [seq]]))
 
@@ -24,6 +25,9 @@
   ([this s] (-intersection this [s]))
   ([this s1 s2] (-intersection this [s1 s2]))
   ([this s1 s2 & sets] (-intersection this (cons s1 (cons s2 sets)))))
+
+(defn set [coll]
+  (hash-set (seq coll)))
 
 (defn subset? [s1 s2]
   (and (<= (count s1) (count s2))

@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-hash-set-test
-  (:refer-clojure :only [deftype first let next nil? sort])
+  (:refer-clojure :only [deftype first let next nil?])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.ihash               :refer [IHash]]
             [clojure.lang.counted             :refer [count]]
