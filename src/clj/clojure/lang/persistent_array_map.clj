@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [defmacro declare defn defn- deftype let + - dec or loop < / inc when when-let if-let even? format list list* and bit-and nil? ->])
+  (:refer-clojure :only [defmacro declare defn defn- deftype let + - dec loop < / inc when when-let if-let even? format list list* bit-and nil? ->])
   (:require [clojure.lang.counted                :refer [count]]
             [clojure.lang.icounted               :refer [ICounted]]
             [clojure.lang.ilookup                :refer [ILookup]]
@@ -9,7 +9,7 @@
             [clojure.lang.hash                   :refer [hash]]
             [clojure.lang.lookup                 :refer [contains? get]]
             [clojure.lang.map-entry              :refer [make-map-entry key val]]
-            [clojure.lang.operators              :refer [= not not=]]
+            [clojure.lang.operators              :refer [and not not= or =]]
             [clojure.lang.platform.hash          :refer [platform-hash-method]]
             [clojure.lang.platform.comparison    :refer [platform-equals-method]]
             [clojure.lang.platform.enumerable    :refer [platform-enumerable-method]]
