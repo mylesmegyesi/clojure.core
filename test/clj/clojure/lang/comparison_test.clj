@@ -1,5 +1,5 @@
 (ns clojure.lang.comparison-test
-  (:refer-clojure :only [deftype let])
+  (:refer-clojure :only [deftype let <])
   (:require [clojure.test             :refer :all]
             [clojure.lang.icomparable :refer [IComparable]]
             [clojure.lang.comparison  :refer :all]
@@ -41,5 +41,16 @@
   (testing "returns 0 if the two numbers are the same value"
     (is (= 0 (compare 1 1)))
     (is (= 0 (compare 1.1 1.1))))
+
+  )
+
+(deftest comparator-test
+  (testing "comparator returns -1 if the predicate returns true"
+    (let [cmp (comparator <)]
+      (is (= -1 (cmp 1 2)))))
+
+  (testing "comparator returns 0 if the predicate returns false"
+    (let [cmp (comparator <)]
+      (is (= 0 (cmp 2 1)))))
 
   )
