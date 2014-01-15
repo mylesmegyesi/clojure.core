@@ -1,10 +1,11 @@
 (ns clojure.lang.keyword
   (:refer-clojure :only [deftype defmacro defn defn- + let list* list concat ->])
-  (:require [clojure.lang.hash                 :refer [hash]]
+  (:require [clojure.lang.comparison           :refer [compare]]
+            [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.imeta                :refer [IMeta]]
             [clojure.lang.inamed               :refer [INamed]]
             [clojure.lang.named                :refer [name namespace]]
-            [clojure.lang.operators            :refer [compare =]]
+            [clojure.lang.operators            :refer [=]]
             [clojure.lang.platform.comparison  :refer [platform-equals-method platform-compare-to-method]]
             [clojure.lang.platform.hash        :refer [platform-hash-method]]
             [clojure.lang.platform.object      :refer [instance? hash-combine expand-methods]]

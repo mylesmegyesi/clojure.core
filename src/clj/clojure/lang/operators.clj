@@ -1,9 +1,7 @@
 (ns clojure.lang.operators
   (:refer-clojure :only [apply cond declare defmacro defn defn- if-let let nil? true?])
-  (:require [clojure.lang.icomparable     :refer [-compare-to]]
-            [clojure.lang.iequivalence    :refer [-equivalent?]]
-            [clojure.lang.platform.object :refer [type]]
-            [clojure.lang.platform.comparison]))
+  (:require [clojure.lang.iequivalence    :refer [-equivalent?]]
+            [clojure.lang.platform.object :refer [type]]))
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -21,13 +19,6 @@
    `(if-let [or-expr# ~x]
       or-expr#
       (or ~@xs))))
-
-(defn compare [x y]
-  (cond
-    (nil? x) -1
-    (nil? y) 1
-    :else
-    (-compare-to x y)))
 
 (defmacro when-not-nil [x y & body]
   {:private true}
