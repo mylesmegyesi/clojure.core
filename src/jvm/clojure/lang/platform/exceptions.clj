@@ -9,3 +9,8 @@
 
 (defmacro new-illegal-state-error [& args]
   (list* 'new illegal-state-error args))
+
+(def unsupported-error UnsupportedOperationException)
+
+(defmacro new-unsupported-error [& args]
+  (list* 'new unsupported-error args))
