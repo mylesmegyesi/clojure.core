@@ -1,5 +1,5 @@
 (ns clojure.lang.keyword
-  (:refer-clojure :only [deftype defmacro defn defn- + let list* list concat ->])
+  (:refer-clojure :only [deftype defmacro declare defn defn- + let list* list concat ->])
   (:require [clojure.lang.comparison           :refer [compare]]
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.imeta                :refer [IMeta]]
@@ -26,10 +26,19 @@
   {:private true}
   [_] '-str)
 
+(declare keyword?)
+
+(defmacro keyword-equals? [my-sym y]
+  `(let [y# ~y]
+     (if (keyword? y#)
+       (= ~my-sym (symbol (namespace y#)
+                          (name y#)))
+       false)))
+
 (defmacro keyword-equals?-init
   {:private true}
   [_ other-arg]
-  (list '= '-sym other-arg))
+  (list 'keyword-equals? '-sym other-arg))
 
 (def platform-keyword-methods
   (-> {}

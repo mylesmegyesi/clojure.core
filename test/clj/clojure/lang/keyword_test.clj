@@ -20,20 +20,22 @@
     (let [kwd (keyword "kwd")]
       (is (= nil (namespace kwd)))))
 
-  (testing "has a hash code similar to its symbol representation"
+  (testing "equivalent keywords has equivalent hash codes"
     (is (= (hash (keyword "kwd"))
-           (+ (hash (symbol "kwd")) 0x9e3779b9)))
-    (is (= (hash (keyword "kwd1"))
-           (+ (hash (symbol "kwd1")) 0x9e3779b9))))
+           (hash (keyword "kwd"))))
+    (is (= (hash (keyword "ns" "kwd"))
+           (hash (keyword "ns" "kwd")))))
+
+  (testing "keywords that are not equal have different hash codes"
+    (is (not= (hash (keyword "kwd"))
+              (hash (keyword "kwd1"))))
+    (is (not= (hash (keyword "ns" "kwd"))
+              (hash (keyword "ns" "kwd1"))))
+    (is (not= (hash (keyword "ns" "kwd"))
+              (hash (keyword "ns1" "kwd")))))
 
   (testing "creates a keyword with a namespace"
     (is (= "the-ns" (namespace (keyword "the-ns" "kwd")))))
-
-  (testing "uses the namespace to create the hash"
-    (let [kwd (keyword "the-ns" "kwd")
-          sym (symbol "the-ns" "kwd")]
-    (is (= (hash kwd)
-           (hash (+ (hash sym) 0x9e3779b9))))))
 
   (testing "creates a keyword with a namespace-qualified name"
     (let [kwd (keyword "the-ns/kwd")]
@@ -104,19 +106,9 @@
     (is (not= nil (keyword "kwd")))
     (is (not= (keyword "kwd") nil)))
 
-  (testing "not equal if either is not Named"
-    (is (not= 1 (keyword "kwd")))
-    (is (not= (keyword "kwd") 1)))
-
-  (testing "loosely equal to symbols"
-    (is (= (symbol "kwd") (keyword "kwd")))
-    (is (= (keyword "kwd") (symbol "kwd"))))
-
-  (testing "but not strictly equal to symbols"
-    (is (not== (symbol "kwd") (keyword "kwd")))
+  (testing "not equal unless other is also a keyword"
+    (is (not= (keyword "kwd") (symbol "kwd")))
     (is (not== (keyword "kwd") (symbol "kwd"))))
-
-  (testing "loosely equal to vars")
 
   (testing "returns 0 if the keywords are equal"
     (let [lhs (keyword "kwd")

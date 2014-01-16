@@ -1,9 +1,8 @@
 (ns clojure.lang.platform.comparison
-  (:refer-clojure :only [defmacro defprotocol deftype extend-protocol fn defn list -> update-in cons])
-  (:require [clojure.lang.icomparable      :refer [IComparable]]
-            [clojure.lang.iequivalence     :refer [IEquivalence]]
-            [clojure.lang.platform.numbers :refer [ops-equals no-overflow-ops]]
-            [clojure.lang.platform.object  :refer [type instance?]]))
+  (:refer-clojure :only [defmacro defprotocol extend-protocol fn defn list -> update-in cons])
+  (:require [clojure.lang.icomparable  :refer [IComparable]]
+            [clojure.lang.iequivalence :refer [IEquivalence]]
+            [clojure.lang.platform.numbers]))
 
 (extend-protocol IComparable
   Object
@@ -14,13 +13,8 @@
   Object
   (-equivalent? [this other]
     (.equals this other))
-
-  Number
-  (-equivalent? [this other]
-    (if (instance? Number other)
-      (-> (no-overflow-ops (type this) (type other))
-        (ops-equals this other))
-      false)))
+  (-equal? [this other]
+    (.equals this other)))
 
 (defn platform-compare-to-method [methods init-macro]
   (update-in methods

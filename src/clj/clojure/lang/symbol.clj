@@ -1,5 +1,5 @@
 (ns clojure.lang.symbol
-  (:refer-clojure :only [defmacro deftype satisfies? defn defn- let list* list nil? cond last butlast first count ->])
+  (:refer-clojure :only [defmacro deftype declare satisfies? defn defn- let list* list nil? cond last butlast first count ->])
   (:require [clojure.lang.comparison          :refer [compare]]
             [clojure.lang.hash                :refer [hash]]
             [clojure.lang.imeta               :refer [IMeta]]
@@ -23,11 +23,13 @@
   `(and (= ~x-name ~y-name)
         (= ~x-ns ~y-ns)))
 
+(declare symbol?)
+
 (defmacro symbol-equals?
   {:private true}
   [x-ns x-name y]
   `(let [y# ~y]
-     (if (satisfies? INamed y#)
+     (if (symbol? y#)
        (named-equivalence? ~x-name
                            (name y#)
                            ~x-ns
