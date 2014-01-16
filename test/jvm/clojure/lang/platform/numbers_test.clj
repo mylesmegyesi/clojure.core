@@ -32,7 +32,7 @@
    (short val)      ; java.lang.Short
    (int val)        ; java.lang.Integer
    (long val)       ; java.lang.Long
-   ;(bigint val)     ; clojure.lang.BigInt
+   (bigint val)     ; clojure.lang.BigInt
    (biginteger val) ; java.math.BigInteger
    ])
 
