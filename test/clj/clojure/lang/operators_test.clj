@@ -1,8 +1,8 @@
 (ns clojure.lang.operators-test
   (:refer-clojure :only [reify let nil?])
-  (:require [clojure.test                  :refer :all]
-            [clojure.lang.iequivalence     :refer [IEquivalence]]
-            [clojure.lang.operators        :refer :all]))
+  (:require [clojure.test             :refer :all]
+            [clojure.lang.operators   :refer [and or = == not not= not==]]
+            [clojure.lang.test-helper :refer [equal-type equivalent-type]]))
 
 (deftest and-test
   (testing "returns true with zero arguments"
@@ -41,9 +41,9 @@
 
 (deftest =-test
   (testing "calls the -equal? method on the lhs"
-    (is (= (reify IEquivalence (-equal? [this other] true))
+    (is (= (equal-type true)
            :anything))
-    (is (not (= (reify IEquivalence (-equal? [this other] false))
+    (is (not (= (equal-type false)
                 :anything))))
 
   (testing "not equal if either is nil"
@@ -64,11 +64,11 @@
 
   )
 
-(deftest ==-test
+(deftest ^:new ==-test
   (testing "calls the -equivalent? method on the lhs"
-    (is (== (reify IEquivalence (-equivalent? [this other] true))
+    (is (== (equivalent-type true)
             :anything))
-    (is (not (== (reify IEquivalence (-equivalent? [this other] false))
+    (is (not (== (equivalent-type false)
                  :anything))))
 
   (testing "not equal if either is nil"
@@ -82,12 +82,11 @@
     (is (== :something)))
 
   (testing "more than two items -  true if every item is equivalent to each other"
-    (let [item1 (reify IEquivalence (-equivalent? [this other] true))
-          item2 (reify IEquivalence (-equivalent? [this other] true))
-          item3 (reify IEquivalence (-equivalent? [this other] true))
-          item4 (reify IEquivalence (-equivalent? [this other] false))
-          item5 (reify IEquivalence (-equivalent? [this other] false))
-          ]
+    (let [item1 (equivalent-type true)
+          item2 (equivalent-type true)
+          item3 (equivalent-type true)
+          item4 (equivalent-type false)
+          item5 (equivalent-type false)]
       (is (== item1 item2 item3))
       (is (== item1 item2 item4))
       (is (not== item1 item4 item2))

@@ -1,14 +1,14 @@
 (ns clojure.lang.persistent-sorted-set-test
   (:refer-clojure :only [deftype first let next nil? >])
   (:require [clojure.test                       :refer :all]
-            [clojure.lang.ihash                 :refer [IHash]]
             [clojure.lang.counted               :refer [count]]
             [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.operators             :refer [not =]]
             [clojure.lang.persistent-set        :refer [conj difference disj intersection subset? superset? union]]
-            [clojure.lang.persistent-sorted-set :refer :all]
-            [clojure.lang.seq                   :refer [seq]]))
+            [clojure.lang.persistent-sorted-set :refer [sorted-set sorted-set-by]]
+            [clojure.lang.seqable               :refer [seq]]
+            [clojure.lang.test-helper           :refer [hashed-and-comparable-type]]))
 
 (deftest persistent-sorted-set-test
   (testing "an empty sorted set does not contains? an item"
@@ -137,22 +137,15 @@
 
   )
 
-(deftype Thing [t]
-  IHash
-  (-hash [this] t)
-
-  Comparable
-  (compareTo [this other] 1))
-
 (deftest persistent-sorted-set-hash-test
   (testing "the hash of an empty set is zero"
     (let [s1 (sorted-set)]
       (is (= 0 (hash s1)))))
 
   (testing "calculates the sum of all of it's elements hash codes"
-    (let [thing1 (Thing. 42)
-          thing2 (Thing. 24)
-          thing3 (Thing. 1337)
+    (let [thing1 (hashed-and-comparable-type 42 1)
+          thing2 (hashed-and-comparable-type 24 1)
+          thing3 (hashed-and-comparable-type 1337 1)
           s1 (sorted-set thing1 thing2 thing3)]
       (is (= 1403 (hash s1)))))
 

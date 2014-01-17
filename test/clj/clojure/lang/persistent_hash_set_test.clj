@@ -1,14 +1,15 @@
 (ns clojure.lang.persistent-hash-set-test
   (:refer-clojure :only [deftype first let next nil?])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.ihash               :refer [IHash]]
             [clojure.lang.counted             :refer [count]]
             [clojure.lang.hash                :refer [hash]]
             [clojure.lang.lookup              :refer [contains? get]]
             [clojure.lang.operators           :refer [not =]]
-            [clojure.lang.persistent-set      :refer [conj difference disj intersection subset? superset? union]]
+            [clojure.lang.persistent-set      :refer [conj difference disj
+                                                      intersection subset? superset? union]]
             [clojure.lang.persistent-hash-set :refer :all]
-            [clojure.lang.seq                 :refer [seq]]))
+            [clojure.lang.seqable             :refer [seq]]
+            [clojure.lang.test-helper         :refer [hashed-type]]))
 
 (deftest persistent-hash-set-test
   (testing "an empty hash set does not contains? an item"
@@ -137,19 +138,15 @@
 
   )
 
-(deftype Thing [t]
-  IHash
-  (-hash [this] t))
-
 (deftest persistent-hash-set-hash-test
   (testing "the hash of an empty set is zero"
     (let [s1 (hash-set)]
       (is (= 0 (hash s1)))))
 
   (testing "calculates the sum of all of it's elements hash codes"
-    (let [thing1 (Thing. 42)
-          thing2 (Thing. 24)
-          thing3 (Thing. 1337)
+    (let [thing1 (hashed-type 42)
+          thing2 (hashed-type 24)
+          thing3 (hashed-type 1337)
           s1 (hash-set thing1 thing2 thing3)]
       (is (= 1403 (hash s1)))))
 

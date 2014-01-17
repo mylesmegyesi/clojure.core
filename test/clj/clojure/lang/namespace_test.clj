@@ -3,22 +3,26 @@
   (:require [clojure.test                 :refer :all]
             [clojure.lang.meta            :refer [meta with-meta]]
             [clojure.lang.named           :refer [name namespace]]
-            [clojure.lang.namespace       :refer :all]
-            [clojure.lang.operators       :refer [=]]
+            [clojure.lang.namespace       :refer [create-ns alias intern ns-resolve -def
+                                                  refer ns-map ns-interns ns-publics
+                                                  ns-refers ns-aliases all-ns find-ns
+                                                  ns-name ns-remove ns-unmap]]
+            [clojure.lang.operators       :refer [not =]]
             [clojure.lang.platform.object :refer [identical?]]
-            [clojure.lang.symbol          :refer [symbol]]))
+            [clojure.lang.symbol          :refer [symbol]]
+            [clojure.lang.var             :refer [var? bound?]]))
 
 (defn empty-ns-map []
   {})
 
-(deftest create-ns-test
+(deftest ^:new create-ns-test
   (testing "creates a namespace"
     (is (= {(symbol "new-ns") {:mappings {}
                                :aliases  {}
                                :ns       (symbol "new-ns")}}
            (create-ns (empty-ns-map) (symbol "new-ns"))))))
 
-(deftest alias-test
+(deftest ^:new alias-test
   (testing "adds an alias to another namespace"
     (is (= {(symbol "to-ns") {:mappings {}
                               :aliases  {(symbol "the-alias") (symbol "target-ns")}
@@ -60,14 +64,14 @@
              (alias (symbol "to-ns") (symbol "the-alias") (symbol "target-ns"))
              (alias (symbol "to-ns") (symbol "the-alias") (symbol "target-ns")))))))
 
-(deftest intern-test
+(deftest ^:new intern-test
   (testing "intern creates a mapping in the given ns"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
                        (intern (symbol "test-ns") (symbol "something")))
           something-var (get-in namespaces [(symbol "test-ns") :mappings (symbol "something")])]
-      (is (instance? clojure.lang.var.Var something-var))
-      (is (instance? clojure.lang.var.Unbound @(.root something-var)))
+      (is (var? something-var))
+      (is (not (bound? @(.root something-var))))
       (is (identical? something-var (.var @(.root something-var))))
       (is (= "test-ns" (namespace something-var)))
       (is (= {} (meta something-var)))))
@@ -88,13 +92,13 @@
     (is (thrown-with-msg? Exception #"Can't intern namespace-qualified symbol"
           (intern (create-ns (empty-ns-map) (symbol "the-ns")) (symbol "the-ns") (symbol "clojure.core/something"))))))
 
-(deftest def-test ; irony?
+(deftest ^:new def-test ; irony?
   (testing "def interns the symbol in the given ns"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (-def (symbol "test-ns") (symbol "something")))
           something-var (ns-resolve namespaces (symbol "test-ns") (symbol "something"))]
-      (is (instance? clojure.lang.var.Var something-var))
-      (is (instance? clojure.lang.var.Unbound @(.root something-var)))
+      (is (var? something-var))
+      (is (not (bound? @(.root something-var))))
       (is (identical? something-var (.var @(.root something-var))))
       (is (= "test-ns" (namespace something-var)))
       (is (= {} (meta something-var)))))
@@ -105,8 +109,8 @@
                        (-def (symbol "test-ns") (symbol "something"))
                        (-def (symbol "other-ns") (symbol "something")))
           something-var2 (ns-resolve namespaces (symbol "other-ns") (symbol "something"))]
-      (is (instance? clojure.lang.var.Var something-var2))
-      (is (instance? clojure.lang.var.Unbound @(.root something-var2)))
+      (is (var? something-var2))
+      (is (not (bound? @(.root something-var2))))
       (is (identical? something-var2 (.var @(.root something-var2))))
       (is (= "other-ns" (namespace something-var2)))
       (is (= {} (meta something-var2)))))
@@ -140,7 +144,7 @@
       (is (= true (:private (meta something-var))))
       (is (= "here" (:other-meta (meta something-var)))))))
 
-(deftest ns-resolve-test
+(deftest ^:new ns-resolve-test
   (testing "resolves a symbol in a namespace"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (intern (symbol "test-ns") (symbol "something")))
@@ -194,7 +198,7 @@
       (is (identical? some-other-something
                       (ns-resolve namespaces (symbol "other-ns") (symbol "some-other/something")))))))
 
-(deftest refer-test
+(deftest ^:new refer-test
 
   (defn test-ns-map []
     (-> (create-ns (empty-ns-map) (symbol "test-ns"))
@@ -303,7 +307,7 @@
                   :only [(symbol "pub1")]
                   :rename {(symbol "pub2") (symbol "else")})))))
 
-(deftest ns-map-test
+(deftest ^:new ns-map-test
   (testing "returns all mappings"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
@@ -324,7 +328,7 @@
     (is (thrown-with-msg? Exception #"No namespace: test-ns found"
           (ns-map (empty-ns-map) (symbol "test-ns"))))))
 
-(deftest ns-interns-test
+(deftest ^:new ns-interns-test
   (testing "returns all interns"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
@@ -368,7 +372,7 @@
     (is (thrown-with-msg? Exception #"No namespace: test-ns found"
           (ns-interns (empty-ns-map) (symbol "test-ns"))))))
 
-(deftest ns-publics-test
+(deftest ^:new ns-publics-test
   (testing "returns all interns without :private true meta"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
@@ -405,7 +409,7 @@
     (is (thrown-with-msg? Exception #"No namespace: test-ns found"
           (ns-publics (empty-ns-map) (symbol "test-ns"))))))
 
-(deftest ns-refers-test
+(deftest ^:new ns-refers-test
   (testing "returns all vars refered by a namespace"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
@@ -429,7 +433,7 @@
     (is (thrown-with-msg? Exception #"No namespace: test-ns found"
           (ns-refers (empty-ns-map) (symbol "test-ns"))))))
 
-(deftest ns-aliases-test
+(deftest ^:new ns-aliases-test
   (testing "returns aliases for an ns"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
@@ -444,7 +448,7 @@
     (is (thrown-with-msg? Exception #"No namespace: test-ns found"
           (ns-aliases (empty-ns-map) (symbol "test-ns"))))))
 
-(deftest all-ns-test
+(deftest ^:new all-ns-test
   (testing "returns all namespaces"
     (is (= #{(symbol "other-ns") (symbol "test-ns")}
            (-> (create-ns (empty-ns-map) (symbol "test-ns"))
@@ -452,7 +456,7 @@
              (all-ns)
              set)))))
 
-(deftest find-ns-test
+(deftest ^:new find-ns-test
   (testing "returns the namespace symbol if it exists"
     (is (= (symbol "test-ns")
            (-> (create-ns (empty-ns-map) (symbol "test-ns"))
@@ -461,7 +465,7 @@
   (testing "returns nil if not found"
     (is (nil? (find-ns (empty-ns-map) (symbol "test-ns"))))))
 
-(deftest ns-name-test
+(deftest ^:new ns-name-test
   (testing "returns the name of the namespace if it exists"
     (is (= (symbol "test-ns")
            (-> (create-ns (empty-ns-map) (symbol "test-ns"))
@@ -471,7 +475,7 @@
     (is (thrown-with-msg? Exception #"No namespace: test-ns found"
           (ns-name (empty-ns-map) (symbol "test-ns"))))))
 
-(deftest ns-remove-test
+(deftest ^:new ns-remove-test
   (testing "removes an ns from the map"
     (let [namespaces (create-ns (empty-ns-map) (symbol "test-ns"))]
       (is (= {}
@@ -481,7 +485,7 @@
     (let [namespaces (ns-remove (empty-ns-map) (symbol "test-ns"))]
       (is (nil? (find-ns namespaces (symbol "test-ns")))))))
 
-(deftest ns-unmap-test
+(deftest ^:new ns-unmap-test
   (testing "removes a sym from the ns map"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (intern (symbol "test-ns") (symbol "v1"))

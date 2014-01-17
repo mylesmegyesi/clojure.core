@@ -1,7 +1,7 @@
 (ns clojure.lang.symbol-test
   (:refer-clojure :only [let get nil? defn])
   (:require [clojure.test                 :refer :all]
-            [clojure.lang.assertions      :refer :all]
+            [clojure.lang.assertions      :refer [is-equal is-less-than is-greater-than]]
             [clojure.lang.hash            :refer [hash]]
             [clojure.lang.keyword         :refer [keyword]]
             [clojure.lang.meta            :refer [meta with-meta]]
@@ -9,7 +9,7 @@
             [clojure.lang.operators       :refer [not not= = ==]]
             [clojure.lang.platform.object :refer [identical?]]
             [clojure.lang.show            :refer [str]]
-            [clojure.lang.symbol          :refer :all]))
+            [clojure.lang.symbol          :refer [symbol symbol?]]))
 
 (deftest symbol-test
   (testing "creates a symbol given just a name"
@@ -30,8 +30,8 @@
 
   (testing "creates a symbol given a namespace-qualified name that has many slashes"
     (let [sym (symbol "the-ns/sym-name/other-name")]
-      (is (= "other-name" (name sym)))
-      (is (= "the-ns/sym-name" (namespace sym)))))
+      (is (= "sym-name/other-name" (name sym)))
+      (is (= "the-ns" (namespace sym)))))
 
   (testing "just returns the symbol if given a symbol"
     (let [sym (symbol "sym")]
@@ -51,8 +51,9 @@
       (is (= 1 (get {sym1 1} sym1)))
       (is (= 1 (get {sym1 1} sym2)))
       (is (= 1 (get {sym2 1} sym1)))
-      (is (= 1 (get {sym2 1} sym2)))))
+      (is (= 1 (get {sym2 1} sym2))))))
 
+(deftest ^:patch symbol-creation
   (testing "cannot create a symbol with nil name"
     (is (thrown-with-msg? Exception #"Can't create symbol with nil name"
           (symbol nil nil)))))
@@ -67,7 +68,7 @@
 
 (deftest meta-test
   (testing "symbols have no initial metadata"
-    (is (= {} (meta (symbol "sym")))))
+    (is (nil? (meta (symbol "sym")))))
 
   (testing "adds metadata using with-meta"
     (let [sym1 (symbol "the-ns" "sym")

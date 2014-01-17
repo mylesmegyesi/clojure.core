@@ -1,9 +1,9 @@
 (ns clojure.lang.keyword-test
-  (:refer-clojure :only [let + defmacro])
+  (:refer-clojure :only [let + defmacro nil?])
   (:require [clojure.test                 :refer :all]
-            [clojure.lang.assertions      :refer :all]
+            [clojure.lang.assertions      :refer [is-equal is-less-than is-greater-than]]
             [clojure.lang.hash            :refer [hash]]
-            [clojure.lang.keyword         :refer :all]
+            [clojure.lang.keyword         :refer [keyword keyword?]]
             [clojure.lang.meta            :refer [meta with-meta]]
             [clojure.lang.named           :refer [name namespace]]
             [clojure.lang.operators       :refer [not not= not== = ==]]
@@ -44,8 +44,8 @@
 
   (testing "creates a keyword with a namespace-qualified name that has many slashes"
     (let [kwd (keyword "the-ns/kwd/kw2")]
-      (is (= "kw2" (name kwd)))
-      (is (= "the-ns/kwd" (namespace kwd)))))
+      (is (= "kwd/kw2" (name kwd)))
+      (is (= "the-ns" (namespace kwd)))))
 
   (testing "returns the string representation of the keyword"
     (let [kwd1 (keyword "kwd1")
@@ -60,24 +60,6 @@
   (testing "returns false if the given object is not a keyword"
     (is (= false (keyword? 1)))
     (is (= false (keyword? nil)))))
-
-(deftest meta-test
-  (testing "keywords have no initial metadata"
-    (is (= {} (meta (keyword "kwd")))))
-
-  (testing "adds metadata using with-meta"
-    (let [kwd1 (keyword "the-ns" "kwd")
-          m {:some-meta "here" :private true}
-          kwd2 (with-meta kwd1 m)]
-      (is (not (identical? kwd1 kwd2)))
-      (is (= kwd1 kwd2))
-
-      (is (= m (meta kwd2)))
-      (is (= (hash kwd1)
-             (hash kwd2)))
-      (is (= "the-ns" (namespace kwd2)))
-      (is (= "kwd" (name kwd2)))
-      (is (= ":the-ns/kwd" (str kwd2))))))
 
 (deftest compare-test
   (testing "equal if ns and name are equal"
@@ -105,10 +87,6 @@
   (testing "not equal if either is nil"
     (is (not= nil (keyword "kwd")))
     (is (not= (keyword "kwd") nil)))
-
-  (testing "not equal unless other is also a keyword"
-    (is (not= (keyword "kwd") (symbol "kwd")))
-    (is (not== (keyword "kwd") (symbol "kwd"))))
 
   (testing "returns 0 if the keywords are equal"
     (let [lhs (keyword "kwd")
@@ -154,3 +132,8 @@
     (let [lhs (keyword "ns" "b")
           rhs (keyword "ns" "a")]
       (is-greater-than lhs rhs))))
+
+(deftest ^:new keyword-equiv
+  (testing "not equal unless other is also a keyword"
+    (is (not= (keyword "kwd") (symbol "kwd")))
+    (is (not== (keyword "kwd") (symbol "kwd")))))

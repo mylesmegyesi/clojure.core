@@ -4,7 +4,8 @@
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.operators            :refer [not =]]
             [clojure.lang.persistent-array-map :refer [array-map]]
-            [clojure.lang.seq                  :refer [first next seq]])
+            [clojure.lang.seqable              :refer [seq]]
+            [clojure.lang.seq                  :refer [first next]])
   (:import [java.util NoSuchElementException]))
 
 (deftest platform-equals-test
@@ -22,10 +23,6 @@
     (let [iterator (.iterator (array-map))]
       (is (not (.hasNext iterator)))))
 
-  (testing "throws an NoSuchElementException when there is no next iterable"
-    (let [iterator (.iterator (array-map))]
-      (is (thrown? NoSuchElementException (.next iterator)))))
-
   (testing "returns the next element when there is a next element"
     (let [m1 (array-map :k1 1)
           iterator (.iterator m1)]
@@ -42,6 +39,11 @@
   (testing "throws an UnsupportedOperationException when trying to use remove"
     (let [iterator (.iterator (array-map))]
       (is (thrown? UnsupportedOperationException (.remove iterator))))))
+
+(deftest ^:patch call-next-on-empty-iterator
+  (testing "throws an NoSuchElementException when there is no next iterable"
+    (let [iterator (.iterator (array-map))]
+      (is (thrown? NoSuchElementException (.next iterator))))))
 
 (deftest platform-hash-code-test
   (testing "returns the hashCode"

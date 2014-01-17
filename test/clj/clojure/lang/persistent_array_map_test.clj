@@ -3,18 +3,25 @@
   (:require [clojure.test                      :refer :all]
             [clojure.lang.counted              :refer [count]]
             [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.ihash                :refer [IHash]]
             [clojure.lang.lookup               :refer [contains? get]]
             [clojure.lang.map-entry            :refer [key val]]
             [clojure.lang.operators            :refer [not not= =]]
             [clojure.lang.persistent-map       :refer [assoc dissoc]]
-            [clojure.lang.persistent-array-map :refer :all]
+            [clojure.lang.persistent-array-map :refer [array-map]]
             [clojure.lang.platform.object      :refer [identical?]]
             [clojure.lang.platform.exceptions  :refer [argument-error]]
-            [clojure.lang.seq                  :refer [first next seq]]))
+            [clojure.lang.seqable              :refer [seq]]
+            [clojure.lang.seq                  :refer [first next]]
+            [clojure.lang.test-helper          :refer [hashed-type]]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))
+
+(deftest ^:new array-map-creation
+  (testing "throws an exception if there are not an even number of arguements"
+    (argument-error-is-thrown?
+      #"PersistenArrayMap can only be created with even number of arguements: 3 arguements given"
+      (array-map :k1 1 :k2))))
 
 (deftest map-test
 
@@ -30,11 +37,6 @@
       (is (= 1 (get m2 :k1)))
       (is (= 2 (get m2 :k2)))
       (is (= 2 (count m2)))))
-
-  (testing "throws an exception if there are not an even number of arguements"
-    (argument-error-is-thrown?
-      #"PersistenArrayMap can only be created with even number of arguements: 3 arguements given"
-      (array-map :k1 1 :k2)))
 
   (testing "associates a key to a value"
     (let [m1 (array-map)
@@ -227,28 +229,24 @@
 
   )
 
-(deftype Thing [t]
-  IHash
-  (-hash [this] t))
-
 (deftest map-hash-test
   (testing "the hash of an empty map-hash is zero"
     (let [m1 (array-map)]
       (is (= 0 (hash m1)))))
 
-  (testing "calculates the bit-and of the key and value and adds them together"
-    (let [thing1 (Thing. 2r1101)
-          thing2 (Thing. 2r1010)
-          m1 (array-map thing1 thing2)]
-      (is (= 2r1000 (hash m1)))))
+  (testing "calculates the exclusive-bit-or of the key and value and adds them together"
+    (let [k (hashed-type 2r1101)
+          v (hashed-type 2r1010)
+          m1 (array-map k v)]
+      (is (= 2r0111 (hash m1)))))
 
-  (testing "calculates the bit-and of to map entries"
-    (let [thing1 (Thing. 2r1101)
-          thing2 (Thing. 2r1010)
-          thing3 (Thing. 2r1011)
-          thing4 (Thing. 2r1111)
+  (testing "calculates the exclusive-bit-or of to map entries"
+    (let [thing1 (hashed-type 2r1101)
+          thing2 (hashed-type 2r1010)
+          thing3 (hashed-type 2r1011)
+          thing4 (hashed-type 2r1111)
           m1 (array-map thing1 thing2 thing3 thing4)]
-      (is (= 2r10011 (hash m1)))))
+      (is (= 2r1011 (hash m1)))))
 
   (testing "hash code of equivalent maps will be the same"
     (let [m1 (array-map :k 1)
