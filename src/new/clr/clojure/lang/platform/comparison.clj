@@ -2,26 +2,32 @@
   (:refer-clojure :only [defmacro defprotocol extend-protocol fn defn list -> update-in cons])
   (:require [clojure.lang.icomparable  :refer [CljComparable]]
             [clojure.lang.iequivalence :refer [IEquivalence]]
-            [clojure.lang.platform.numbers]))
+            [clojure.lang.platform.numbers :refer [number? num-equivalent? num-equal?]]))
 
 (extend-protocol CljComparable
   Object
   (-compare-to [this other]
-    (.compareTo this other)))
+    (.CompareTo this other)))
 
 (extend-protocol IEquivalence
   Object
   (-equivalent? [this other]
-    (.equals this other))
+    (if (number? this)
+      (num-equivalent? this other)
+      (.Equals this other)))
+
   (-equal? [this other]
-    (.equals this other)))
+    (if (number? this)
+      (num-equal? this other)
+      (.Equals this other)))
+  )
 
 (defn platform-compare-to-method [methods init-macro]
   (update-in methods
-             ['Comparable]
+             ['IComparable]
              (fn [old]
                (cons
-                 (list 'compareTo ['this 'other]
+                 (list 'CompareTo ['this 'other]
                        (list init-macro 'this 'other))
                  old))))
 
@@ -30,6 +36,6 @@
              ['Object]
              (fn [old]
                (cons
-                 (list 'equals ['this 'other]
+                 (list 'Equals ['this 'other]
                        (list init-macro 'this 'other))
                  old))))

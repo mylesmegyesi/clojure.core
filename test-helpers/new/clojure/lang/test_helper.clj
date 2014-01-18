@@ -1,12 +1,11 @@
 (ns clojure.lang.test-helper
-  (:require [clojure.lang.icomparable         :refer [IComparable]]
-            [clojure.lang.iequivalence        :refer [IEquivalence]]
-            [clojure.lang.ihash               :refer [IHash]]
+  (:require [clojure.lang.icomparable         :refer [CljComparable]]
+            [clojure.lang.iequivalence        :refer [IEquivalence]] [clojure.lang.ihash               :refer [IHash]]
             [clojure.lang.platform.comparison :refer [platform-compare-to-method]]
             [clojure.lang.platform.object     :refer [expand-methods]]))
 
 (deftype TenComparator []
-  IComparable
+  CljComparable
   (-compare-to [this other]
     10))
 

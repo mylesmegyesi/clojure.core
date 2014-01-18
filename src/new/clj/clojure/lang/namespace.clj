@@ -1,11 +1,12 @@
 (ns clojure.lang.namespace
   (:refer-clojure :only [defn defn- assoc get-in if-let let assoc-in atom reduce fn val key -> select-keys doseq when-not contains? format apply dissoc get set concat keys update-in])
-  (:require [clojure.lang.named      :refer [namespace name]]
-            [clojure.lang.meta       :refer [meta with-meta]]
-            [clojure.lang.operators  :refer [not or =]]
-            [clojure.lang.show       :refer [str]]
-            [clojure.lang.symbol     :refer [symbol]]
-            [clojure.lang.var        :refer [-alter-var-root make-var make-unbound]]))
+  (:require [clojure.lang.named               :refer [namespace name]]
+            [clojure.lang.meta                :refer [meta with-meta]]
+            [clojure.lang.operators           :refer [not or =]]
+            [clojure.lang.platform.exceptions :refer [new-argument-error]]
+            [clojure.lang.show                :refer [str]]
+            [clojure.lang.symbol              :refer [symbol]]
+            [clojure.lang.var                 :refer [-alter-var-root make-var make-unbound]]))
 
 (defn create-ns [namespaces ns-sym]
   (assoc namespaces ns-sym {:mappings {}
@@ -18,7 +19,7 @@
 (defn the-ns [namespaces ns-sym]
   (if-let [ns (find-ns namespaces ns-sym)]
     ns
-    (throw (Exception. (str "No namespace: " ns-sym " found")))))
+    (throw (new-argument-error (str "No namespace: " ns-sym " found")))))
 
 (def ns-name the-ns)
 
@@ -31,14 +32,14 @@
     (if-let [existing-alias (resolve-alias namespaces to-ns-sym alias)]
       (if (= existing-alias target-ns-sym)
         namespaces
-        (throw (Exception. (str "Alias " alias " already exists in namespace " to-ns ", aliasing " existing-alias))))
+        (throw (new-argument-error (str "Alias " alias " already exists in namespace " to-ns ", aliasing " existing-alias))))
       (assoc-in namespaces
                 [to-ns :aliases alias]
                 target-ns))))
 
 (defn intern [namespaces -ns sym]
   (if (namespace sym)
-    (throw (IllegalArgumentException. "Can't intern namespace-qualified symbol")))
+    (throw (new-argument-error "Can't intern namespace-qualified symbol")))
   (let [-ns (the-ns namespaces -ns)
         root (atom nil)
         v (make-var (or (meta sym) {}) -ns sym root)]
@@ -125,12 +126,12 @@
     mappings))
 
 (defn- throw-does-not-exist [sym]
-  (throw (Exception. (str sym " does not exist"))))
+  (throw (new-argument-error (str sym " does not exist"))))
 
 (defn- validate-exists [mappings namespaces syms message]
   (doseq [sym syms]
     (when-not (contains? mappings sym)
-      (throw (Exception. (format message sym)))))
+      (throw (new-argument-error (format message sym)))))
   mappings)
 
 (defn- filter-excludes [mappings excludes]
@@ -175,6 +176,6 @@
 
 (defn ns-unmap [namespaces ns-sym sym]
   (if (namespace sym)
-    (throw (Exception. "Can't unintern namespace-qualified symbol")))
+    (throw (new-argument-error "Can't unintern namespace-qualified symbol")))
   (update-in namespaces
              [(the-ns namespaces ns-sym) :mappings] #(dissoc % sym)))
