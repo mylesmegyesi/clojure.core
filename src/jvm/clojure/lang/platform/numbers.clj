@@ -375,7 +375,7 @@
 
 (defn- long-hash-code [lpart]
   (NumberOps/primativeInt
-    (NumberOps/longBitOr
+    (NumberOps/longBitXor
       lpart
       (NumberOps/longBitUnsignedShiftRight lpart 32))))
 

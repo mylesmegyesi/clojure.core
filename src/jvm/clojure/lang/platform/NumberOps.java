@@ -18,7 +18,7 @@ public class NumberOps {
     return x + y;
   }
 
-  public static long longBitOr(long x, long y) {
+  public static long longBitXor(long x, long y) {
     return x ^ y;
   }
 
