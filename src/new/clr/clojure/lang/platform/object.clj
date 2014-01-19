@@ -6,7 +6,9 @@
   (.GetType obj))
 
 (defn instance? [cls obj]
-  (.IsAssignableFrom cls (type obj)))
+  (if obj
+    (.IsAssignableFrom cls (type obj))
+    false))
 
 (defn identical? [x y]
   (Object/ReferenceEquals x y))

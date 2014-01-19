@@ -20,8 +20,8 @@
   (testing "allows an atom's state to be set if the current state's comparison succeeds"
     (let [atm     (atom "atm")
           success (compare-and-set! atm "atm" "new atm")]
-      (is (and success
-               (= "new atm" (deref atm))))))
+      (is (= true success))
+      (is (= "new atm" (deref atm)))))
 
   (testing "does not allow an atom's state to be set if the current state's comparison fails"
     (let [atm     (atom "atm")

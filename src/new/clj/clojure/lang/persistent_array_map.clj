@@ -160,7 +160,7 @@
   (PersistentArrayMap. arr size count (make-array-map-seq arr count (dec count) 0)))
 
 (defn array-map [& args]
-  (let [[arr size] (arr/make-array-with-items (or args []))]
+  (let [[arr size] (arr/make-array-with-items args)]
     (if (even? size)
       (make-array-map arr size (/ size 2))
       (throw (new-argument-error

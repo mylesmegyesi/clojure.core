@@ -7,14 +7,16 @@
   (Array/newInstance Object (int size)))
 
 (defn make-array-with-items [iterable]
-  (let [it (.iterator iterable)
-        arr-list (ArrayList.)]
-    (loop [size 0]
-      (if (.hasNext it)
-        (do
-          (.add arr-list (.next it))
-          (recur (inc size)))
-        [(.toArray arr-list) size]))))
+  (if iterable
+    (let [it (.iterator iterable)
+          arr-list (ArrayList.)]
+      (loop [size 0]
+        (if (.hasNext it)
+          (do
+            (.add arr-list (.next it))
+            (recur (inc size)))
+          [(.toArray arr-list) size])))
+    [(Array/newInstance Object (int 0)) 0]))
 
 (defn array-set! [arr idx v]
   (Array/set arr idx v))
