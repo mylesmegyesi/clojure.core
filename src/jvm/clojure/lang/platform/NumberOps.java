@@ -17,4 +17,16 @@ public class NumberOps {
   public static double doubleAdd(double x, double y) {
     return x + y;
   }
+
+  public static long longBitXor(long x, long y) {
+    return x ^ y;
+  }
+
+  public static long longBitUnsignedShiftRight(long x, long y) {
+    return x >>> y;
+  }
+
+  public static int primativeInt(Number x) {
+    return x.intValue();
+  }
 }

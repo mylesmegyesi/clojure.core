@@ -1,6 +1,7 @@
 (ns clojure.lang.operators
   (:refer-clojure :only [apply cond declare defmacro defn defn- if-let let nil? true?])
-  (:require [clojure.lang.iequivalence    :refer [-equivalent?]]
+  (:require [clojure.lang.iequivalence    :refer [-equivalent? -equal?]]
+            [clojure.lang.platform.comparison]
             [clojure.lang.platform.object :refer [type]]))
 
 (defmacro and
@@ -32,28 +33,27 @@
        :else
        ~@body)))
 
-(defn- values-equal? [x y]
+(defn- equal? [x y]
+  (when-not-nil
+    x y
+    (-equal? x y)))
+
+(defn- equivalent? [x y]
   (when-not-nil
     x y
     (-equivalent? x y)))
 
-(defn- values-and-types-equal? [x y]
-  (when-not-nil
-    x y
-    (and (-equivalent? (type x) (type y))
-         (-equivalent? x y))))
-
 (defn =
-  "Loose eqaulity. Equality is determined by value."
+  "Eqaulity. Calls the -equal? method on the first argument."
   ([x] true)
-  ([x y] (values-equal? x y))
-  ([x y & more] (and (= x y) (apply = x more))))
+  ([x y] (equal? x y))
+  ([x y & more] (and (= x y) (apply = y more))))
 
 (defn ==
-  "Strict eqaulity. Equality is determined by value and type."
+  "Equivalence. Calls the -equal? method on the first argument."
   ([x] true)
-  ([x y] (values-and-types-equal? x y))
-  ([x y & more] (and (== x y) (apply == x more))))
+  ([x y] (equivalent? x y))
+  ([x y & more] (and (== x y) (apply == y more))))
 
 (defn not
   "Returns true if x is logical false, false otherwise."

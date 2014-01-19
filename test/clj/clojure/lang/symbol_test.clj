@@ -109,13 +109,10 @@
     (is (not= nil (symbol "sym")))
     (is (not= (symbol "sym") nil)))
 
-  (testing "not equal if either does not implement the Named protocol"
+  (testing "not equal if either is not a symbol"
     (is (not= 1 (symbol "sym")))
-    (is (not= (symbol "sym") 1)))
-
-  (testing "can be equal to other Named types"
-    (is (= (symbol "kwd") (keyword "kwd")))
-    (is (= (keyword "kwd") (symbol "kwd"))))
+    (is (not= (symbol "sym") 1))
+    (is (not= (symbol "sym") (keyword "sym"))))
 
   (testing "returns 0 if the symbols are equal"
     (let [lhs (symbol "sym")

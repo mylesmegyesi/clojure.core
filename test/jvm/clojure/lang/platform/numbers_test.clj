@@ -1,10 +1,11 @@
 (ns clojure.lang.platform.numbers-test
   (:refer-clojure :only [defmacro let doseq defn cons when
                          byte short int long bigint biginteger float double
-                         = == / not= hash
+                         /
                          ])
   (:require [clojure.test                 :refer [deftest is testing]]
-            ; [clojure.lang.hash            :refer [hash]] make me work
+            [clojure.lang.hash            :refer [hash]]
+            [clojure.lang.operators       :refer [= == not=]]
             [clojure.lang.show            :refer [str]]
             [clojure.lang.platform.object :refer [type]]))
 
