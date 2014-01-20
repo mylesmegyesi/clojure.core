@@ -1,4 +1,4 @@
-(ns clojure.lang.persistent-set-helper
+(ns clojure.lang.apersistent-set
   (:refer-clojure :only [apply assoc cons defmacro defn defn- dissoc empty? every? fn flatten first keys let list list* loop map reduce repeat rest take + ->])
   (:require [clojure.lang.counted             :refer [count]]
             [clojure.lang.hash                :refer [hash]]
@@ -45,16 +45,16 @@
 
 (defmacro set-equals?-init
   [this other-set]
-  (list 'clojure.lang.persistent-set-helper/set-equals? '-map other-set))
+  (list 'clojure.lang.apersistent-set/set-equals? '-map other-set))
 
 (defmacro set-hash-init
   [this]
-  (list 'clojure.lang.persistent-set-helper/set-hash (list 'clojure.lang.seq/seq this)))
+  (list 'clojure.lang.apersistent-set/set-hash (list 'clojure.lang.seq/seq this)))
 
 (def platform-set-methods
   (-> {}
-    (platform-equals-method 'clojure.lang.persistent-set-helper/set-equals?-init)
-    (platform-hash-method 'clojure.lang.persistent-set-helper/set-hash-init)
+    (platform-equals-method 'clojure.lang.apersistent-set/set-equals?-init)
+    (platform-hash-method 'clojure.lang.apersistent-set/set-hash-init)
     expand-methods))
 
 (defmacro defset [type gen-next]
@@ -78,7 +78,7 @@
         (list gen-next 'next-map)))
 
     (list '-difference ['this 'sets]
-      (list 'clojure.core/let ['next-map (list 'clojure.lang.persistent-set-helper/set-difference '-map 'sets)]
+      (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-difference '-map 'sets)]
         (list gen-next 'next-map)))
 
     (list '-disj ['this 'xs]
@@ -86,15 +86,15 @@
         (list gen-next 'next-map)))
 
     (list '-intersection ['this 'sets]
-      (list 'clojure.core/let ['next-map (list 'clojure.lang.persistent-set-helper/set-intersection '-map 'sets)]
+      (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-intersection '-map 'sets)]
         (list gen-next 'next-map)))
 
     (list '-union ['this 'sets]
-      (list 'clojure.core/let ['next-map (list 'clojure.lang.persistent-set-helper/set-union '-map 'sets)]
+      (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-union '-map 'sets)]
         (list gen-next 'next-map)))
 
     'clojure.lang.iseqable/ISeqable
     (list '-seq ['this]
       (list 'clojure.core/seq (list 'clojure.core/keys '-map)))
 
-    clojure.lang.persistent-set-helper/platform-set-methods))
+    clojure.lang.apersistent-set/platform-set-methods))

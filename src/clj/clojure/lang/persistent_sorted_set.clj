@@ -1,6 +1,6 @@
 (ns clojure.lang.persistent-sorted-set
   (:refer-clojure :only [apply cons declare defn defn- sorted-map sorted-map-by])
-  (:require [clojure.lang.persistent-set-helper :refer [defset make-pairs]]))
+  (:require [clojure.lang.apersistent-set :refer [defset make-pairs]]))
 
 (declare make-sorted-set)
 
