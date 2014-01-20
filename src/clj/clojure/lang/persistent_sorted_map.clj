@@ -403,10 +403,10 @@
                    v
                    (val (-entry root)))
          left (if (< comparison 0)
-                (sorted-map-replace (-left root) k v)
+                (sorted-map-replace (-left root) compare-fn k v)
                 (-left root))
          right (if (> comparison 0)
-                 (sorted-map-replace (-right root) k v)
+                 (sorted-map-replace (-right root) compare-fn k v)
                  (-right root))]
     (-replace root (make-map-entry (key (-entry root)) new-val) left right)))
 
@@ -483,8 +483,7 @@
               (rest kv)
               (assoc -sorted-map k v)))))))
   ([root cnt compare-fn]
-    (PersistentSortedMap. root cnt compare-fn))
-  )
+    (PersistentSortedMap. root cnt compare-fn)))
 
 (defn- keyvals [args]
   (loop [remaining-args args

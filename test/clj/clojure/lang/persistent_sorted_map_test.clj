@@ -4,7 +4,7 @@
             [clojure.lang.counted               :refer [count]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.operators             :refer [not not= =]]
-            [clojure.lang.persistent-map        :refer [assoc]]
+            [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
             [clojure.lang.platform.object       :refer [identical?]]))
@@ -59,6 +59,13 @@
           m2 (assoc m1 :key 1)
           m3 (assoc m2 :key 1)]
       (is (identical? m2 m3))))
+
+  (testing "associates many keys to their values"
+    (let [m1 (sorted-map :k1 1)
+          m2 (assoc m1 :k2 2 :k3 3 :k1 4)]
+      (is (= 4 (get m2 :k1)))
+      (is (= 2 (get m2 :k2)))
+      (is (= 3 (get m2 :k3)))))
 
   (testing "returns a provided not-found value when using get"
     (let [m1 (sorted-map)]
