@@ -65,6 +65,13 @@
           m3 (assoc m2 :key 1)]
       (is (identical? m2 m3))))
 
+  (testing "associates many keys to their values"
+    (let [m1 (array-map :k1 1)
+          m2 (assoc m1 :k2 2 :k3 3 :k1 4)]
+      (is (= 4 (get m2 :k1)))
+      (is (= 2 (get m2 :k2)))
+      (is (= 3 (get m2 :k3)))))
+
   (testing "dissociates a key from a map with one item"
     (let [m1 (array-map :k1 1)
           m2 (dissoc m1 :k1)]
