@@ -1,13 +1,26 @@
 (ns clojure.lang.persistent-sorted-map-test
-  (:refer-clojure :only [defmacro let list list* nil?])
+  (:refer-clojure :only [defmacro deftype defn let list list* nil? re-pattern])
   (:require [clojure.test                       :refer :all]
+            [clojure.lang.persistent-map-test   :refer [map-test]]
+            [clojure.lang.persistent-sorted-map :refer [sorted-map]]
+
             [clojure.lang.counted               :refer [count]]
+            [clojure.lang.ihash                 :refer [IHash]]
+            [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
+            [clojure.lang.map-entry             :refer [key val]]
             [clojure.lang.operators             :refer [not not= =]]
             [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
-            [clojure.lang.platform.object       :refer [identical?]]))
+            [clojure.lang.platform.object       :refer [identical?]]
+            [clojure.lang.seq                   :refer [seq first next]]
+            [clojure.lang.show                  :refer [str]]
+            ))
+
+; uncomment this when the rest of sorted map is implemented
+;(deftest sorted-map-test
+;  (map-test "PersistentSortedMap" sorted-map))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))

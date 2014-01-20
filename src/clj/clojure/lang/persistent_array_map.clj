@@ -163,5 +163,5 @@
     (if (even? size)
       (make-array-map arr size (/ size 2))
       (throw (new-argument-error
-               (format "PersistenArrayMap can only be created with even number of arguements: %s arguements given"
+               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
                        size))))))
