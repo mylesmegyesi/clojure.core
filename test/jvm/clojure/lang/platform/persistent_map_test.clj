@@ -31,13 +31,6 @@
       (is (= (first (seq m1))
              (.next iterator)))))
 
-  (testing "return the next next element when there is a next next element"
-    (let [m1 (constructor :k1 1 :k2 2)
-          iterator (.iterator m1)]
-      (.next iterator)
-      (is (= (first (next (seq m1)))
-             (.next iterator)))))
-
   (testing "throws an UnsupportedOperationException when trying to use remove"
     (let [iterator (.iterator (constructor))]
       (is (thrown? UnsupportedOperationException (.remove iterator))))))

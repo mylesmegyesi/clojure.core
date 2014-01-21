@@ -5,13 +5,11 @@
             [clojure.lang.ihash                 :refer [IHash]]
             [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
-            [clojure.lang.map-entry             :refer [key val]]
             [clojure.lang.operators             :refer [not not= =]]
             [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
             [clojure.lang.platform.object       :refer [identical?]]
-            [clojure.lang.seq                   :refer [seq first next]]
             [clojure.lang.show                  :refer [str]]))
 
 (defmacro argument-error-is-thrown? [msg & body]
@@ -150,68 +148,6 @@
     (let [m1 (constructor)]
       (is (= "not found" (get m1 :not-a-key "not found"))))))
 
-(defn map-seq-test [constructor]
-  (testing "seq returns nil when the map is empty"
-    (is (nil? (seq (constructor)))))
-
-  (testing "first gives a map entry with the key and val"
-    (let [m1 (constructor :k1 1)
-          m1-seq (seq m1)
-          entry (first m1-seq)]
-      (is (= :k1 (key entry)))
-      (is (= 1 (val entry)))))
-
-  (testing "next returns nil when there is only one entry"
-    (is (nil? (next (seq (constructor :k1 1))))))
-
-  (testing "returns the first map entry when there are two items"
-    (let [m1 (constructor :k1 1 :k2 2)
-          m1-seq (seq m1)
-          entry (first m1-seq)]
-      (is (= :k1 (key entry)))
-      (is (= 1 (val entry)))))
-
-  (testing "next returns nil when there more than one entry"
-    (let [m1 (constructor :k1 1 :k2 2)
-          m1-seq (seq m1)
-          m2-seq (next m1-seq)
-          entry (first m2-seq)]
-      (not (identical? m1-seq m2-seq))
-      (is (= :k2 (key entry)))
-      (is (= 2 (val entry)))))
-
-  (testing "can keep calling next and eventually get to every item"
-    (let [m1-seq (seq (constructor :k1 1 :k2 2 :k3 3 :k4 4 :k5 5))
-          m2-seq (next m1-seq)
-          m3-seq (next m2-seq)
-          m4-seq (next m3-seq)
-          m5-seq (next m4-seq)
-          m6-seq (next m5-seq)]
-      (is (= :k1 (key (first m1-seq))))
-      (is (= 1   (val (first m1-seq))))
-      (is (= :k2 (key (first m2-seq))))
-      (is (= 2   (val (first m2-seq))))
-      (is (= :k3 (key (first m3-seq))))
-      (is (= 3   (val (first m3-seq))))
-      (is (= :k4 (key (first m4-seq))))
-      (is (= 4   (val (first m4-seq))))
-      (is (= :k5 (key (first m5-seq))))
-      (is (= 5   (val (first m5-seq))))
-      (is (nil? m6-seq))))
-
-  (testing "counts the items in a seq"
-    (let [m1-seq (seq (constructor :k1 1 :k2 2 :k3 3 :k4 4 :k5 5))
-          m2-seq (next m1-seq)
-          m3-seq (next m2-seq)
-          m4-seq (next m3-seq)
-          m5-seq (next m4-seq)
-          m6-seq (next m5-seq)]
-      (is (= 5 (count m1-seq)))
-      (is (= 4 (count m2-seq)))
-      (is (= 3 (count m3-seq)))
-      (is (= 2 (count m4-seq)))
-      (is (= 1 (count m5-seq))))))
-
 (defn map-equivalence-test [constructor]
   (testing "equal if same keys and values"
     (let [m1 (constructor :k1 1 :k2 2)
@@ -265,6 +201,5 @@
   (map-creation-test class-name constructor)
   (map-assoc-test constructor)
   (map-dissoc-test constructor)
-  (map-seq-test constructor)
   (map-equivalence-test constructor)
   (map-hash-test constructor))
