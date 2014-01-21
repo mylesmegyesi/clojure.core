@@ -72,6 +72,11 @@
       (is (= 3 (get m2 :k3))))))
 
 (defn map-dissoc-test [constructor]
+  (testing "dissociating zero keys from a map will return the same map"
+    (let [m1 (constructor)
+          m2 (dissoc m1)]
+      (is (identical? m1 m2))))
+
   (testing "dissociates a key from a map with one item"
     (let [m1 (constructor :k1 1)
           m2 (dissoc m1 :k1)]
@@ -128,10 +133,18 @@
       (is (= 2 (get m4 :k2)))
       (is (nil? (get m4 :k3)))))
 
+  (testing "dissociates many keys"
+    (let [m1 (constructor :k1 1 :k2 2 :k3 3)
+          m2 (dissoc m1 :k1 :k3 :k4)]
+      (is (= 2 (get m2 :k2)))
+      (is (not (contains? m2 :k1)))
+      (is (not (contains? m2 :k3)))))
+
   (testing "returns the map when there are not items to dissoc"
     (let [m1 (constructor :k1 1 :k2 2 :k3 3)]
-      (is (identical? m1 (dissoc m1 :k4)))))
+      (is (identical? m1 (dissoc m1 :k4))))))
 
+(defn map-contains?-test [constructor]
   (testing "contains? a key if the key is present in the map"
     (let [m1 (constructor :k1 1)]
       (is (contains? m1 :k1))))
@@ -201,5 +214,6 @@
   (map-creation-test class-name constructor)
   (map-assoc-test constructor)
   (map-dissoc-test constructor)
+  (map-contains?-test constructor)
   (map-equivalence-test constructor)
   (map-hash-test constructor))
