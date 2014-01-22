@@ -5,7 +5,8 @@
             [clojure.lang.lookup    :refer [contains? get]]
             [clojure.lang.map-entry :refer [key val]]
             [clojure.lang.operators :refer [and =]]
-            [clojure.lang.seq       :refer [first next seq]]))
+            [clojure.lang.seqable   :refer [seq]]
+            [clojure.lang.seq       :refer [first next]]))
 
 (defn map-hash [-seq]
   (loop [entries -seq

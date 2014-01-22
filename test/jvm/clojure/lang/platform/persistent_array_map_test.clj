@@ -4,7 +4,8 @@
             [clojure.lang.operators                    :refer [=]]
             [clojure.lang.platform.persistent-map-test :refer [platform-map-test]]
             [clojure.lang.persistent-array-map         :refer [array-map]]
-            [clojure.lang.seq                          :refer [first next seq]]))
+            [clojure.lang.seqable                      :refer [seq]]
+            [clojure.lang.seq                          :refer [first next]]))
 
 (deftest array-map-platform-test
   (platform-map-test array-map))

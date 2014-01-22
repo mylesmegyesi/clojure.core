@@ -8,7 +8,7 @@
             [clojure.lang.operators             :refer [not =]]
             [clojure.lang.persistent-set        :refer [conj difference disj intersection subset? superset? union]]
             [clojure.lang.persistent-sorted-set :refer :all]
-            [clojure.lang.seq                   :refer [seq]]))
+            [clojure.lang.seqable               :refer [seq]]))
 
 (deftest persistent-sorted-set-test
   (testing "an empty sorted set does not contains? an item"

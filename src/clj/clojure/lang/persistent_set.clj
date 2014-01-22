@@ -5,10 +5,10 @@
             [clojure.lang.lookup              :refer [contains?]]
             [clojure.lang.operators           :refer [and]]
             [clojure.lang.persistent-hash-set :refer [hash-set]]
-            [clojure.lang.seq                 :refer [seq]]))
+            [clojure.lang.seqable             :refer [seq]]))
 
 (defn conj
-  ([this x] (-conj this [x]))
+  ([this x] (-conj this (cons x nil)))
   ([this x & xs] (-conj this (cons x xs))))
 
 (defn difference

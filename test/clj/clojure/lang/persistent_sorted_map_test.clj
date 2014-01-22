@@ -8,7 +8,11 @@
             [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-sorted-map :refer :all]
-            [clojure.lang.seq                   :refer [seq first next]]))
+            [clojure.lang.platform.exceptions   :refer [argument-error]]
+            [clojure.lang.platform.object       :refer [identical?]]
+            [clojure.lang.seqable               :refer [seq]]
+            [clojure.lang.seq                   :refer [first next]]
+            [clojure.lang.show                  :refer [str]]))
 
 (deftest sorted-map-test
   (map-test "PersistentTreeMap" sorted-map))

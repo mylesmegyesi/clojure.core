@@ -24,3 +24,12 @@
 
 (defn array-copy! [src src-pos dest dest-pos length]
   (System/arraycopy src src-pos dest dest-pos length))
+
+(defn get-array-length [arr]
+  (Array/getLength arr))
+
+(defn array-clone! [arr]
+  (let [size (get-array-length arr)
+        new-arr (make-array size)]
+    (array-copy! arr 0 new-arr 0 size)
+    new-arr))

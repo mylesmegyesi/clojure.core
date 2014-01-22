@@ -1,8 +1,19 @@
 (ns clojure.lang.operators
   (:refer-clojure :only [apply cond declare defmacro defn defn- if-let let nil? true?])
-  (:require [clojure.lang.iequivalence    :refer [-equivalent? -equal?]]
-            [clojure.lang.platform.comparison]
-            [clojure.lang.platform.object :refer [type]]))
+  (:require [clojure.lang.iequivalence         :refer [-equivalent? -equal?]]
+            [clojure.lang.platform.equivalence]
+            [clojure.lang.platform.numbers     :refer [-bit-unsigned-shift-right
+                                                       -bit-shift-left
+                                                       -bit-and
+                                                       -bit-count
+                                                       -bit-or
+                                                       -bit-xor
+                                                       -add
+                                                       -subtract
+                                                       -multiply
+                                                       -increment
+                                                       -decrement]]
+            [clojure.lang.platform.object      :refer [type]]))
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -69,3 +80,36 @@
   "Same as (not (== obj1 obj2))."
   [& args]
   (not (apply == args)))
+
+(defn bit-unsigned-shift-right [n shift]
+  (-bit-unsigned-shift-right n shift))
+
+(defn bit-shift-left [n shift]
+  (-bit-shift-left n shift))
+
+(defn bit-and [n other]
+  (-bit-and n other))
+
+(defn bit-or [n other]
+  (-bit-or n other))
+
+(defn bit-xor [n other]
+  (-bit-xor n other))
+
+(defn bit-count [i]
+  (-bit-count i))
+
+(defn + [x y]
+  (-add x y))
+
+(defn - [x y]
+  (-subtract x y))
+
+(defn * [x y]
+  (-multiply x y))
+
+(defn inc [i]
+  (-increment i))
+
+(defn dec [i]
+  (-decrement i))

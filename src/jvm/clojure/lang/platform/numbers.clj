@@ -18,7 +18,8 @@
   (->double [this])
   (->bigint [this])
   (->ratio  [this])
-  (->bigdec [this]))
+  (->bigdec [this])
+  (unsafe-cast-int [this]))
 
 (defprotocol Categorized
   (category [this]))
@@ -57,13 +58,14 @@
   (category [this] :integer)
 
   NumberCoercions
-  (->int    [this] this)
-  (->long   [this] (.longValue this))
-  (->float  [this] (.floatValue this))
-  (->double [this] (.doubleValue this))
-  (->ratio  [this] (Ratio. (->bigint this) BigInteger/ONE))
-  (->bigint [this] (BigInteger. (.toString this)))
-  (->bigdec [this] (BigDecimal. this)))
+  (->int           [this] this)
+  (->long          [this] (.longValue this))
+  (->float         [this] (.floatValue this))
+  (->double        [this] (.doubleValue this))
+  (->ratio         [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->bigint        [this] (BigInteger. (.toString this)))
+  (->bigdec        [this] (BigDecimal. this))
+  (unsafe-cast-int [this] this))
 
 (extend-type AtomicInteger
   Categorized
@@ -83,12 +85,14 @@
   (category [this] :integer)
 
   NumberCoercions
-  (->long   [this] this)
-  (->float  [this] (.floatValue this))
-  (->double [this] (.doubleValue this))
-  (->ratio  [this] (Ratio. (->bigint this) BigInteger/ONE))
-  (->bigint [this] (BigInteger. (.toString this)))
-  (->bigdec [this] (BigDecimal. (.longValue this))))
+  (->long          [this] this)
+  (->float         [this] (.floatValue this))
+  (->double        [this] (.doubleValue this))
+  (->ratio         [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->bigint        [this] (BigInteger. (.toString this)))
+  (->bigdec        [this] (BigDecimal. (.longValue this)))
+  (unsafe-cast-int [this] (.intValue this))
+  )
 
 (extend-type AtomicLong
   Categorized
@@ -153,9 +157,19 @@
   (->bigdec [this] this))
 
 (defprotocol Ops
-  (ops-equals [ops x y])
-  (ops-add    [ops x y])
-  (zero?      [ops x]))
+  (ops-add                      [ops x y])
+  (ops-bit-and                  [ops x y])
+  (ops-bit-count                [ops i])
+  (ops-bit-or                   [ops x y])
+  (ops-bit-xor                  [ops x y])
+  (ops-bit-shift-left           [ops x y])
+  (ops-bit-unsigned-shift-right [ops x y])
+  (ops-decrement                [ops i])
+  (ops-equals                   [ops x y])
+  (ops-increment                [ops i])
+  (ops-multiply                 [ops x y])
+  (ops-subtract                 [ops x y])
+  (ops-zero?                    [ops x]))
 
 (defmacro -equals [coerce-fn x y]
   `(.equals (~coerce-fn ~x) (~coerce-fn ~y)))
@@ -168,19 +182,31 @@
 (deftype ShortOps []
   Ops
   (ops-equals [_ x y] (-equals ->short x y))
-  (ops-add    [_ x y] (NumberOps/shortAdd (->short x) (->short y)))
   )
 
 (deftype IntegerOps []
   Ops
-  (ops-equals [_ x y] (-equals ->int x y))
-  (ops-add    [_ x y] (NumberOps/intAdd (->int x) (->int y)))
-  )
+  (ops-add                       [_ x y] (NumberOps/intAdd (->int x) (->int y)))
+  (ops-bit-and                   [_ x y] (NumberOps/intBitAnd (->int x) (->int y)))
+  (ops-bit-count                 [_ i]   (Integer/bitCount i))
+  (ops-bit-or                    [_ x y] (NumberOps/intBitOr (->int x) (->int y)))
+  (ops-bit-xor                   [_ x y] (NumberOps/intBitXor (->int x) (->int y)))
+  (ops-bit-shift-left            [_ x y] (NumberOps/intBitShiftLeft (->int x) (->int y)))
+  (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/intBitUnsignedShiftRight (->int x) (->int y)))
+  (ops-decrement                 [_ i]   (NumberOps/intDecrement (->int i)))
+  (ops-equals                    [_ x y] (-equals ->int x y))
+  (ops-increment                 [_ i]   (NumberOps/intIncrement (->int i)))
+  (ops-multiply                  [_ x y] (NumberOps/intMultiply (->int x) (->int y)))
+  (ops-subtract                  [_ x y] (NumberOps/intSubtract (->int x) (->int y))))
 
 (deftype LongOps []
   Ops
-  (ops-equals [_ x y] (-equals ->long x y))
-  (ops-add    [_ x y] (NumberOps/longAdd (->long x) (->long y)))
+  (ops-equals                    [_ x y] (-equals ->long x y))
+  ;(ops-bit-and                   [_ x y] (NumberOps/longBitAnd (->long x) (->long y)))
+  ;(ops-bit-or                    [_ x y] (NumberOps/longBitOr (->long x) (->long y)))
+  (ops-bit-xor                   [_ x y] (NumberOps/longBitXor (->long x) (->long y)))
+  ;(ops-bit-shift-left            [_ x y] (NumberOps/longBitShiftLeft (->long x) (->long y)))
+  (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/longBitUnsignedShiftRight (->long x) (->long y)))
   )
 
 (deftype FloatOps []
@@ -201,7 +227,6 @@
 (deftype BigIntegerOps []
   Ops
   (ops-equals [_ x y] (-equals ->bigint x y))
-  (ops-add    [_ x y] (.add (->bigint x) (->bigint y)))
   )
 
 (def INTEGER-ZERO (Integer. "0"))
@@ -211,7 +236,7 @@
   (ops-equals [this x y]
     (.equals (.compareTo (->bigdec x) (->bigdec y))
              INTEGER-ZERO))
-  (zero?      [this x]
+  (ops-zero?  [this x]
     (.equals (.signum x) INTEGER-ZERO)))
 
 (def BYTE-OPS (ByteOps.))
@@ -228,6 +253,12 @@
   (make-ops [this]))
 
 (extend-protocol MakeOps
+  Integer
+  (make-ops [this] INTEGER-OPS)
+
+  Long
+  (make-ops [this] LONG-OPS)
+
   BigDecimal
   (make-ops [this] BIGDECIMAL-OPS))
 
@@ -373,11 +404,19 @@
 (defmethod no-overflow-ops [BigDecimal BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [BigDecimal BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
 
+(defprotocol BitOperations
+  (-bit-and                  [this other])
+  (-bit-count                [this])
+  (-bit-or                   [this other])
+  (-bit-xor                  [this other])
+  (-bit-shift-left           [this shift])
+  (-bit-unsigned-shift-right [this shift]))
+
 (defn- long-hash-code [lpart]
-  (NumberOps/primativeInt
-    (NumberOps/longBitXor
+  (unsafe-cast-int
+    (-bit-xor
       lpart
-      (NumberOps/longBitUnsignedShiftRight lpart 32))))
+      (-bit-unsigned-shift-right lpart 32))))
 
 (extend-protocol IHash
 
@@ -399,7 +438,7 @@
 
   BigDecimal
   (-hash [this]
-    (if (zero? (make-ops this) this)
+    (if (ops-zero? (make-ops this) this)
       (.hashCode BigInteger/ZERO)
       (.hashCode (.stripTrailingZeros this))))
 
@@ -409,8 +448,15 @@
   (-> (no-overflow-ops (type this) (type other))
     (ops-equals this other)))
 
-(extend-protocol IEquivalence
-  Number
+(defprotocol MathOperations
+  (-add       [x y])
+  (-subtract  [x y])
+  (-multiply  [x y])
+  (-increment [x])
+  (-decrement [x]))
+
+(extend-type Number
+  IEquivalence
   (-equivalent? [this other]
     (if (instance? Number other)
       (equivalent? this other)
@@ -422,4 +468,49 @@
                    (category other))
         (-equivalent? this other)
         false)
-      false)))
+      false))
+
+  BitOperations
+  (-bit-and [this other]
+    (-> (no-overflow-ops (type this) (type other))
+      (ops-bit-and this other)))
+
+  (-bit-count [i]
+    (ops-bit-count (make-ops i) i))
+
+  (-bit-or [this other]
+    (-> (no-overflow-ops (type this) (type other))
+      (ops-bit-or this other)))
+
+  (-bit-xor [this other]
+    (-> (no-overflow-ops (type this) (type other))
+      (ops-bit-xor this other)))
+
+  (-bit-shift-left [this shift]
+    (-> (no-overflow-ops (type this) (type shift))
+      (ops-bit-shift-left this shift)))
+
+  (-bit-unsigned-shift-right [this shift]
+    (-> (no-overflow-ops (type this) (type shift))
+      (ops-bit-unsigned-shift-right this shift)))
+
+  MathOperations
+  (-add [x y]
+    (-> (no-overflow-ops (type x) (type y))
+      (ops-add x y)))
+
+  (-subtract [x y]
+    (-> (no-overflow-ops (type x) (type y))
+      (ops-subtract x y)))
+
+  (-multiply [x y]
+    (-> (no-overflow-ops (type x) (type y))
+      (ops-multiply x y)))
+
+  (-increment [i]
+    (ops-increment (make-ops i) i))
+
+  (-decrement [i]
+    (ops-decrement (make-ops i) i))
+
+  )

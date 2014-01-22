@@ -1,21 +1,21 @@
 (ns clojure.lang.persistent-sorted-map
   (:refer-clojure :only [apply cond comparator cons count dec declare defmacro defn defn- defprotocol deftype empty? even? first format let list* list loop next nil? rest second zero? + - > < ->])
-  (:require [clojure.lang.icounted            :refer [ICounted]]
-            [clojure.lang.ilookup             :refer [ILookup]]
-            [clojure.lang.imeta               :refer [IMeta]]
-            [clojure.lang.ipersistent-map     :refer [IPersistentMap]]
-            [clojure.lang.iseq                :refer [ISeq]]
-            [clojure.lang.iseqable            :refer [ISeqable]]
-            [clojure.lang.apersistent-map     :refer [map-equals? map-hash]]
-            [clojure.lang.comparison          :refer [compare]]
-            [clojure.lang.map-entry           :refer [key make-map-entry val]]
-            [clojure.lang.operators           :refer [and not or = ==]]
-            [clojure.lang.persistent-map      :refer [assoc]]
-            [clojure.lang.platform.comparison :refer [platform-equals-method]]
-            [clojure.lang.platform.enumerable :refer [platform-enumerable-method]]
-            [clojure.lang.platform.exceptions :refer [new-argument-error new-unsupported-error]]
-            [clojure.lang.platform.hash       :refer [platform-hash-method]]
-            [clojure.lang.platform.object     :refer [expand-methods]]))
+  (:require [clojure.lang.icounted             :refer [ICounted]]
+            [clojure.lang.ilookup              :refer [ILookup]]
+            [clojure.lang.imeta                :refer [IMeta]]
+            [clojure.lang.ipersistent-map      :refer [IPersistentMap]]
+            [clojure.lang.iseq                 :refer [ISeq]]
+            [clojure.lang.iseqable             :refer [ISeqable]]
+            [clojure.lang.apersistent-map      :refer [map-equals? map-hash]]
+            [clojure.lang.comparison           :refer [compare]]
+            [clojure.lang.map-entry            :refer [key make-map-entry val]]
+            [clojure.lang.operators            :refer [and not or = ==]]
+            [clojure.lang.persistent-map       :refer [assoc]]
+            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
+            [clojure.lang.platform.enumerable  :refer [platform-enumerable-method]]
+            [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
+            [clojure.lang.platform.hash        :refer [platform-hash-method]]
+            [clojure.lang.platform.object      :refer [expand-methods]]))
 
 (declare red-node?)
 (declare black-node?)

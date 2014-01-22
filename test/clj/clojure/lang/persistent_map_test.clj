@@ -1,22 +1,41 @@
 (ns clojure.lang.persistent-map-test
-  (:refer-clojure :only [defmacro deftype defn let list list* nil? re-pattern])
+  (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* nil? re-pattern loop when < inc cond >])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.counted               :refer [count]]
             [clojure.lang.icomparable           :refer [IComparable]]
+            [clojure.lang.iequivalence          :refer [IEquivalence]]
             [clojure.lang.ihash                 :refer [IHash]]
             [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.meta                  :refer [meta with-meta]]
             [clojure.lang.operators             :refer [not not= =]]
-            [clojure.lang.persistent-map        :refer [assoc dissoc]]
+            [clojure.lang.persistent-map        :refer [assoc dissoc keys vals]]
+            [clojure.lang.persistent-array-map  :refer [array-map]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
             [clojure.lang.platform.object       :refer [identical?]]
-            [clojure.lang.show                  :refer [str]]))
+            [clojure.lang.show                  :refer [str]]
+            [clojure.lang.seq                   :refer [first next]]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))
+
+(defprotocol Boxed
+  (get-value [this]))
+
+(deftype FixedHash [h v]
+  IHash
+  (-hash [this] (clojure.core/int h))
+
+  IEquivalence
+  (-equal? [this other] (= v (get-value other)))
+
+  IComparable
+  (-compare-to [this other] (if (= v (get-value other)) 0 -1))
+
+  Boxed
+  (get-value [this] v))
 
 (defn map-creation-test [class-name constructor]
   (testing "creates a map with 0 items"
@@ -72,7 +91,60 @@
           m2 (assoc m1 :k2 2 :k3 3 :k1 4)]
       (is (= 4 (get m2 :k1)))
       (is (= 2 (get m2 :k2)))
-      (is (= 3 (get m2 :k3))))))
+      (is (= 3 (get m2 :k3)))))
+
+  (testing "associates nil to a value"
+    (let [m (constructor nil 1)]
+      (is (= 1 (get m nil)))
+      (is (= 1 (count m)))))
+
+  (testing "associates a key to nil"
+    (let [m (constructor 1 nil)]
+      (is (nil? (get m 1)))
+      (is (= 1 (count m)))))
+
+  (testing "associates nil twice"
+    (let [m1 (constructor nil 1)
+          m2 (assoc m1 nil 2)]
+      (is (= 1 (get m1 nil)))
+      (is (= 1 (count m1)))
+      (is (= 2 (get m2 nil)))
+      (is (= 1 (count m2)))))
+
+  (testing "returns the same map when associating nil to an equivalent value"
+    (let [m1 (constructor nil 1)
+          m2 (assoc m1 nil 1)]
+      (is (identical? m1 m2))))
+
+  (testing "associng lots of data"
+    (loop [m (constructor) i 0 max 1000]
+      (when (< i max)
+        (let [uuid (java.util.UUID/randomUUID)
+              m1 (assoc m uuid uuid)]
+          (is (= (inc (count m)) (count m1)))
+          (is (= uuid (get m1 uuid)))
+          (recur m1 (inc i) max)))))
+
+  (testing "associng lots of nils"
+    (loop [m (constructor) i 0 max 1000]
+      (when (< i max)
+        (let [uuid (java.util.UUID/randomUUID)
+              m1 (assoc m uuid nil)]
+          (is (= (inc (count m)) (count m1)))
+          (is (nil? (get m1 uuid)))
+          (recur m1 (inc i) max)))))
+
+  (testing "associng lots of items with the same hashcode"
+    (loop [m (constructor) i 0 max 100]
+      (when (< i max)
+        (let [uuid (java.util.UUID/randomUUID)
+              key (FixedHash. 0 uuid)
+              m1 (assoc m key uuid)]
+          (is (= (inc (count m)) (count m1)))
+          (is (= uuid (get m1 key)))
+          (recur m1 (inc i) max)))))
+
+  )
 
 (defn map-dissoc-test [constructor]
   (testing "dissociating zero keys from a map will return the same map"
@@ -136,16 +208,47 @@
       (is (= 2 (get m4 :k2)))
       (is (nil? (get m4 :k3)))))
 
-  (testing "dissociates many keys"
+  (testing "dissociates many keys at once"
     (let [m1 (constructor :k1 1 :k2 2 :k3 3)
           m2 (dissoc m1 :k1 :k3 :k4)]
       (is (= 2 (get m2 :k2)))
       (is (not (contains? m2 :k1)))
       (is (not (contains? m2 :k3)))))
 
-  (testing "returns the map when there are not items to dissoc"
+  (testing "returns the same map when there are not items to dissoc"
     (let [m1 (constructor :k1 1 :k2 2 :k3 3)]
-      (is (identical? m1 (dissoc m1 :k4))))))
+      (is (identical? m1 (dissoc m1 :k4)))))
+
+  ;(testing "dissocing lots of data"
+  ;  (loop [m (constructor) i 0 max 1000]
+  ;    (when (< i max)
+  ;      (let [uuid (java.util.UUID/randomUUID)
+  ;            m1 (assoc m uuid uuid)]
+  ;        (is (= (inc (count m)) (count m1)))
+  ;        (is (= uuid (get m1 uuid)))
+  ;        (recur m1 (inc i) max)))))
+
+  (testing "dissocing nil key"
+    (let [m1 (constructor nil 1)
+          m2 (dissoc m1 nil)]
+      (is (= 0 (count m2)))
+      (is (not (contains? m2 nil)))))
+
+  (testing "dissocing nil key when nil is not a key"
+    (let [m1 (constructor :k1 1)
+          m2 (dissoc m1 nil)]
+      (is (identical? m1 m2))))
+
+  ;(testing "dissocing lots of items with the same hashcode"
+  ;  (loop [m (constructor) i 0 max 100]
+  ;    (when (< i max)
+  ;      (let [uuid (java.util.UUID/randomUUID)
+  ;            key (FixedHash. 0 uuid)
+  ;            m1 (assoc m key uuid)]
+  ;        (is (= (inc (count m)) (count m1)))
+  ;        (is (= uuid (get m1 key)))
+  ;        (recur m1 (inc i) max)))))
+  )
 
 (defn map-contains?-test [constructor]
   (testing "contains? a key if the key is present in the map"
@@ -235,3 +338,37 @@
   (map-equivalence-test constructor)
   (map-meta-test constructor)
   (map-hash-test constructor))
+
+(deftest keys-test
+  (testing "returns nil if there are no entries"
+    (is (nil? (keys (array-map)))))
+
+  (testing "returns the first key"
+    (is (= :k1 (first (keys (array-map :k1 1))))))
+
+  (testing "next returns nil when there is no next entry"
+    (is (nil? (next (keys (array-map :k1 1))))))
+
+  (testing "returns the next seq"
+    (is (= :k2 (first (next (keys (array-map :k1 1 :k2 2)))))))
+
+  (testing "counts the keys"
+    (is (= 1 (count (keys (array-map :k1 1)))))
+    (is (= 2 (count (keys (array-map :k1 1 :k2 2)))))))
+
+(deftest vals-test
+  (testing "returns nil if there are no entries"
+    (is (nil? (vals (array-map)))))
+
+  (testing "returns the first val"
+    (is (= 1 (first (vals (array-map :k1 1))))))
+
+  (testing "next returns nil when there is no next entry"
+    (is (nil? (next (vals (array-map :k1 1))))))
+
+  (testing "returns the next seq"
+    (is (= 2 (first (next (vals (array-map :k1 1 :k2 2)))))))
+
+  (testing "counts the vals"
+    (is (= 1 (count (vals (array-map :k1 1)))))
+    (is (= 2 (count (vals (array-map :k1 1 :k2 2)))))))

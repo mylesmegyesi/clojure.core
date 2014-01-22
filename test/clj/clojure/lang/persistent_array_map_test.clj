@@ -7,8 +7,8 @@
             [clojure.lang.persistent-map-test  :refer [map-test]]
             [clojure.lang.persistent-array-map :refer [array-map]]
             [clojure.lang.platform.object      :refer [identical?]]
-            [clojure.lang.seq                  :refer [seq first next]]
-            ))
+            [clojure.lang.seqable              :refer [seq]]
+            [clojure.lang.seq                  :refer [first next]]))
 
 (deftest array-map-test
   (map-test "PersistentArrayMap" array-map))

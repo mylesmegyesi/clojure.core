@@ -11,5 +11,8 @@
 (defn compare-and-set-entity! [entity old-value new-value]
   (.compareAndSet entity old-value new-value))
 
-(defn make-atomic-entity [value]
-  (AtomicReference. value))
+(defn make-atomic-entity
+  ([]
+   (AtomicReference.))
+  ([value]
+    (AtomicReference. value)))

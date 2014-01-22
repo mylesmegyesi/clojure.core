@@ -13,12 +13,13 @@
             [clojure.lang.map-entry              :refer [make-map-entry key val]]
             [clojure.lang.operators              :refer [and not not= or =]]
             [clojure.lang.platform.hash          :refer [platform-hash-method]]
-            [clojure.lang.platform.comparison    :refer [platform-equals-method]]
+            [clojure.lang.platform.equivalence   :refer [platform-equals-method]]
             [clojure.lang.platform.enumerable    :refer [platform-enumerable-method]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.mutable-array :as    arr]
             [clojure.lang.platform.object        :refer [expand-methods]]
-            [clojure.lang.seq                    :refer [first next seq]]))
+            [clojure.lang.seqable                :refer [seq]]
+            [clojure.lang.seq                    :refer [first next]]))
 
 (defn- index-of [arr size value]
   (loop [i 0]
