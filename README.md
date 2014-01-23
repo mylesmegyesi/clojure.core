@@ -2,11 +2,10 @@
 
 ## Goals
 
-* Reimplement clojure.lang package in Clojure
-* Reimplement stdlib (clojure.core and associated) as modular components
-* Make clojure.lang and clojure stdlib host agnostic
-* Build a comprehensive test suite for Clojure
-* Maintain as much backwards compatibility as possible
+* Port the clojure.lang package to Clojure (Clojure-in-Clojure)
+* Make Clojure stdlib reusable for all hosts, starting with the JVM and CLR.
+* Build an executable specification for Clojure, in the same vein as the [RubySpec](http://rubyspec.org/).
+* 100% backwards compatibility
 
 ## Run the tests
 
