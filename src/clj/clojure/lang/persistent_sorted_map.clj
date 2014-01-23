@@ -1,13 +1,23 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [apply cond cons count declare defn defn- defprotocol deftype empty? even? first format let loop map nil? repeat rest second take zero? + > <])
+  (:refer-clojure :only [apply cond comparator cons count dec declare defmacro defn defn- defprotocol deftype empty? even? first format let list* list loop next nil? rest second zero? + - > < ->])
   (:require [clojure.lang.icounted            :refer [ICounted]]
             [clojure.lang.ilookup             :refer [ILookup]]
             [clojure.lang.ipersistent-map     :refer [IPersistentMap]]
+            [clojure.lang.iseq                :refer [ISeq]]
+            [clojure.lang.iseqable            :refer [ISeqable]]
+            [clojure.lang.apersistent-map     :refer [map-equals? map-hash]]
             [clojure.lang.comparison          :refer [compare]]
             [clojure.lang.map-entry           :refer [key make-map-entry val]]
             [clojure.lang.operators           :refer [and not or = ==]]
             [clojure.lang.persistent-map      :refer [assoc]]
-            [clojure.lang.platform.exceptions :refer [new-argument-error new-unsupported-error]]))
+            [clojure.lang.platform.comparison :refer [platform-equals-method]]
+            [clojure.lang.platform.enumerable :refer [platform-enumerable-method]]
+            [clojure.lang.platform.exceptions :refer [new-argument-error new-unsupported-error]]
+            [clojure.lang.platform.hash       :refer [platform-hash-method]]
+            [clojure.lang.platform.object     :refer [expand-methods]]))
+
+(declare red-node?)
+(declare black-node?)
 
 (declare make-sorted-red-node)
 (declare make-sorted-red-node-val)
@@ -218,24 +228,26 @@
     (make-red-node -map-entry nil node))
   (-balance-left [this node]
     (cond
-      (= :red (-color -left-node))
-        (let [blackened-right (make-black-node (-entry node) -right-node (-right node))]
-          (make-red-node -map-entry (-blacken -left-node) blackened-right)
-      (= :red (-color -right-node))
+      (red-node? -left-node)
+        (let [blackened-node (make-black-node (-entry node) -right-node (-right node))]
+          (make-red-node -map-entry (-blacken -left-node) blackened-node))
+      (red-node? -right-node)
         (let [blackened (make-black-node -map-entry -left-node (-right -left-node))
               blackened-right (make-black-node (-entry node) (-right -right-node) (-right node))]
           (make-red-node -map-entry blackened blackened-right))
       :else
-        (make-black-node (-entry node) this (-right node)))))
+        (make-black-node (-entry node) this (-right node))))
   (-balance-right [this node]
     (cond
-      (= :red (-color -right-node))
-        (let [blackened-left (make-black-node (-entry node) (-left node) -left-node)]
-          (make-red-node -map-entry blackened-left (-blacken -right-node)))
-      (= :red (-color -left-node))
+      (red-node? -right-node)
+        (let [blackened (make-black-node (-entry node) (-left node) -left-node)]
+          (make-red-node -map-entry blackened (-blacken -right-node)))
+      (red-node? -left-node)
         (let [blackened-left (make-black-node (-entry node) (-left node) (-left -left-node))
-              blackened-right (make-black-node -map-entry (-left -right-node) -right-node)]
-          (make-red-node (-entry -left-node) blackened-left blackened-right))))
+              blackened-right (make-black-node -map-entry (-right -left-node) -right-node)]
+          (make-red-node (-entry -left-node) blackened-left blackened-right))
+      :else
+        (make-black-node (-entry node) (-left node) this)))
   (-blacken [this]
     (make-sorted-black-branch -map-entry -left-node -right-node))
   (-redden [this]
@@ -261,30 +273,42 @@
     (make-red-node -map-entry nil node))
   (-balance-left [this node]
     (cond
-      (= :red (-color -left-node))
-        (let [blackened-right (make-black-node (-entry node) -right-node (-right node))]
-          (make-red-node -map-entry (-blacken -left-node) blackened-right)
-      (= :red (-color -right-node))
+      (red-node? -left-node)
+        (let [blackened-node (make-black-node (-entry node) -right-node (-right node))]
+          (make-red-node -map-entry (-blacken -left-node) blackened-node))
+      (red-node? -right-node)
         (let [blackened (make-black-node -map-entry -left-node (-right -left-node))
               blackened-right (make-black-node (-entry node) (-right -right-node) (-right node))]
           (make-red-node -map-entry blackened blackened-right))
       :else
-        (make-black-node (-entry node) this (-right node)))))
+        (make-black-node (-entry node) this (-right node))))
   (-balance-right [this node]
     (cond
-      (= :red (-color -right-node))
-        (let [blackened-left (make-black-node (-entry node) (-left node) -left-node)]
-          (make-red-node -map-entry blackened-left (-blacken -right-node)))
-      (= :red (-color -left-node))
+      (red-node? -right-node)
+        (let [blackened (make-black-node (-entry node) (-left node) -left-node)]
+          (make-red-node -map-entry blackened (-blacken -right-node)))
+      (red-node? -left-node)
         (let [blackened-left (make-black-node (-entry node) (-left node) (-left -left-node))
-              blackened-right (make-black-node -map-entry (-left -right-node) -right-node)]
-          (make-red-node (-entry -left-node) blackened-left blackened-right))))
+              blackened-right (make-black-node -map-entry (-right -left-node) -right-node)]
+          (make-red-node (-entry -left-node) blackened-left blackened-right))
+      :else
+        (make-black-node (-entry node) (-left node) this)))
   (-blacken [this]
     (make-sorted-black-branch-val -map-entry -left-node -right-node))
   (-redden [this]
     (throw (new-unsupported-error "Invariant Violation")))
   (-replace [this entry left right]
     (make-red-node entry left right)))
+
+(defn- red-node? [node]
+  (and
+    (not (nil? node))
+    (= :red (-color node))))
+
+(defn- black-node? [node]
+  (and
+    (not (nil? node))
+    (= :black (-color node))))
 
 (defn- make-sorted-red-node [-map-entry]
   (SortedRedNode. -map-entry))
@@ -332,10 +356,10 @@
 
 (defn- left-balance [-map-entry ins right]
   (cond
-    (and (= :red (-color ins)) (= :red (-color (-left ins))))
+    (and (red-node? ins) (red-node? (-left ins)))
       (let [blackened (make-black-node -map-entry (-right ins) right)]
         (make-red-node (-entry ins) (-blacken (-left ins)) blackened))
-    (and (= :red (-color ins)) (= :red (-color (-right ins))))
+    (and (red-node? ins) (red-node? (-right ins)))
       (let [blackened-ins (make-black-node (-entry ins) (-left ins) (-left (-right ins)))
             blackened (make-black-node -map-entry (-right (-right ins)) right)]
         (make-red-node (-entry (-right ins)) blackened-ins blackened))
@@ -344,10 +368,10 @@
 
 (defn- right-balance [-map-entry left ins]
   (cond
-    (and (= :red (-color ins)) (= :red (-color (-right ins))))
+    (and (red-node? ins) (red-node? (-right ins)))
       (let [blackened (make-black-node -map-entry left (-left ins))]
         (make-red-node (-entry ins) blackened (-blacken (-right ins))))
-    (and (= :red (-color ins)) (= :red (-color (-left ins))))
+    (and (red-node? ins) (red-node? (-left ins)))
       (let [blackened (make-black-node -map-entry left (-left (-left ins)))
             blackened-ins (make-black-node (-entry ins) (-right (-left ins)) (-right ins))]
         (make-red-node (-entry (-left ins)) blackened blackened-ins))
@@ -356,11 +380,11 @@
 
 (defn- balance-left-del [-map-entry del right]
   (cond
-    (= :red (-color del))
+    (red-node? del)
       (make-red-node -map-entry (-blacken del) right)
-    (= :black (-color right))
+    (black-node? right)
       (right-balance -map-entry del (-redden right))
-    (and (= :red (-color right)) (= :black (-color (-left right))))
+    (and (red-node? right) (black-node? (-left right)))
       (let [blackened (make-black-node -map-entry del (-left (-left right)))
             r-balance (right-balance (-entry right) (-right (-left right)) (-redden (-right right)))]
         (make-red-node (-entry (-left right)) blackened r-balance))
@@ -369,11 +393,11 @@
 
 (defn- balance-right-del [-map-entry left del]
   (cond
-    (= :red (-color del))
+    (red-node? del)
       (make-red-node -map-entry -left (-blacken del))
-    (= :black (-color -left))
+    (black-node? left)
       (left-balance -map-entry (-redden left) del)
-    (and (= :red (-color left)) (= :black (-color (-right left))))
+    (and (red-node? left) (black-node? (-right left)))
       (let [l-balance (left-balance (-entry left) (-redden (-left left)) (-left (-right left)))
             blackened (make-black-node -map-entry (-right (-right left)) del)]
         (make-red-node (-entry (-right left)) l-balance blackened))
@@ -397,6 +421,52 @@
               [(-add-left root node) false]
               [(-add-right root node) false])))))))
 
+(defn- sorted-map-append [left right]
+  (cond
+    (nil? left)
+      right
+    (nil? right)
+      left
+    (red-node? left)
+      (if (red-node? right)
+        (let [app (sorted-map-append (-right left) (-left right))]
+          (if (red-node? app)
+            (let [redened-left (make-red-node (-entry left) (-left left) (-left app))
+                  redened-right (make-red-node (-entry right) (-right app) (-right right))]
+              (make-red-node (-entry app) redened-left redened-right))
+            (let [redened (make-red-node (-entry right) app (-right right))]
+              (make-red-node (-entry left) (-left left) redened))))
+        (make-red-node (-entry left) (-left left) (sorted-map-append (-right left) right)))
+    (red-node? right)
+      (make-red-node (-entry right) (sorted-map-append left (-right left)) (-right right))
+    :else
+      (let [app (sorted-map-append (-left right) (-right left))]
+        (if (red-node? app)
+          (let [blackened-left (make-black-node (-entry left) (-left left) (-left app))
+                blackened-right (make-black-node (-entry right) (-right app) (-right right))]
+              (make-red-node (-entry app) blackened-left blackened-right))
+          (let [blackened (make-black-node (-entry right) app (-right right))]
+            (balance-left-del (-entry left) (-left left) blackened))))))
+
+(defn- sorted-map-remove [root compare-fn k]
+  (if (nil? root)
+    [root false]
+    (let [comparison (compare-fn k (key (-entry root)))]
+      (if (zero? comparison)
+        [(sorted-map-append (-left root) (-right root)) true]
+        (let [[node found?] (if (< comparison 0)
+                              (sorted-map-remove (-left root) compare-fn k)
+                              (sorted-map-remove (-right root) compare-fn k))]
+          (if (not found?)
+            [root false]
+            (if (< comparison 0)
+              (if (black-node? (-left root))
+                [(balance-left-del (-entry root) node (-right root)) true]
+                [(make-red-node (-entry root) node (-right root)) true])
+              (if (black-node? (-right root))
+                [(balance-right-del (-entry root) (-left root) node) true]
+                [(make-red-node (-entry root) (-left root) node) true]))))))))
+
 (defn- sorted-map-replace [root compare-fn k v]
   (let [comparison (compare-fn k (key (-entry root)))
          new-val (if (zero? comparison)
@@ -418,18 +488,23 @@
         [(sorted-map-replace root compare-fn k v) 0])
       [(-blacken node) 1])))
 
-(defn- sorted-map-includes? [-root compare-fn k]
-  (loop [node -root]
-    (if (nil? node)
-      false
-      (let [comparison (compare-fn k (key (-entry node)))]
-        (cond
-          (zero? comparison)
-            true
-          (< comparison)
-            (recur (-left node))
-          (> comparison)
-            (recur (-right node)))))))
+(defn- sorted-map-dissoc [root compare-fn k]
+  (let [[node found?] (sorted-map-remove root compare-fn k)]
+    (if found?
+      [node 1]
+      [root 0])))
+
+(defn- sorted-map-includes? [node compare-fn k]
+  (if (nil? node)
+    false
+    (let [comparison (compare-fn k (key (-entry node)))]
+      (cond
+        (zero? comparison)
+          true
+        (< comparison 0)
+          (recur (-left node) compare-fn k)
+        (> comparison 0)
+          (recur (-right node) compare-fn k)))))
 
 (defn- sorted-map-lookup [-root compare-fn k default]
   (loop [node -root
@@ -449,58 +524,110 @@
             (> comparison 0)
               (recur (-right node) false))))))
 
-(deftype PersistentSortedMap [-root -count -comparator]
+(declare make-seq-stack)
+(declare make-sorted-map-seq)
+
+(deftype PersistentSortedMapSeq [-stack -count]
   ICounted
   (-count [this] -count)
 
-  ILookup
-  (-includes? [this k]
-    (sorted-map-includes? -root -comparator k))
+  ISeq
+  (-first [this]
+    (-entry (first -stack)))
 
-  (-lookup [this k default]
-    (sorted-map-lookup -root -comparator k default))
-
-  IPersistentMap
-  (-assoc [this k v]
-    (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
-      (if (== tree -root)
-        this
-        (make-sorted-map tree (+ -count cnt) -comparator))))
+  (-next [this]
+    (let [node (first -stack)
+          next-stack (make-seq-stack (-right node) (next -stack))]
+      (make-sorted-map-seq next-stack (dec -count))))
 
   )
 
-(defn- make-sorted-map
-  ([compare-fn keyvals]
-    (let [empty-sorted-map (PersistentSortedMap. nil 0 compare-fn)]
-      (loop [kv keyvals
-             -sorted-map empty-sorted-map]
-        (if (empty? kv)
-          -sorted-map
-          (let [keyval (first kv)
-                k (first keyval)
-                v (second keyval)]
-            (recur
-              (rest kv)
-              (assoc -sorted-map k v)))))))
-  ([root cnt compare-fn]
-    (PersistentSortedMap. root cnt compare-fn)))
+(defn- make-seq-stack [tree stack]
+  (if (nil? tree)
+    stack
+    (recur (-left tree) (cons tree stack))))
 
-(defn- keyvals [args]
-  (loop [remaining-args args
-         keyvals        '()]
-    (if (empty? remaining-args)
-      keyvals
-      (let [k (first remaining-args)
-            v (second remaining-args)]
-        (recur (rest (rest remaining-args)) (cons [k v] keyvals))))))
+(defn- make-sorted-map-seq [stack cnt]
+  (if (nil? (first stack))
+    nil
+    (PersistentSortedMapSeq. stack cnt)))
 
-(defn sorted-map-by [compare-fn & args]
+(defmacro sorted-map-hash-init
+  {:private true}
+  [_]
+  (list 'map-hash (list 'make-sorted-map-seq (list 'make-seq-stack '-root nil) '-count)))
+
+(defmacro sorted-map-equals?-init
+  {:private true}
+  [this other]
+  (list 'map-equals? this other))
+
+(def platform-sorted-map-methods
+  ^{:private true}
+  (-> {}
+    (platform-hash-method 'sorted-map-hash-init)
+    platform-enumerable-method
+    (platform-equals-method 'sorted-map-equals?-init)
+    expand-methods))
+
+(defmacro defpersistentsortedmap [type]
+  (list*
+    'deftype type ['-root '-count '-comparator]
+
+    'ICounted
+    (list '-count ['this] '-count)
+
+    'ILookup
+    (list '-includes? ['this 'k]
+      (list 'sorted-map-includes? '-root '-comparator 'k))
+
+    (list '-lookup ['this 'k 'default]
+      (list 'sorted-map-lookup '-root '-comparator 'k 'default))
+
+    'IPersistentMap
+    (list '-assoc ['this 'k 'v]
+      (list 'let [['tree 'cnt] (list 'sorted-map-assoc '-root '-comparator 'k 'v)]
+        (list 'if (list '== 'tree '-root)
+          'this
+          (list 'make-sorted-map 'tree (list '+ '-count 'cnt) '-comparator))))
+
+    (list '-dissoc ['this 'k]
+      (list 'let [['tree 'cnt] (list 'sorted-map-dissoc '-root '-comparator 'k)]
+        (list 'if (list '== 'tree '-root)
+          'this
+          (list 'make-sorted-map 'tree (list '- '-count 'cnt) '-comparator))))
+
+    'ISeqable
+    (list '-seq ['this]
+      (list 'make-sorted-map-seq (list 'make-seq-stack '-root nil) '-count))
+
+    platform-sorted-map-methods))
+
+(defpersistentsortedmap PersistentSortedMap)
+
+(defn- make-sorted-map [root cnt compare-fn]
+  (PersistentSortedMap. root cnt compare-fn))
+
+(defn- create-sorted-map [compare-fn args]
   (let [arg-count (count args)]
     (if (even? arg-count)
-      (make-sorted-map compare-fn (keyvals args))
+      (let [empty-sorted-map (PersistentSortedMap. nil 0 compare-fn)]
+        (loop [kvs args
+               -sorted-map empty-sorted-map]
+          (if (empty? kvs)
+            -sorted-map
+            (let [k (first kvs)
+                  v (second kvs)]
+              (recur
+                (rest (next kvs))
+                (assoc -sorted-map k v))))))
       (throw (new-argument-error
                (format "PersistentSortedMap can only be created with even number of arguments: %s arguments given"
                 arg-count))))))
 
+(defn sorted-map-by [compare-fn & args]
+  (let [comparable (comparator compare-fn)]
+    (create-sorted-map comparable args)))
+
 (defn sorted-map [& args]
-  (apply sorted-map-by (cons compare args)))
+  (create-sorted-map compare args))

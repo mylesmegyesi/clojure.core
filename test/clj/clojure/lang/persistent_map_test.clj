@@ -2,12 +2,14 @@
   (:refer-clojure :only [defmacro deftype defn let list list* nil? re-pattern])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.counted               :refer [count]]
+            [clojure.lang.icomparable           :refer [IComparable]]
             [clojure.lang.ihash                 :refer [IHash]]
             [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.operators             :refer [not not= =]]
             [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-sorted-map :refer :all]
+            [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
             [clojure.lang.platform.object       :refer [identical?]]
             [clojure.lang.show                  :refer [str]]))
@@ -146,16 +148,17 @@
 
 (defn map-contains?-test [constructor]
   (testing "contains? a key if the key is present in the map"
-    (let [m1 (constructor :k1 1)]
-      (is (contains? m1 :k1))))
+    (let [m1 (constructor :k1 1 :k2 2)]
+      (is (contains? m1 :k1))
+      (is (contains? m1 :k2))))
 
   (testing "does not contains? a key if the key is not present in the map"
     (let [m1 (constructor :k1 1)]
       (is (not (contains? m1 :k2)))))
 
   (testing "does not contains? a key if the key is present AS A VALUE in the map"
-    (let [m1 (constructor :k1 1)]
-      (is (not (contains? m1 1)))))
+    (let [m1 (constructor :k1 :v1)]
+      (is (not (contains? m1 :v1)))))
 
   (testing "returns a provided not-found value when using get"
     (let [m1 (constructor)]
@@ -179,7 +182,10 @@
 
 (deftype Thing [t]
   IHash
-  (-hash [this] t))
+  (-hash [this] t)
+
+  IComparable
+  (-compare-to [this other] 1))
 
 (defn map-hash-test [constructor]
   (testing "the hash of an empty map-hash is zero"
