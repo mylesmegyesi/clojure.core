@@ -13,7 +13,7 @@
 (deftest array-map-test
   (map-test "PersistentArrayMap" array-map))
 
-(deftest map-seq-test
+(deftest array-map-seq-test
   (testing "seq returns nil when the map is empty"
     (is (nil? (seq (array-map)))))
 
