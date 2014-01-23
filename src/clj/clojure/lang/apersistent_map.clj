@@ -7,16 +7,16 @@
             [clojure.lang.operators :refer [and =]]
             [clojure.lang.seq       :refer [first next seq]]))
 
-(defmacro map-hash [-seq]
-  `(loop [entries# ~-seq
-          acc#     0]
-     (if entries#
-       (let [entry# (first entries#)]
-         (recur
-           (next entries#)
-           (+ acc# (bit-and (hash (key entry#))
-                            (hash (val entry#))))))
-      acc#)))
+(defn map-hash [-seq]
+  (loop [entries -seq
+         acc     0]
+    (if entries
+      (let [entry (first entries)]
+        (recur
+          (next entries)
+          (+ acc (bit-and (hash (key entry))
+                          (hash (val entry))))))
+      acc)))
 
 (defn map-equals? [m1 m2]
   (if (= (count m1) (count m2))
