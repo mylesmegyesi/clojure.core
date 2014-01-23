@@ -1,15 +1,20 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [apply cond comparator cons count dec declare defn defn- defprotocol deftype empty? even? first format let loop map next nil? repeat rest second take zero? + - > <])
+  (:refer-clojure :only [apply cond comparator cons count dec declare defmacro defn defn- defprotocol deftype empty? even? first format let list* list loop next nil? rest second zero? + - > < ->])
   (:require [clojure.lang.icounted            :refer [ICounted]]
             [clojure.lang.ilookup             :refer [ILookup]]
             [clojure.lang.ipersistent-map     :refer [IPersistentMap]]
             [clojure.lang.iseq                :refer [ISeq]]
             [clojure.lang.iseqable            :refer [ISeqable]]
+            [clojure.lang.apersistent-map     :refer [map-equals? map-hash]]
             [clojure.lang.comparison          :refer [compare]]
             [clojure.lang.map-entry           :refer [key make-map-entry val]]
             [clojure.lang.operators           :refer [and not or = ==]]
             [clojure.lang.persistent-map      :refer [assoc]]
-            [clojure.lang.platform.exceptions :refer [new-argument-error new-unsupported-error]]))
+            [clojure.lang.platform.comparison :refer [platform-equals-method]]
+            [clojure.lang.platform.enumerable :refer [platform-enumerable-method]]
+            [clojure.lang.platform.exceptions :refer [new-argument-error new-unsupported-error]]
+            [clojure.lang.platform.hash       :refer [platform-hash-method]]
+            [clojure.lang.platform.object     :refer [expand-methods]]))
 
 (declare red-node?)
 (declare black-node?)
@@ -489,18 +494,17 @@
       [node 1]
       [root 0])))
 
-(defn- sorted-map-includes? [-root compare-fn k]
-  (loop [node -root]
-    (if (nil? node)
-      false
-      (let [comparison (compare-fn k (key (-entry node)))]
-        (cond
-          (zero? comparison)
-            true
-          (< comparison)
-            (recur (-left node))
-          (> comparison)
-            (recur (-right node)))))))
+(defn- sorted-map-includes? [node compare-fn k]
+  (if (nil? node)
+    false
+    (let [comparison (compare-fn k (key (-entry node)))]
+      (cond
+        (zero? comparison)
+          true
+        (< comparison 0)
+          (recur (-left node) compare-fn k)
+        (> comparison 0)
+          (recur (-right node) compare-fn k)))))
 
 (defn- sorted-map-lookup [-root compare-fn k default]
   (loop [node -root
@@ -548,61 +552,74 @@
     nil
     (PersistentSortedMapSeq. stack cnt)))
 
-(deftype PersistentSortedMap [-root -count -comparator]
-  ICounted
-  (-count [this] -count)
+(defmacro sorted-map-hash-init
+  {:private true}
+  [_]
+  (list 'map-hash (list 'make-sorted-map-seq (list 'make-seq-stack '-root nil) '-count)))
 
-  ILookup
-  (-includes? [this k]
-    (sorted-map-includes? -root -comparator k))
+(defmacro sorted-map-equals?-init
+  {:private true}
+  [this other]
+  (list 'map-equals? this other))
 
-  (-lookup [this k default]
-    (sorted-map-lookup -root -comparator k default))
+(def platform-sorted-map-methods
+  ^{:private true}
+  (-> {}
+    (platform-hash-method 'sorted-map-hash-init)
+    platform-enumerable-method
+    (platform-equals-method 'sorted-map-equals?-init)
+    expand-methods))
 
-  IPersistentMap
-  (-assoc [this k v]
-    (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
-      (if (== tree -root)
-        this
-        (make-sorted-map tree (+ -count cnt) -comparator))))
+(defmacro defpersistentsortedmap [type]
+  (list*
+    'deftype type ['-root '-count '-comparator]
 
-  (-dissoc [this k]
-    (let [[tree cnt] (sorted-map-dissoc -root -comparator k)]
-      (if (== tree -root)
-        this
-        (make-sorted-map tree (- -count cnt) -comparator))))
+    'ICounted
+    (list '-count ['this] '-count)
 
-  ISeqable
-  (-seq [this]
-    (make-sorted-map-seq (make-seq-stack -root nil) -count))
+    'ILookup
+    (list '-includes? ['this 'k]
+      (list 'sorted-map-includes? '-root '-comparator 'k))
 
-  )
+    (list '-lookup ['this 'k 'default]
+      (list 'sorted-map-lookup '-root '-comparator 'k 'default))
+
+    'IPersistentMap
+    (list '-assoc ['this 'k 'v]
+      (list 'let [['tree 'cnt] (list 'sorted-map-assoc '-root '-comparator 'k 'v)]
+        (list 'if (list '== 'tree '-root)
+          'this
+          (list 'make-sorted-map 'tree (list '+ '-count 'cnt) '-comparator))))
+
+    (list '-dissoc ['this 'k]
+      (list 'let [['tree 'cnt] (list 'sorted-map-dissoc '-root '-comparator 'k)]
+        (list 'if (list '== 'tree '-root)
+          'this
+          (list 'make-sorted-map 'tree (list '- '-count 'cnt) '-comparator))))
+
+    'ISeqable
+    (list '-seq ['this]
+      (list 'make-sorted-map-seq (list 'make-seq-stack '-root nil) '-count))
+
+    platform-sorted-map-methods))
+
+(defpersistentsortedmap PersistentSortedMap)
 
 (defn- make-sorted-map [root cnt compare-fn]
   (PersistentSortedMap. root cnt compare-fn))
-
-(defn- keyvals [args]
-  (loop [remaining-args args
-         keyvals        '()]
-    (if (empty? remaining-args)
-      keyvals
-      (let [k (first remaining-args)
-            v (second remaining-args)]
-        (recur (rest (rest remaining-args)) (cons [k v] keyvals))))))
 
 (defn- create-sorted-map [compare-fn args]
   (let [arg-count (count args)]
     (if (even? arg-count)
       (let [empty-sorted-map (PersistentSortedMap. nil 0 compare-fn)]
-        (loop [kv (keyvals args)
+        (loop [kvs args
                -sorted-map empty-sorted-map]
-          (if (empty? kv)
+          (if (empty? kvs)
             -sorted-map
-            (let [keyval (first kv)
-                  k (first keyval)
-                  v (second keyval)]
+            (let [k (first kvs)
+                  v (second kvs)]
               (recur
-                (rest kv)
+                (rest (next kvs))
                 (assoc -sorted-map k v))))))
       (throw (new-argument-error
                (format "PersistentSortedMap can only be created with even number of arguments: %s arguments given"

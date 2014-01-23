@@ -1,6 +1,7 @@
 (ns clojure.lang.persistent-array-map
   (:refer-clojure :only [defmacro declare defn defn- deftype let + - dec loop < / inc when when-let if-let even? format list list* bit-and nil? ->])
-  (:require [clojure.lang.counted                :refer [count]]
+  (:require [clojure.lang.apersistent-map        :refer [map-equals? map-hash]]
+            [clojure.lang.counted                :refer [count]]
             [clojure.lang.icounted               :refer [ICounted]]
             [clojure.lang.ilookup                :refer [ILookup]]
             [clojure.lang.ipersistent-map        :refer [IPersistentMap]]
@@ -60,38 +61,6 @@
     (arr/array-get arr (inc idx))
     not-found))
 
-(defn- array-map-equals? [-seq -count other]
-  (if (= -count (count other))
-    (loop [this-seq -seq]
-      (if this-seq
-        (let [first-entry (first this-seq)
-              k (key first-entry)
-              v (val first-entry)]
-          (if (and (contains? other k)
-                   (= (get other k) v))
-            (recur (next this-seq))
-            false))
-        true))
-    false))
-
-(defmacro array-map-equals?-init
-  {:private true}
-  [this-arg other-arg]
-  (list 'array-map-equals? '-seq '-count other-arg))
-
-(defmacro array-map-hash
-  {:private true}
-  [-seq]
-  `(loop [entries# ~-seq
-          acc#     0]
-     (if entries#
-       (let [entry# (first entries#)]
-         (recur
-           (next entries#)
-           (+ acc# (bit-and (hash (key entry#))
-                            (hash (val entry#))))))
-       acc#)))
-
 (declare make-array-map-seq)
 
 (deftype PersistentArrayMapSeq [first-entry arr count next-count position]
@@ -116,7 +85,12 @@
 (defmacro array-map-hash-init
   {:private true}
   [_]
-  (list 'array-map-hash '-seq))
+  (list 'map-hash '-seq))
+
+(defmacro array-map-equals?-init
+  {:private true}
+  [this other]
+  (list 'map-equals? this other))
 
 (def platform-array-map-methods
   ^{:private true}
