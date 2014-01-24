@@ -603,15 +603,15 @@
 
     platform-sorted-map-methods))
 
-(defpersistentsortedmap PersistentSortedMap)
+(defpersistentsortedmap PersistentTreeMap) ; PersistentTreeMap is the clojure class name
 
 (defn- make-sorted-map [root cnt compare-fn]
-  (PersistentSortedMap. root cnt compare-fn))
+  (PersistentTreeMap. root cnt compare-fn))
 
 (defn- create-sorted-map [compare-fn args]
   (let [arg-count (count args)]
     (if (even? arg-count)
-      (let [empty-sorted-map (PersistentSortedMap. nil 0 compare-fn)]
+      (let [empty-sorted-map (make-sorted-map nil 0 compare-fn)]
         (loop [kvs args
                -sorted-map empty-sorted-map]
           (if (empty? kvs)
