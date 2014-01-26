@@ -2,14 +2,41 @@
   (:refer-clojure :only [let nil? >])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.counted               :refer [count]]
+            [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.map-entry             :refer [key val]]
             [clojure.lang.operators             :refer [=]]
+            [clojure.lang.persistent-map        :refer [assoc]]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.seq                   :refer [seq first next]]))
 
 (deftest sorted-map-test
   (map-test "PersistentSortedMap" sorted-map))
+
+(deftest sorted-map-rebalance-test
+  (testing "assoc to an existing key"
+    (let [m1 (sorted-map :k1 :v1)
+          m2 (assoc m1 :k1 :v2)]
+      (is (= 1 (count m1)))
+      (is (= 1 (count m2)))
+      (is (= :v1 (get m1 :k1)))
+      (is (= :v2 (get m2 :k1)))))
+
+  (testing "rebalances a red branch left"
+    (let [m1 (sorted-map 1 :v2 3 :v3 2 :v1)]
+      (is (= 3 (count m1)))
+      (is (contains? m1 1))
+      (is (contains? m1 2))
+      (is (contains? m1 3))))
+
+  (testing "rebalances a red branch right"
+    (let [m1 (sorted-map-by > 1 :v1 3 :v3 2 :v2)]
+      (is (= 3 (count m1)))
+      (is (contains? m1 1))
+      (is (contains? m1 2))
+      (is (contains? m1 3))))
+
+  )
 
 (deftest sorted-map-seq-test
   (testing "seq return nil when the map is empty"
