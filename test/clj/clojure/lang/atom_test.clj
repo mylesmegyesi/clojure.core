@@ -5,8 +5,8 @@
             [clojure.lang.deref               :refer [deref]]
             [clojure.lang.meta                :refer [meta reset-meta! alter-meta!]]
             [clojure.lang.operators           :refer [not not= =]]
-            [clojure.lang.validatable         :refer [get-validator set-validator!]]
-            [clojure.lang.watchable           :refer [add-watch remove-watch]]
+            [clojure.lang.validated           :refer [get-validator set-validator!]]
+            [clojure.lang.watched             :refer [add-watch remove-watch]]
             [clojure.lang.platform.exceptions :refer [illegal-state-error]]))
 
 (defmacro illegal-state-error-is-thrown? [msg & body]

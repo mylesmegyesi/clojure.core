@@ -1,4 +1,4 @@
-(ns clojure.lang.watchable
+(ns clojure.lang.watched
   (:refer-clojure :only [defn])
   (:require [clojure.lang.iwatchable :refer [-add-watch -remove-watch]]))
 
