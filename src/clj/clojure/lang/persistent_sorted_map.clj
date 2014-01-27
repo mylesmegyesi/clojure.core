@@ -65,9 +65,9 @@
   (-add-right [this node]
     (-balance-right node this))
   (-remove-left [this node]
-    (balance-left-del -map-entry nil node nil))
+    (balance-left-del -map-entry node nil))
   (-remove-right [this node]
-    (balance-right-del -map-entry nil nil node))
+    (balance-right-del -map-entry nil node))
   (-balance-left [this node]
     (make-black-node (-entry node) this (-right node)))
   (-balance-right [this node]
@@ -91,9 +91,9 @@
   (-add-right [this node]
     (-balance-right node this))
   (-remove-left [this node]
-    (balance-left-del -map-entry nil node nil))
+    (balance-left-del -map-entry node nil))
   (-remove-right [this node]
-    (balance-right-del -map-entry nil nil node))
+    (balance-right-del -map-entry nil node))
   (-balance-left [this node]
     (make-black-node (-entry node) this (-right node)))
   (-balance-right [this node]
@@ -117,9 +117,9 @@
   (-add-right [this node]
     (-balance-right node this))
   (-remove-left [this node]
-    (balance-left-del -map-entry nil node nil))
+    (balance-left-del -map-entry node -right-node))
   (-remove-right [this node]
-    (balance-right-del -map-entry nil nil node))
+    (balance-right-del -map-entry -left-node node))
   (-balance-left [this node]
     (make-black-node (-entry node) this (-right node)))
   (-balance-right [this node]
@@ -143,9 +143,9 @@
   (-add-right [this node]
     (-balance-right node this))
   (-remove-left [this node]
-    (balance-left-del -map-entry nil node nil))
+    (balance-left-del -map-entry node -right-node))
   (-remove-right [this node]
-    (balance-right-del -map-entry nil nil node))
+    (balance-right-del -map-entry -left-node node))
   (-balance-left [this node]
     (make-black-node (-entry node) this (-right node)))
   (-balance-right [this node]
@@ -219,22 +219,22 @@
   (-left [this] -left-node)
   (-right [this] -right-node)
   (-add-left [this node]
-    (make-red-node -map-entry node nil))
+    (make-red-node -map-entry node -right-node))
   (-add-right [this node]
-    (make-red-node -map-entry nil node))
+    (make-red-node -map-entry -left-node node))
   (-remove-left [this node]
-    (make-red-node -map-entry node nil))
+    (make-red-node -map-entry node -right-node))
   (-remove-right [this node]
-    (make-red-node -map-entry nil node))
+    (make-red-node -map-entry -left-node node))
   (-balance-left [this node]
     (cond
       (red-node? -left-node)
         (let [blackened-node (make-black-node (-entry node) -right-node (-right node))]
           (make-red-node -map-entry (-blacken -left-node) blackened-node))
       (red-node? -right-node)
-        (let [blackened (make-black-node -map-entry -left-node (-right -left-node))
+        (let [blackened (make-black-node -map-entry -left-node (-left -right-node))
               blackened-right (make-black-node (-entry node) (-right -right-node) (-right node))]
-          (make-red-node -map-entry blackened blackened-right))
+          (make-red-node (-entry -right-node) -map-entry blackened blackened-right))
       :else
         (make-black-node (-entry node) this (-right node))))
   (-balance-right [this node]
@@ -264,22 +264,22 @@
   (-left [this] -left-node)
   (-right [this] -right-node)
   (-add-left [this node]
-    (make-red-node -map-entry node nil))
+    (make-red-node -map-entry node -right-node))
   (-add-right [this node]
-    (make-red-node -map-entry nil node))
+    (make-red-node -map-entry -left-node node))
   (-remove-left [this node]
-    (make-red-node -map-entry node nil))
+    (make-red-node -map-entry node -right-node))
   (-remove-right [this node]
-    (make-red-node -map-entry nil node))
+    (make-red-node -map-entry -left-node node))
   (-balance-left [this node]
     (cond
       (red-node? -left-node)
         (let [blackened-node (make-black-node (-entry node) -right-node (-right node))]
           (make-red-node -map-entry (-blacken -left-node) blackened-node))
       (red-node? -right-node)
-        (let [blackened (make-black-node -map-entry -left-node (-right -left-node))
+        (let [blackened (make-black-node -map-entry -left-node (-left -right-node))
               blackened-right (make-black-node (-entry node) (-right -right-node) (-right node))]
-          (make-red-node -map-entry blackened blackened-right))
+          (make-red-node (-entry -right-node) blackened blackened-right))
       :else
         (make-black-node (-entry node) this (-right node))))
   (-balance-right [this node]
