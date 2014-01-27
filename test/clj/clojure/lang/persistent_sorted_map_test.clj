@@ -1,11 +1,11 @@
 (ns clojure.lang.persistent-sorted-map-test
-  (:refer-clojure :only [let nil? >])
+  (:refer-clojure :only [conj dec defn- distinct let loop nil? rand-nth remove rand-int reduce repeatedly sort zero? >])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.counted               :refer [count]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.map-entry             :refer [key val]]
             [clojure.lang.operators             :refer [=]]
-            [clojure.lang.persistent-map        :refer [assoc]]
+            [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.seq                   :refer [seq first next]]))
@@ -22,21 +22,64 @@
       (is (= :v1 (get m1 :k1)))
       (is (= :v2 (get m2 :k1)))))
 
-  (testing "rebalances a red branch left"
-    (let [m1 (sorted-map 1 :v2 3 :v3 2 :v1)]
-      (is (= 3 (count m1)))
-      (is (contains? m1 1))
-      (is (contains? m1 2))
-      (is (contains? m1 3))))
+  (testing "rebalances a red branch left assoc"
+    (let [m1 (sorted-map 1 :v1 3 :v3)
+          m2 (assoc m1 2 :v2)]
+      (is (= 3 (count m2)))
+      (is (contains? m2 1))
+      (is (contains? m2 2))
+      (is (contains? m2 3))))
 
-  (testing "rebalances a red branch right"
-    (let [m1 (sorted-map-by > 1 :v1 3 :v3 2 :v2)]
-      (is (= 3 (count m1)))
-      (is (contains? m1 1))
-      (is (contains? m1 2))
-      (is (contains? m1 3))))
+  (testing "rebalances a red branch right on assoc"
+    (let [m1 (sorted-map-by > 1 :v1 3 :v3)
+          m2 (assoc m1 2 :v2)]
+      (is (= 3 (count m2)))
+      (is (contains? m2 1))
+      (is (contains? m2 2))
+      (is (contains? m2 3))))
 
-  )
+  (testing "rebalances a black branch left on dissoc"
+    (let [m1 (sorted-map 3 :v3 2 :v2 4 :v4 1 :v1)
+          m2 (dissoc m1 2)]
+      (is (= 3 (count m2)))
+      (is (contains? m2 1))
+      (is (contains? m2 3))
+      (is (contains? m2 4))))
+
+  (testing "rebalances a black branch right on dissoc"
+    (let [m1 (sorted-map 2 :v2 1 :v1 3 :v3 4 :v4)
+          m2 (dissoc m1 3)]
+      (is (= 3 (count m2)))
+      (is (contains? m2 1))
+      (is (contains? m2 2))
+      (is (contains? m2 4)))))
+
+(deftest sorted-map-generative-test
+  (defn- random-partition [coll remove-size]
+    (loop [c coll
+          removed-c '()
+          counter remove-size]
+      (if (zero? counter)
+        [c removed-c]
+        (let [rand-elem (rand-nth c)]
+          (recur
+            (remove #(= rand-elem %) c)
+            (conj removed-c rand-elem)
+            (dec counter))))))
+
+  (testing "random assoc and dissoc combinations"
+    (let [keyvals (repeatedly 100 #(rand-int 999))
+          m1 (reduce #(assoc %1 %2 %2) (sorted-map) keyvals)
+          [ks removed-ks] (random-partition keyvals 25)
+          uniq-ks (distinct ks)
+          m2 (reduce #(dissoc %1 %2) m1 removed-ks)]
+      (is (= (clojure.core/count uniq-ks) (count m2)))
+      (loop [expected-ks (sort uniq-ks)
+             mseq (seq m2)]
+        (if expected-ks
+          (do
+            (is (= (clojure.core/first expected-ks) (key (first mseq))))
+            (recur (clojure.core/next expected-ks) (next mseq))))))))
 
 (deftest sorted-map-seq-test
   (testing "seq return nil when the map is empty"

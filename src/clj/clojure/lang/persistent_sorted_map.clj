@@ -19,18 +19,13 @@
 (declare red-node?)
 (declare black-node?)
 
+(declare make-red-node)
 (declare make-sorted-red-node)
-(declare make-sorted-red-node-val)
 (declare make-sorted-red-branch)
-(declare make-sorted-red-branch-val)
-
-(declare make-sorted-black-node)
-(declare make-sorted-black-node-val)
-(declare make-sorted-black-branch)
-(declare make-sorted-black-branch-val)
 
 (declare make-black-node)
-(declare make-red-node)
+(declare make-sorted-black-node)
+(declare make-sorted-black-branch)
 
 (declare make-sorted-map)
 
@@ -78,32 +73,6 @@
   (-replace [this entry left right]
     (make-black-node entry left right)))
 
-(deftype SortedBlackNodeVal ^{:private true}
-  [-map-entry]
-
-  SortedNode
-  (-color [this] :black)
-  (-entry [this] -map-entry)
-  (-left [this] nil)
-  (-right [this] nil)
-  (-add-left [this node]
-    (-balance-left node this))
-  (-add-right [this node]
-    (-balance-right node this))
-  (-remove-left [this node]
-    (balance-left-del -map-entry node nil))
-  (-remove-right [this node]
-    (balance-right-del -map-entry nil node))
-  (-balance-left [this node]
-    (make-black-node (-entry node) this (-right node)))
-  (-balance-right [this node]
-    (make-black-node (-entry node) (-left node) this))
-  (-blacken [this] this)
-  (-redden [this]
-    (make-sorted-red-node-val -map-entry))
-  (-replace [this entry left right]
-    (make-black-node entry left right)))
-
 (deftype SortedBlackBranch ^{:private true}
   [-map-entry -left-node -right-node]
 
@@ -127,32 +96,6 @@
   (-blacken [this] this)
   (-redden [this]
     (make-sorted-red-branch -map-entry -left-node -right-node))
-  (-replace [this entry left right]
-    (make-black-node entry left right)))
-
-(deftype SortedBlackBranchVal ^{:private true}
-  [-map-entry -left-node -right-node]
-
-  SortedNode
-  (-color [this] :black)
-  (-entry [this] -map-entry)
-  (-left [this] -left-node)
-  (-right [this] -right-node)
-  (-add-left [this node]
-    (-balance-left node this))
-  (-add-right [this node]
-    (-balance-right node this))
-  (-remove-left [this node]
-    (balance-left-del -map-entry node -right-node))
-  (-remove-right [this node]
-    (balance-right-del -map-entry -left-node node))
-  (-balance-left [this node]
-    (make-black-node (-entry node) this (-right node)))
-  (-balance-right [this node]
-    (make-black-node (-entry node) (-left node) this))
-  (-blacken [this] this)
-  (-redden [this]
-    (make-sorted-red-branch-val -map-entry -left-node -right-node))
   (-replace [this entry left right]
     (make-black-node entry left right)))
 
@@ -183,79 +126,7 @@
   (-replace [this entry left right]
     (make-red-node entry left right)))
 
-(deftype SortedRedNodeVal ^{:private true}
-  [-map-entry]
-
-  SortedNode
-  (-color [this] :red)
-  (-entry [this] -map-entry)
-  (-left [this] nil)
-  (-right [this] nil)
-  (-add-left [this node]
-    (make-red-node -map-entry node nil))
-  (-add-right [this node]
-    (make-red-node -map-entry nil node))
-  (-remove-left [this node]
-    (make-red-node -map-entry node nil))
-  (-remove-right [this node]
-    (make-red-node -map-entry nil node))
-  (-balance-left [this node]
-    (make-black-node (-entry node) this (-right node)))
-  (-balance-right [this node]
-    (make-black-node (-entry node) (-left node) this))
-  (-blacken [this]
-    (make-sorted-black-node-val -map-entry))
-  (-redden [this]
-    (throw (new-unsupported-error "Invariant Violation")))
-  (-replace [this entry left right]
-    (make-red-node entry left right)))
-
 (deftype SortedRedBranch ^{:private true}
-  [-map-entry -left-node -right-node]
-
-  SortedNode
-  (-color [this] :red)
-  (-entry [this] -map-entry)
-  (-left [this] -left-node)
-  (-right [this] -right-node)
-  (-add-left [this node]
-    (make-red-node -map-entry node -right-node))
-  (-add-right [this node]
-    (make-red-node -map-entry -left-node node))
-  (-remove-left [this node]
-    (make-red-node -map-entry node -right-node))
-  (-remove-right [this node]
-    (make-red-node -map-entry -left-node node))
-  (-balance-left [this node]
-    (cond
-      (red-node? -left-node)
-        (let [blackened-node (make-black-node (-entry node) -right-node (-right node))]
-          (make-red-node -map-entry (-blacken -left-node) blackened-node))
-      (red-node? -right-node)
-        (let [blackened (make-black-node -map-entry -left-node (-left -right-node))
-              blackened-right (make-black-node (-entry node) (-right -right-node) (-right node))]
-          (make-red-node (-entry -right-node) -map-entry blackened blackened-right))
-      :else
-        (make-black-node (-entry node) this (-right node))))
-  (-balance-right [this node]
-    (cond
-      (red-node? -right-node)
-        (let [blackened (make-black-node (-entry node) (-left node) -left-node)]
-          (make-red-node -map-entry blackened (-blacken -right-node)))
-      (red-node? -left-node)
-        (let [blackened-left (make-black-node (-entry node) (-left node) (-left -left-node))
-              blackened-right (make-black-node -map-entry (-right -left-node) -right-node)]
-          (make-red-node (-entry -left-node) blackened-left blackened-right))
-      :else
-        (make-black-node (-entry node) (-left node) this)))
-  (-blacken [this]
-    (make-sorted-black-branch -map-entry -left-node -right-node))
-  (-redden [this]
-    (throw (new-unsupported-error "Invariant Violation")))
-  (-replace [this entry left right]
-    (make-red-node entry left right)))
-
-(deftype SortedRedBranchVal ^{:private true}
   [-map-entry -left-node -right-node]
 
   SortedNode
@@ -294,7 +165,7 @@
       :else
         (make-black-node (-entry node) (-left node) this)))
   (-blacken [this]
-    (make-sorted-black-branch-val -map-entry -left-node -right-node))
+    (make-sorted-black-branch -map-entry -left-node -right-node))
   (-redden [this]
     (throw (new-unsupported-error "Invariant Violation")))
   (-replace [this entry left right]
@@ -313,46 +184,24 @@
 (defn- make-sorted-red-node [-map-entry]
   (SortedRedNode. -map-entry))
 
-(defn- make-sorted-red-node-val [-map-entry]
-  (SortedRedNodeVal. -map-entry))
-
 (defn- make-sorted-red-branch [-map-entry -left -right]
   (SortedRedBranch. -map-entry -left -right))
-
-(defn- make-sorted-red-branch-val [-map-entry -left -right]
-  (SortedRedBranchVal. -map-entry -left -right))
 
 (defn- make-sorted-black-node [-map-entry]
   (SortedBlackNode. -map-entry))
 
-(defn- make-sorted-black-node-val [-map-entry]
-  (SortedBlackNodeVal. -map-entry))
-
 (defn- make-sorted-black-branch [-map-entry -left -right]
   (SortedBlackBranch. -map-entry -left -right))
 
-(defn- make-sorted-black-branch-val [-map-entry -left -right]
-  (SortedBlackBranchVal. -map-entry -left -right))
-
 (defn- make-black-node [-map-entry left right]
-  (let [v (val -map-entry)]
-    (if (and (nil? left) (nil? right))
-      (if (nil? v)
-        (make-sorted-black-node -map-entry)
-        (make-sorted-black-node-val -map-entry))
-      (if (nil? v)
-        (make-sorted-black-branch -map-entry left right)
-        (make-sorted-black-branch-val -map-entry left right)))))
+  (if (and (nil? left) (nil? right))
+    (make-sorted-black-node -map-entry)
+    (make-sorted-black-branch -map-entry left right)))
 
 (defn- make-red-node [-map-entry left right]
-  (let [v (val -map-entry)]
-    (if (and (nil? left) (nil? right))
-      (if (nil? v)
-        (make-sorted-red-node -map-entry)
-        (make-sorted-red-node-val -map-entry))
-      (if (nil? v)
-        (make-sorted-red-branch -map-entry left right)
-        (make-sorted-red-branch-val -map-entry left right)))))
+  (if (and (nil? left) (nil? right))
+    (make-sorted-red-node -map-entry)
+    (make-sorted-red-branch -map-entry left right)))
 
 (defn- left-balance [-map-entry ins right]
   (cond
@@ -394,7 +243,7 @@
 (defn- balance-right-del [-map-entry left del]
   (cond
     (red-node? del)
-      (make-red-node -map-entry -left (-blacken del))
+      (make-red-node -map-entry left (-blacken del))
     (black-node? left)
       (left-balance -map-entry (-redden left) del)
     (and (red-node? left) (black-node? (-right left)))
@@ -406,9 +255,7 @@
 
 (defn- sorted-map-add [root compare-fn k v]
   (if (nil? root)
-    (if (nil? v)
-      [(make-sorted-red-node (make-map-entry k v)) false]
-      [(make-sorted-red-node-val (make-map-entry k v)) false])
+    [(make-sorted-red-node (make-map-entry k v)) false]
     (let [comparison (compare-fn k (key (-entry root)))]
       (if (zero? comparison)
         [root true]
@@ -438,9 +285,9 @@
               (make-red-node (-entry left) (-left left) redened))))
         (make-red-node (-entry left) (-left left) (sorted-map-append (-right left) right)))
     (red-node? right)
-      (make-red-node (-entry right) (sorted-map-append left (-right left)) (-right right))
+      (make-red-node (-entry right) (sorted-map-append left (-left right)) (-right right))
     :else
-      (let [app (sorted-map-append (-left right) (-right left))]
+      (let [app (sorted-map-append (-right left) (-left right))]
         (if (red-node? app)
           (let [blackened-left (make-black-node (-entry left) (-left left) (-left app))
                 blackened-right (make-black-node (-entry right) (-right app) (-right right))]
