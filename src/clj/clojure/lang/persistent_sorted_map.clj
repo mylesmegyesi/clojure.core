@@ -394,7 +394,7 @@
 (defn- balance-right-del [-map-entry left del]
   (cond
     (red-node? del)
-      (make-red-node -map-entry -left (-blacken del))
+      (make-red-node -map-entry left (-blacken del))
     (black-node? left)
       (left-balance -map-entry (-redden left) del)
     (and (red-node? left) (black-node? (-right left)))
@@ -438,9 +438,9 @@
               (make-red-node (-entry left) (-left left) redened))))
         (make-red-node (-entry left) (-left left) (sorted-map-append (-right left) right)))
     (red-node? right)
-      (make-red-node (-entry right) (sorted-map-append left (-right left)) (-right right))
+      (make-red-node (-entry right) (sorted-map-append left (-left right)) (-right right))
     :else
-      (let [app (sorted-map-append (-left right) (-right left))]
+      (let [app (sorted-map-append (-right left) (-left right))]
         (if (red-node? app)
           (let [blackened-left (make-black-node (-entry left) (-left left) (-left app))
                 blackened-right (make-black-node (-entry right) (-right app) (-right right))]
