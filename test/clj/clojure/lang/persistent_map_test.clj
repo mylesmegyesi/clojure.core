@@ -6,6 +6,7 @@
             [clojure.lang.ihash                 :refer [IHash]]
             [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
+            [clojure.lang.meta                  :refer [meta with-meta]]
             [clojure.lang.operators             :refer [not not= =]]
             [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-sorted-map :refer :all]
@@ -180,6 +181,16 @@
           m2 (constructor :k2 1)]
       (is (not= m1 m2)))))
 
+(defn map-meta-test [constructor]
+  (testing "meta is nil after creation"
+    (is (nil? (meta (constructor)))))
+
+  (testing "with-meta returns a map with the specified meta"
+    (let [mta {:so :meta}
+          m1 (constructor)
+          m2 (with-meta m1 mta)]
+      (is (= mta (meta m2))))))
+
 (deftype Thing [t]
   IHash
   (-hash [this] t)
@@ -222,4 +233,5 @@
   (map-dissoc-test constructor)
   (map-contains?-test constructor)
   (map-equivalence-test constructor)
+  (map-meta-test constructor)
   (map-hash-test constructor))

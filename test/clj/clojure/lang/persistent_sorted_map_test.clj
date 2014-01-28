@@ -11,7 +11,7 @@
             [clojure.lang.seq                   :refer [seq first next]]))
 
 (deftest sorted-map-test
-  (map-test "PersistentSortedMap" sorted-map))
+  (map-test "PersistentTreeMap" sorted-map))
 
 (deftest sorted-map-rebalance-test
   (testing "assoc to an existing key"
