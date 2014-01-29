@@ -1,27 +1,25 @@
 (ns clojure.lang.platform.seqable
   (:refer-clojure :only [extend-type fn defn deftype declare when])
-  (:require [clojure.lang.icounted :refer [ICounted]]
+  (:require [clojure.lang.aseq     :refer [defseq]]
+            [clojure.lang.icounted :refer [ICounted]]
             [clojure.lang.iseqable :refer [ISeqable]]
-            [clojure.lang.iseq     :refer [ISeq]]
-            [clojure.lang.seq      :refer [first next]]))
+            [clojure.lang.iseq     :refer [ISeq]]))
 
 (declare old-seq->new-seq)
 
-(deftype OldSeqAdapter [count first-entry next-seq]
+(defseq OldSeqAdapter [old]
   ICounted
-  (-count [this] count)
+  (-count [this] (clojure.core/count old))
 
   ISeq
-  (-first [this] first-entry)
+  (-first [this] (clojure.core/first old))
 
   (-next [this]
-    (old-seq->new-seq next-seq)))
+    (old-seq->new-seq (clojure.core/next old))))
 
 (defn old-seq->new-seq [old]
   (when old
-    (OldSeqAdapter. (clojure.core/count old)
-                    (clojure.core/first old)
-                    (clojure.core/next old))))
+    (OldSeqAdapter. old)))
 
 (extend-type clojure.lang.ISeq
   ISeqable

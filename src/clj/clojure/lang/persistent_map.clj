@@ -1,6 +1,7 @@
 (ns clojure.lang.persistent-map
   (:refer-clojure :only [deftype defn defn- declare empty? let when-let when loop])
-  (:require [clojure.lang.icounted        :refer [ICounted]]
+  (:require [clojure.lang.aseq            :refer [defseq]]
+            [clojure.lang.icounted        :refer [ICounted]]
             [clojure.lang.counted         :refer [count]]
             [clojure.lang.ipersistent-map :refer [-assoc -dissoc]]
             [clojure.lang.iseq            :refer [ISeq]]
@@ -33,7 +34,7 @@
 
 (declare new-key-seq)
 
-(deftype KeySeq [seq]
+(defseq KeySeq [seq]
   ICounted
   (-count [this]
     (count seq))
@@ -54,7 +55,7 @@
 
 (declare new-val-seq)
 
-(deftype ValSeq [seq]
+(defseq ValSeq [seq]
   ICounted
   (-count [this]
     (count seq))

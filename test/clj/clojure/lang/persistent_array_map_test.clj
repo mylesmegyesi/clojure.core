@@ -1,14 +1,21 @@
 (ns clojure.lang.persistent-array-map-test
-  (:refer-clojure :only [nil? let])
+  (:refer-clojure :only [deftype nil? let])
   (:require [clojure.test                      :refer :all]
             [clojure.lang.counted              :refer [count]]
+            [clojure.lang.iseqable             :refer [ISeqable]]
+            [clojure.lang.isequential          :refer [ISequential]]
             [clojure.lang.map-entry            :refer [key val]]
-            [clojure.lang.operators            :refer [not =]]
+            [clojure.lang.object               :refer [identical?]]
+            [clojure.lang.operators            :refer [not = not=]]
             [clojure.lang.persistent-map-test  :refer [map-test]]
             [clojure.lang.persistent-array-map :refer [array-map]]
-            [clojure.lang.platform.object      :refer [identical?]]
             [clojure.lang.seqable              :refer [seq]]
             [clojure.lang.seq                  :refer [first next]]))
+
+(deftype FixedSequential [seq]
+  ISequential
+  ISeqable
+  (-seq [this] seq))
 
 (deftest array-map-test
   (map-test "PersistentArrayMap" array-map))
@@ -73,4 +80,30 @@
       (is (= 4 (count m2-seq)))
       (is (= 3 (count m3-seq)))
       (is (= 2 (count m4-seq)))
-      (is (= 1 (count m5-seq))))))
+      (is (= 1 (count m5-seq)))))
+
+  (testing "array-map-seqs and Seqable and return themselves"
+    (let [s (seq (array-map :k1 1 :k2 2 :k3 3))]
+      (is (identical? s (seq s)))))
+
+  (testing "seqs are equal when every seq entry is equal"
+    (is (= (seq (array-map :k1 1 :k2 2 :k3 3))
+           (seq (array-map :k1 1 :k2 2 :k3 3)))))
+
+  (testing "seqs are not equal when one item is missing from other"
+    (is (not= (seq (array-map :k1 1 :k2 2 :k3 3))
+              (seq (array-map :k1 1 :k2 2)))))
+
+  (testing "seqs are not equal when one item is missing from this"
+    (is (not= (seq (array-map :k1 1 :k2 2))
+              (seq (array-map :k1 1 :k2 2 :k3 3)))))
+
+  (testing "seqs are not equal when other is not a sequential"
+    (is (not= (seq (array-map :k1 1)) 1)))
+
+  (testing "seqs are equal to sequential things"
+    (let [s1 (seq (array-map :k1 1 :k2 2))
+          s2 (seq (array-map :k1 1 :k2 2))]
+      (is (= s1 (FixedSequential. s2)))))
+
+  )

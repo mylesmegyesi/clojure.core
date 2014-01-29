@@ -6,8 +6,8 @@
             [clojure.lang.keyword         :refer [keyword]]
             [clojure.lang.meta            :refer [meta with-meta]]
             [clojure.lang.named           :refer [name namespace]]
+            [clojure.lang.object          :refer [identical?]]
             [clojure.lang.operators       :refer [not not= = ==]]
-            [clojure.lang.platform.object :refer [identical?]]
             [clojure.lang.show            :refer [str]]
             [clojure.lang.symbol          :refer :all]))
 

@@ -1,14 +1,14 @@
 (ns clojure.lang.apersistent-set
   (:refer-clojure :only [apply assoc cons defmacro defn defn- dissoc empty? every? fn flatten first keys let list list* loop map reduce repeat rest take + ->])
   (:require [clojure.lang.counted              :refer [count]]
+            [clojure.lang.deftype              :refer [expand-methods]]
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.ipersistent-set]
             [clojure.lang.lookup               :refer [contains?]]
             [clojure.lang.operators            :refer [=]]
             [clojure.lang.seqable              :refer [seq]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.platform.hash        :refer [platform-hash-method]]
-            [clojure.lang.platform.object      :refer [expand-methods]]))
+            [clojure.lang.platform.hash        :refer [platform-hash-method]]))
 
 (defn make-pairs [xs]
   (flatten (map #(take 2 (repeat %)) xs)))

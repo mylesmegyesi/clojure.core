@@ -4,12 +4,12 @@
             [clojure.lang.counted               :refer [count]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.map-entry             :refer [key val]]
+            [clojure.lang.object                :refer [identical?]]
             [clojure.lang.operators             :refer [=]]
             [clojure.lang.persistent-map        :refer [assoc dissoc]]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
-            [clojure.lang.platform.object       :refer [identical?]]
             [clojure.lang.seqable               :refer [seq]]
             [clojure.lang.seq                   :refer [first next]]
             [clojure.lang.show                  :refer [str]]))

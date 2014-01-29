@@ -12,8 +12,7 @@
                                                        -subtract
                                                        -multiply
                                                        -increment
-                                                       -decrement]]
-            [clojure.lang.platform.object      :refer [type]]))
+                                                       -decrement]]))
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -70,6 +69,11 @@
   "Returns true if x is logical false, false otherwise."
   [x]
   (if x false true))
+
+(defn boolean
+  "Returns true if x is logical true, false otherwise."
+  [x]
+  (if x true false))
 
 (defn not=
   "Same as (not (= obj1 obj2))."

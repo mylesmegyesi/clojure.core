@@ -1,15 +1,19 @@
 (ns clojure.lang.apersistent-map
-  (:refer-clojure :only [bit-and defmacro defn let loop +])
-  (:require [clojure.lang.counted   :refer [count]]
-            [clojure.lang.hash      :refer [hash]]
-            [clojure.lang.lookup    :refer [contains? get]]
-            [clojure.lang.map-entry :refer [key val]]
-            [clojure.lang.operators :refer [and =]]
-            [clojure.lang.seqable   :refer [seq]]
-            [clojure.lang.seq       :refer [first next]]))
+  (:refer-clojure :only [bit-and defmacro defn let loop + list list* concat ->])
+  (:require [clojure.lang.counted              :refer [count]]
+            [clojure.lang.deftype              :refer [expand-methods]]
+            [clojure.lang.hash                 :refer [hash]]
+            [clojure.lang.lookup               :refer [contains? get]]
+            [clojure.lang.map-entry            :refer [key val]]
+            [clojure.lang.operators            :refer [and =]]
+            [clojure.lang.platform.enumerable  :refer [platform-enumerable-method]]
+            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
+            [clojure.lang.platform.hash        :refer [platform-hash-method]]
+            [clojure.lang.seqable              :refer [seq]]
+            [clojure.lang.seq                  :refer [first next]]))
 
-(defn map-hash [-seq]
-  (loop [entries -seq
+(defn map-hash [m]
+  (loop [entries (seq m)
          acc     0]
     (if entries
       (let [entry (first entries)]
@@ -32,3 +36,13 @@
             false))
         true))
     false))
+
+(defmacro defmap [type bindings & body]
+  (concat
+    (list* 'clojure.core/deftype type bindings body)
+    (-> {}
+      (platform-hash-method 'clojure.lang.apersistent-map/map-hash)
+      ;platform-show-method
+      platform-enumerable-method
+      (platform-equals-method 'clojure.lang.apersistent-map/map-equals?)
+      expand-methods)))

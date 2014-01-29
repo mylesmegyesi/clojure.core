@@ -1,21 +1,18 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [apply cond comparator cons count dec declare defmacro defn defn- defprotocol deftype empty? even? first format let list* list loop next nil? rest second zero? + - > < ->])
-  (:require [clojure.lang.icounted             :refer [ICounted]]
+  (:refer-clojure :only [cond comparator cons count dec declare defn defn- defprotocol deftype empty? even? first format let loop next nil? rest second zero? + - > < ->])
+  (:require [clojure.lang.apersistent-map      :refer [defmap]]
+            [clojure.lang.aseq                 :refer [defseq]]
+            [clojure.lang.comparison           :refer [compare]]
+            [clojure.lang.icounted             :refer [ICounted]]
             [clojure.lang.ilookup              :refer [ILookup]]
             [clojure.lang.imeta                :refer [IMeta]]
             [clojure.lang.ipersistent-map      :refer [IPersistentMap]]
-            [clojure.lang.iseq                 :refer [ISeq]]
             [clojure.lang.iseqable             :refer [ISeqable]]
-            [clojure.lang.apersistent-map      :refer [map-equals? map-hash]]
-            [clojure.lang.comparison           :refer [compare]]
-            [clojure.lang.map-entry            :refer [key make-map-entry val]]
+            [clojure.lang.iseq                 :refer [ISeq]]
+            [clojure.lang.map-entry            :refer [key new-map-entry val]]
             [clojure.lang.operators            :refer [and not or = ==]]
             [clojure.lang.persistent-map       :refer [assoc]]
-            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.platform.enumerable  :refer [platform-enumerable-method]]
-            [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
-            [clojure.lang.platform.hash        :refer [platform-hash-method]]
-            [clojure.lang.platform.object      :refer [expand-methods]]))
+            [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]))
 
 (declare red-node?)
 (declare black-node?)
@@ -256,7 +253,7 @@
 
 (defn- sorted-map-add [root compare-fn k v]
   (if (nil? root)
-    [(make-sorted-red-node (make-map-entry k v)) false]
+    [(make-sorted-red-node (new-map-entry k v)) false]
     (let [comparison (compare-fn k (key (-entry root)))]
       (if (zero? comparison)
         [root true]
@@ -326,7 +323,7 @@
          right (if (> comparison 0)
                  (sorted-map-replace (-right root) compare-fn k v)
                  (-right root))]
-    (-replace root (make-map-entry (key (-entry root)) new-val) left right)))
+    (-replace root (new-map-entry (key (-entry root)) new-val) left right)))
 
 (defn- sorted-map-assoc [root compare-fn k v]
   (let [[node existed?] (sorted-map-add root compare-fn k v)]
@@ -375,7 +372,7 @@
 (declare make-seq-stack)
 (declare make-sorted-map-seq)
 
-(deftype PersistentSortedMapSeq [-stack -count]
+(defseq PersistentSortedMapSeq [-stack -count]
   ICounted
   (-count [this] -count)
 
@@ -400,64 +397,39 @@
     nil
     (PersistentSortedMapSeq. stack cnt)))
 
-(defmacro sorted-map-hash-init
-  {:private true}
-  [_]
-  (list 'map-hash (list 'make-sorted-map-seq (list 'make-seq-stack '-root nil) '-count)))
+(defmap PersistentTreeMap [-root -count -comparator -meta] ; PersistentTreeMap is the clojure class name
+  ICounted
+  (-count [this] -count)
 
-(defmacro sorted-map-equals?-init
-  {:private true}
-  [this other]
-  (list 'map-equals? this other))
+  ILookup
+  (-includes? [this k]
+    (sorted-map-includes? -root -comparator k))
 
-(def platform-sorted-map-methods
-  ^{:private true}
-  (-> {}
-    (platform-hash-method 'sorted-map-hash-init)
-    platform-enumerable-method
-    (platform-equals-method 'sorted-map-equals?-init)
-    expand-methods))
+  (-lookup [this k default]
+    (sorted-map-lookup -root -comparator k default))
 
-(defmacro defpersistentsortedmap [type]
-  (list*
-    'deftype type ['-root '-count '-comparator '-meta]
+  IMeta
+  (-meta [this] -meta)
 
-    'ICounted
-    (list '-count ['this] '-count)
+  (-with-meta [this m]
+    (make-sorted-map -root -count -comparator m))
 
-    'ILookup
-    (list '-includes? ['this 'k]
-      (list 'sorted-map-includes? '-root '-comparator 'k))
+  IPersistentMap
+  (-assoc [this k v]
+    (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
+      (if (= tree -root)
+        this
+        (make-sorted-map tree (+ -count cnt) -comparator -meta))))
 
-    (list '-lookup ['this 'k 'default]
-      (list 'sorted-map-lookup '-root '-comparator 'k 'default))
+  (-dissoc [this k]
+    (let [[tree cnt] (sorted-map-dissoc -root -comparator k)]
+      (if (= tree -root)
+        this
+        (make-sorted-map tree (- -count cnt) -comparator -meta))))
 
-    'IMeta
-    (list '-meta ['this] '-meta)
-
-    (list '-with-meta ['this 'm]
-      (list 'make-sorted-map '-root '-count '-comparator 'm))
-
-    'IPersistentMap
-    (list '-assoc ['this 'k 'v]
-      (list 'let [['tree 'cnt] (list 'sorted-map-assoc '-root '-comparator 'k 'v)]
-        (list 'if (list '== 'tree '-root)
-          'this
-          (list 'make-sorted-map 'tree (list '+ '-count 'cnt) '-comparator '-meta))))
-
-    (list '-dissoc ['this 'k]
-      (list 'let [['tree 'cnt] (list 'sorted-map-dissoc '-root '-comparator 'k)]
-        (list 'if (list '== 'tree '-root)
-          'this
-          (list 'make-sorted-map 'tree (list '- '-count 'cnt) '-comparator '-meta))))
-
-    'ISeqable
-    (list '-seq ['this]
-      (list 'make-sorted-map-seq (list 'make-seq-stack '-root nil) '-count))
-
-    platform-sorted-map-methods))
-
-(defpersistentsortedmap PersistentTreeMap) ; PersistentTreeMap is the clojure class name
+  ISeqable
+  (-seq [this]
+    (make-sorted-map-seq (make-seq-stack -root nil) -count)))
 
 (defn- make-sorted-map [root cnt compare-fn mta]
   (PersistentTreeMap. root cnt compare-fn mta))

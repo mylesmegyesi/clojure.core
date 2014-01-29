@@ -2,13 +2,13 @@
   (:refer-clojure :only [nil? let defn- loop])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.counted             :refer [count]]
-            [clojure.lang.map-entry           :refer [make-map-entry key val]]
+            [clojure.lang.map-entry           :refer [key val]]
+            [clojure.lang.object              :refer [identical?]]
             [clojure.lang.operators           :refer [not =]]
             [clojure.lang.persistent-map-test :refer [map-test]]
             [clojure.lang.persistent-hash-map :refer [hash-map]]
             [clojure.lang.persistent-hash-set :refer [hash-set]]
             [clojure.lang.persistent-set      :refer [union]]
-            [clojure.lang.platform.object     :refer [identical?]]
             [clojure.lang.seqable             :refer [seq]]
             [clojure.lang.seq                 :refer [first next]]))
 

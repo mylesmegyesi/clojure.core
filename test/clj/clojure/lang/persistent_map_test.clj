@@ -8,13 +8,13 @@
             [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.meta                  :refer [meta with-meta]]
+            [clojure.lang.object                :refer [identical?]]
             [clojure.lang.operators             :refer [not not= =]]
             [clojure.lang.persistent-map        :refer [assoc dissoc keys vals]]
             [clojure.lang.persistent-array-map  :refer [array-map]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
-            [clojure.lang.platform.object       :refer [identical?]]
             [clojure.lang.show                  :refer [str]]
             [clojure.lang.seq                   :refer [first next]]))
 
@@ -266,7 +266,11 @@
 
   (testing "returns a provided not-found value when using get"
     (let [m1 (constructor)]
-      (is (= "not found" (get m1 :not-a-key "not found"))))))
+      (is (= "not found" (get m1 :not-a-key "not found")))))
+
+  (testing "contains a nil key"
+    (is (contains? (constructor nil 1) nil))
+    (is (not (contains? (constructor 1 1) nil)))))
 
 (defn map-equivalence-test [constructor]
   (testing "equal if same keys and values"

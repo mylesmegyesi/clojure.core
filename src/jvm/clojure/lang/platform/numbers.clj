@@ -1,8 +1,8 @@
 (ns clojure.lang.platform.numbers
   (:refer-clojure :only [defmacro defprotocol deftype defmulti defmethod defn- extend-protocol extend-type fn ->])
-  (:require [clojure.lang.iequivalence     :refer [IEquivalence -equivalent?]]
-            [clojure.lang.ihash            :refer [IHash]]
-            [clojure.lang.platform.object  :refer [type instance?]])
+  (:require [clojure.lang.iequivalence :refer [IEquivalence -equivalent?]]
+            [clojure.lang.ihash        :refer [IHash]]
+            [clojure.lang.object       :refer [type instance?]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]
