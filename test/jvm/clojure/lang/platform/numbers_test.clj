@@ -3,11 +3,11 @@
                          byte short int long bigint biginteger float double
                          /
                          ])
-  (:require [clojure.test                 :refer [deftest is testing]]
-            [clojure.lang.hash            :refer [hash]]
-            [clojure.lang.operators       :refer [= == not=]]
-            [clojure.lang.show            :refer [str]]
-            [clojure.lang.platform.object :refer [type]]))
+  (:require [clojure.test           :refer [deftest is testing]]
+            [clojure.lang.hash      :refer [hash]]
+            [clojure.lang.object    :refer [type]]
+            [clojure.lang.operators :refer [= == not=]]
+            [clojure.lang.show      :refer [str]]))
 
 (defmacro all-pairs-equal [equal-var vals]
   `(let [equal-var# ~equal-var

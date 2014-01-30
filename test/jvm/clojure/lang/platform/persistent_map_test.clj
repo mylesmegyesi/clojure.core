@@ -3,7 +3,8 @@
   (:require [clojure.test                      :refer :all]
             [clojure.lang.hash                 :refer [hash]]
             [clojure.lang.operators            :refer [not =]]
-            [clojure.lang.seq                  :refer [first next seq]])
+            [clojure.lang.seqable              :refer [seq]]
+            [clojure.lang.seq                  :refer [first next]])
   (:import [java.util NoSuchElementException]))
 
 (defn platform-equals-test [constructor]

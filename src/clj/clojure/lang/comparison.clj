@@ -1,7 +1,7 @@
 (ns clojure.lang.comparison
   (:refer-clojure :only [cond defn defn- fn nil? number? <])
   (:require [clojure.lang.icomparable :refer [-compare-to]]
-            [clojure.lang.operators   :refer [not ==]]
+            [clojure.lang.operators   :refer [not =]]
             [clojure.lang.platform.comparison]))
 
 (defn comparator [predicate]
@@ -15,7 +15,7 @@
     :else 0))
 
 (defn compare [x y]
-  (if (== x y)
+  (if (= x y)
     0
     (if (not (nil? x))
       (if (nil? y)

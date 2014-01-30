@@ -1,21 +1,75 @@
 (ns clojure.lang.persistent-map
-  (:refer-clojure :only [defn empty? first let next second])
-  (:require [clojure.lang.ipersistent-map :refer [-assoc -dissoc]]))
+  (:refer-clojure :only [deftype defn defn- declare empty? let when-let when loop])
+  (:require [clojure.lang.aseq            :refer [defseq]]
+            [clojure.lang.icounted        :refer [ICounted]]
+            [clojure.lang.counted         :refer [count]]
+            [clojure.lang.ipersistent-map :refer [-assoc -dissoc]]
+            [clojure.lang.iseq            :refer [ISeq]]
+            [clojure.lang.map-entry       :refer [key val]]
+            [clojure.lang.seqable         :refer [seq]]
+            [clojure.lang.seq             :refer [first next]]))
+
+(defn assoc-seq [m kvs]
+  (if kvs
+    (let [n (next kvs)]
+      (recur (-assoc m (first kvs) (first n)) (next n)))
+    m))
 
 (defn assoc
   ([m k v]
-    (-assoc m k v))
+   (-assoc m k v))
   ([m k v & kvs]
-    (let [persistent-map (-assoc m k v)]
-      (if kvs
-        (recur persistent-map (first kvs) (second kvs) (next (next kvs)))
-        persistent-map))))
+   (assoc-seq (-assoc m k v) (seq kvs))))
+
+(defn dissoc-seq [m ks]
+  (if ks
+    (recur (-dissoc m (first ks)) (next ks))
+    m))
 
 (defn dissoc
   ([m] m)
   ([m k] (-dissoc m k))
   ([m k & ks]
-   (let [persistent-map (-dissoc m k)]
-     (if ks
-       (recur persistent-map (first ks) (next ks))
-       persistent-map))))
+   (dissoc-seq (-dissoc m k) (seq ks))))
+
+(declare new-key-seq)
+
+(defseq KeySeq [seq]
+  ICounted
+  (-count [this]
+    (count seq))
+
+  ISeq
+  (-first [this]
+    (key (first seq)))
+
+  (-next [this]
+    (new-key-seq (next seq))))
+
+(defn- new-key-seq [seq]
+  (when seq
+    (KeySeq. seq)))
+
+(defn keys [m]
+  (new-key-seq (seq m)))
+
+(declare new-val-seq)
+
+(defseq ValSeq [seq]
+  ICounted
+  (-count [this]
+    (count seq))
+
+  ISeq
+  (-first [this]
+    (val (first seq)))
+
+  (-next [this]
+    (new-val-seq (next seq))))
+
+(defn- new-val-seq [seq]
+  (when seq
+    (ValSeq. seq)))
+
+(defn vals [m]
+  (new-val-seq (seq m)))
