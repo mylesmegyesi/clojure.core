@@ -1,7 +1,7 @@
 (ns clojure.lang.map-entry-test
-  (:refer-clojure :only [and let])
+  (:refer-clojure :only [let])
   (:require [clojure.test           :refer :all]
-            [clojure.lang.operators :refer [not= =]]
+            [clojure.lang.operators :refer [and not= =]]
             [clojure.lang.map-entry :refer [new-map-entry key val]]))
 
 (deftest map-entry-test
