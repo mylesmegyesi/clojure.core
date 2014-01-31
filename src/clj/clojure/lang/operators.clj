@@ -60,7 +60,7 @@
   ([x y & more] (and (= x y) (apply = y more))))
 
 (defn ==
-  "Equivalence. Calls the -equal? method on the first argument."
+  "Equivalence. Calls the -equivalent? method on the first argument."
   ([x] true)
   ([x y] (equivalent? x y))
   ([x y & more] (and (== x y) (apply == y more))))
