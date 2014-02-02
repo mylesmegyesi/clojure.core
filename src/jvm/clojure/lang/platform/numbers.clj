@@ -1,12 +1,14 @@
 (ns clojure.lang.platform.numbers
-  (:refer-clojure :only [defmacro defprotocol deftype defmulti defmethod defn- extend-protocol extend-type fn ->])
+  (:refer-clojure :only [and or defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> not= = /])
   (:require [clojure.lang.iequivalence :refer [IEquivalence -equivalent?]]
             [clojure.lang.ihash        :refer [IHash]]
-            [clojure.lang.object       :refer [type instance?]])
+            [clojure.lang.iratio       :refer [IRatio]]
+            [clojure.lang.object       :refer [type instance?]]
+            [clojure.lang.ratio        :refer [denominator numerator]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]
-           [clojure.lang BigInt Ratio]
+           [clojure.lang BigInt]
            [clojure.lang.platform NumberOps]))
 
 (defprotocol NumberCoercions
@@ -24,6 +26,52 @@
 (defprotocol Categorized
   (category [this]))
 
+(deftype Ratio [-numerator -denominator]
+  Object
+  (equals [this other]
+    (if (and (not (nil? other)) (instance? Ratio other))
+      (and
+        (.equals -numerator (numerator other))
+        (.equals -denominator (denominator other)))
+    false))
+
+  IRatio
+  (-numerator   [this] -numerator)
+  (-denominator [this] -denominator)
+
+  Categorized
+  (category [this] :ratio)
+
+  NumberCoercions
+  (->ratio  [this] this)
+  (->int    [this] (.intValue (->double this)))
+  (->long   [this] (.longValue (->bigint this)))
+  (->float  [this] (.floatValue (->double this)))
+  (->double [this]
+    (let [mc java.math.MathContext/DECIMAL64
+          big-decimal-numerator (BigDecimal. -numerator)
+          big-decimal-denominator (BigDecimal. -denominator)]
+      (.doubleValue (.divide big-decimal-numerator big-decimal-denominator mc))))
+  (->bigint [this] (.divide -numerator -denominator))
+  (->bigdec [this]
+    (let [mc java.math.MathContext/UNLIMITED
+          big-decimal-numerator (BigDecimal. -numerator)
+          big-decimal-denominator (BigDecimal. -denominator)]
+      (.divide big-decimal-numerator big-decimal-denominator mc))))
+
+(defn- gcd [a b]
+  (if (zero? b)
+    a
+    (recur b (mod a b))))
+
+(defn make-ratio [numerator denominator]
+ (let [gcd (gcd numerator denominator)]
+    (if (zero? gcd)
+      (Ratio. (BigInteger. "0") (BigInteger. "1"))
+      (let [n (BigInteger. (.toString (/ numerator gcd)))
+            d (BigInteger. (.toString (/ denominator gcd)))]
+        (Ratio. n d)))))
+
 (extend-type Byte
   Categorized
   (category [this] :integer)
@@ -35,7 +83,7 @@
   (->long   [this] (.longValue this))
   (->float  [this] (.floatValue this))
   (->double [this] (.doubleValue this))
-  (->ratio  [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->ratio  [this] (make-ratio this BigInteger/ONE))
   (->bigint [this] (BigInteger. (.toString this)))
   (->bigdec [this] (BigDecimal. (.intValue this))))
 
@@ -49,7 +97,7 @@
   (->long   [this] (.longValue this))
   (->float  [this] (.floatValue this))
   (->double [this] (.doubleValue this))
-  (->ratio  [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->ratio  [this] (make-ratio this BigInteger/ONE))
   (->bigint [this] (BigInteger. (.toString this)))
   (->bigdec [this] (BigDecimal. (.intValue this))))
 
@@ -62,7 +110,7 @@
   (->long          [this] (.longValue this))
   (->float         [this] (.floatValue this))
   (->double        [this] (.doubleValue this))
-  (->ratio         [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->ratio         [this] (make-ratio this BigInteger/ONE))
   (->bigint        [this] (BigInteger. (.toString this)))
   (->bigdec        [this] (BigDecimal. this))
   (unsafe-cast-int [this] this))
@@ -76,7 +124,7 @@
   (->long   [this] (.longValue this))
   (->float  [this] (.floatValue this))
   (->double [this] (.doubleValue this))
-  (->ratio  [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->ratio  [this] (make-ratio this BigInteger/ONE))
   (->bigint [this] (BigInteger. (.toString this)))
   (->bigdec [this] (BigDecimal. (.intValue this))))
 
@@ -88,7 +136,7 @@
   (->long          [this] this)
   (->float         [this] (.floatValue this))
   (->double        [this] (.doubleValue this))
-  (->ratio         [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->ratio         [this] (make-ratio this BigInteger/ONE))
   (->bigint        [this] (BigInteger. (.toString this)))
   (->bigdec        [this] (BigDecimal. (.longValue this)))
   (unsafe-cast-int [this] (.intValue this))
@@ -102,7 +150,7 @@
   (->long   [this] (.longValue this))
   (->float  [this] (.floatValue this))
   (->double [this] (.doubleValue this))
-  (->ratio  [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->ratio  [this] (make-ratio this BigInteger/ONE))
   (->bigint [this] (BigInteger. (.toString this)))
   (->bigdec [this] (BigDecimal. (.longValue this))))
 
@@ -128,7 +176,7 @@
   (category [this] :integer)
 
   NumberCoercions
-  (->ratio  [this] (Ratio. this BigInteger/ONE))
+  (->ratio  [this] (make-ratio this BigInteger/ONE))
   (->bigint [this] this)
   (->bigdec [this] (BigDecimal. this)))
 
@@ -137,17 +185,9 @@
   (category [this] :integer)
 
   NumberCoercions
-  (->ratio  [this] (Ratio. (->bigint this) BigInteger/ONE))
+  (->ratio  [this] (make-ratio this BigInteger/ONE))
   (->bigint [this] (.toBigInteger this))
   (->bigdec [this] (BigDecimal. (.toBigInteger this))))
-
-(extend-type Ratio
-  Categorized
-  (category [this] :ratio)
-
-  NumberCoercions
-  (->ratio  [this] this)
-  (->bigdec [this] (.decimalValue this)))
 
 (extend-type BigDecimal
   Categorized
@@ -275,6 +315,7 @@
 (defmethod no-overflow-ops [Byte BigInt]        [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Byte BigInteger]    [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Byte BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Byte Ratio]         [ops1 opts] RATIO-OPS)
 
 (defmethod no-overflow-ops [Short Byte]          [ops1 ops2] SHORT-OPS)
 (defmethod no-overflow-ops [Short Short]         [ops1 ops2] SHORT-OPS)
@@ -287,6 +328,7 @@
 (defmethod no-overflow-ops [Short BigInt]        [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Short BigInteger]    [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Short BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Short Ratio]         [ops1 ops2] RATIO-OPS)
 
 (defmethod no-overflow-ops [Integer Byte]          [ops1 ops2] INTEGER-OPS)
 (defmethod no-overflow-ops [Integer Short]         [ops1 ops2] INTEGER-OPS)
@@ -299,6 +341,7 @@
 (defmethod no-overflow-ops [Integer BigInteger]    [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Integer BigInt]        [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Integer BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Integer Ratio]         [ops1 ops2] INTEGER-OPS)
 
 (defmethod no-overflow-ops [AtomicInteger Byte]          [ops1 ops2] INTEGER-OPS)
 (defmethod no-overflow-ops [AtomicInteger Short]         [ops1 ops2] INTEGER-OPS)
@@ -311,6 +354,7 @@
 (defmethod no-overflow-ops [AtomicInteger BigInteger]    [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [AtomicInteger BigInt]        [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [AtomicInteger BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [AtomicInteger Ratio]         [ops1 ops2] INTEGER-OPS)
 
 (defmethod no-overflow-ops [Long Byte]          [ops1 ops2] LONG-OPS)
 (defmethod no-overflow-ops [Long Short]         [ops1 ops2] LONG-OPS)
@@ -323,6 +367,7 @@
 (defmethod no-overflow-ops [Long BigInteger]    [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Long BigInt]        [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [Long BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Long Ratio]         [ops1 ops2] LONG-OPS)
 
 (defmethod no-overflow-ops [AtomicLong Byte]          [ops1 ops2] LONG-OPS)
 (defmethod no-overflow-ops [AtomicLong Short]         [ops1 ops2] LONG-OPS)
@@ -335,6 +380,7 @@
 (defmethod no-overflow-ops [AtomicLong BigInteger]    [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [AtomicLong BigInt]        [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [AtomicLong BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [AtomicLong Ratio]         [ops1 ops2] LONG-OPS)
 
 (defmethod no-overflow-ops [Float Byte]          [ops1 ops2] FLOAT-OPS)
 (defmethod no-overflow-ops [Float Short]         [ops1 ops2] FLOAT-OPS)
@@ -357,15 +403,23 @@
 (defmethod no-overflow-ops [Double AtomicLong]    [ops1 ops2] DOUBLE-OPS)
 (defmethod no-overflow-ops [Double Float]         [ops1 ops2] DOUBLE-OPS)
 (defmethod no-overflow-ops [Double Double]        [ops1 ops2] DOUBLE-OPS)
-(defmethod no-overflow-ops [Double Ratio]         [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Double Ratio]         [ops1 ops2] DOUBLE-OPS)
 (defmethod no-overflow-ops [Double BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [Double BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [Double BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
 
-(defmethod no-overflow-ops [Ratio Float]      [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Ratio Double]     [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Ratio Ratio]      [ops1 ops2] RATIO-OPS)
-(defmethod no-overflow-ops [Ratio BigDecimal] [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Ratio Byte]          [ops1 ops2] RATIO-OPS)
+(defmethod no-overflow-ops [Ratio Short]         [ops1 ops2] RATIO-OPS)
+(defmethod no-overflow-ops [Ratio Integer]       [ops1 ops2] INTEGER-OPS)
+(defmethod no-overflow-ops [Ratio AtomicInteger] [ops1 ops2] INTEGER-OPS)
+(defmethod no-overflow-ops [Ratio Long]          [ops1 ops2] LONG-OPS)
+(defmethod no-overflow-ops [Ratio AtomicLong]    [ops1 ops2] LONG-OPS)
+(defmethod no-overflow-ops [Ratio Float]         [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Ratio Double]        [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Ratio BigInt]        [ops2 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Ratio BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Ratio BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [Ratio Ratio]         [ops1 ops2] RATIO-OPS)
 
 (defmethod no-overflow-ops [BigInteger Byte]          [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [BigInteger Short]         [ops1 ops2] BIGINTEGER-OPS)
@@ -378,6 +432,7 @@
 (defmethod no-overflow-ops [BigInteger BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [BigInteger BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [BigInteger BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [BigInteger Ratio]         [ops1 ops2] BIGDECIMAL-OPS)
 
 (defmethod no-overflow-ops [BigInt Byte]          [ops1 ops2] BIGINTEGER-OPS)
 (defmethod no-overflow-ops [BigInt Short]         [ops1 ops2] BIGINTEGER-OPS)
@@ -390,6 +445,7 @@
 (defmethod no-overflow-ops [BigInt BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [BigInt BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [BigInt BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
+(defmethod no-overflow-ops [BigInt Ratio]         [ops1 ops2] BIGDECIMAL-OPS)
 
 (defmethod no-overflow-ops [BigDecimal Byte]          [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [BigDecimal Short]         [ops1 ops2] BIGDECIMAL-OPS)
@@ -442,6 +498,12 @@
       (.hashCode BigInteger/ZERO)
       (.hashCode (.stripTrailingZeros this))))
 
+  Ratio
+  (-hash [this]
+    (-bit-xor
+      (.hashCode (numerator this))
+      (.hashCode (denominator this))))
+
   )
 
 (defn- equivalent? [this other]
@@ -455,10 +517,67 @@
   (-increment [x])
   (-decrement [x]))
 
+(extend-type Ratio
+  IEquivalence
+  (-equivalent? [this other]
+    (if (or (instance? Number other) (instance? Ratio other))
+      (equivalent? this other)
+      false))
+
+  (-equal? [this other]
+    (if (instance? Ratio other)
+      (-equivalent? this other)
+      false))
+
+  BitOperations
+  (-bit-and [this other]
+    (-> (no-overflow-ops (type this) (type other))
+      (ops-bit-and this other)))
+
+  (-bit-count [i]
+    (ops-bit-count (make-ops i) i))
+
+  (-bit-or [this other]
+    (-> (no-overflow-ops (type this) (type other))
+      (ops-bit-or this other)))
+
+  (-bit-xor [this other]
+    (-> (no-overflow-ops (type this) (type other))
+      (ops-bit-xor this other)))
+
+  (-bit-shift-left [this shift]
+    (-> (no-overflow-ops (type this) (type shift))
+      (ops-bit-shift-left this shift)))
+
+  (-bit-unsigned-shift-right [this shift]
+    (-> (no-overflow-ops (type this) (type shift))
+      (ops-bit-unsigned-shift-right this shift)))
+
+  MathOperations
+  (-add [x y]
+    (-> (no-overflow-ops (type x) (type y))
+      (ops-add x y)))
+
+  (-subtract [x y]
+    (-> (no-overflow-ops (type x) (type y))
+      (ops-subtract x y)))
+
+  (-multiply [x y]
+    (-> (no-overflow-ops (type x) (type y))
+      (ops-multiply x y)))
+
+  (-increment [i]
+    (ops-increment (make-ops i) i))
+
+  (-decrement [i]
+    (ops-decrement (make-ops i) i))
+
+  )
+
 (extend-type Number
   IEquivalence
   (-equivalent? [this other]
-    (if (instance? Number other)
+    (if (or (instance? Number other) (instance? Ratio other))
       (equivalent? this other)
       false))
 
