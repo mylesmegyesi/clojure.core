@@ -1,9 +1,9 @@
 (ns clojure.lang.map-entry
   (:refer-clojure :refer [deftype defmacro defn defn- let list list* -> satisfies?])
   (:require [clojure.lang.deftype              :refer [expand-methods]]
-            [clojure.lang.imap-entry           :refer [IMapEntry -key -val]]
             [clojure.lang.operators            :refer [and =]]
-            [clojure.lang.platform.equivalence :refer [platform-equals-method]]))
+            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
+            [clojure.lang.protocols            :refer [IMapEntry -key -val]]))
 
 (defn key [entry]
   (-key entry))

@@ -1,6 +1,6 @@
 (ns clojure.lang.show
   (:refer-clojure :only [defn nil? cons])
-  (:require [clojure.lang.ishow :refer [-show]]
+  (:require [clojure.lang.protocols     :refer [-show]]
             [clojure.lang.platform.show :refer [build-string]]))
 
 (defn str

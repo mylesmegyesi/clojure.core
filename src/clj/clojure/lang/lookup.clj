@@ -1,6 +1,6 @@
 (ns clojure.lang.lookup
   (:refer-clojure :only [defn])
-  (:require [clojure.lang.ilookup :refer [-includes? -lookup]]))
+  (:require [clojure.lang.protocols :refer [-includes? -lookup]]))
 
 (defn contains? [coll k]
   (-includes? coll k))

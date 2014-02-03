@@ -1,9 +1,7 @@
 (ns clojure.lang.platform.seqable
   (:refer-clojure :only [extend-type fn defn deftype declare when])
-  (:require [clojure.lang.aseq     :refer [defseq]]
-            [clojure.lang.icounted :refer [ICounted]]
-            [clojure.lang.iseqable :refer [ISeqable]]
-            [clojure.lang.iseq     :refer [ISeq]]))
+  (:require [clojure.lang.aseq      :refer [defseq]]
+            [clojure.lang.protocols :refer [ICounted ISeqable ISeq]]))
 
 (declare old-seq->new-seq)
 

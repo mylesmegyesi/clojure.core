@@ -3,8 +3,7 @@
   (:require [clojure.test           :refer :all]
             [clojure.lang.operators :refer [not =]]
             [clojure.lang.seq       :refer :all]
-            [clojure.lang.iseq      :refer [ISeq]]
-            [clojure.lang.iseqable  :refer [ISeqable]]))
+            [clojure.lang.protocols :refer [ISeq ISeqable]]))
 
 (deftype TestSeq [-list]
   ISeqable

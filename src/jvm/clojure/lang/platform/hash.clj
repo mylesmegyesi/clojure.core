@@ -1,6 +1,6 @@
 (ns clojure.lang.platform.hash
   (:refer-clojure :only [extend-protocol fn defn list update-in cons])
-  (:require [clojure.lang.ihash :refer [IHash]]
+  (:require [clojure.lang.protocols :refer [IHash]]
             [clojure.lang.platform.numbers]))
 
 (defn platform-hash-method [methods init-macro]

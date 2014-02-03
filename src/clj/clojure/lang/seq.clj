@@ -1,7 +1,7 @@
 (ns clojure.lang.seq
   (:refer-clojure :only [cond defn let nil?])
-  (:require [clojure.lang.iseq      :refer [-first -next]]
-            [clojure.lang.operators :refer [not]]
+  (:require [clojure.lang.operators :refer [not]]
+            [clojure.lang.protocols :refer [-first -next]]
             [clojure.lang.seqable   :refer [seq]]))
 
 (defn first [s]

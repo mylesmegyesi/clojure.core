@@ -5,12 +5,6 @@
             [clojure.lang.aseq                   :refer [defseq]]
             [clojure.lang.counted                :refer [count]]
             [clojure.lang.hash                   :refer [hash]]
-            [clojure.lang.icounted               :refer [ICounted]]
-            [clojure.lang.ilookup                :refer [ILookup]]
-            [clojure.lang.imeta                  :refer [IMeta]]
-            [clojure.lang.ipersistent-map        :refer [IPersistentMap]]
-            [clojure.lang.iseqable               :refer [ISeqable]]
-            [clojure.lang.iseq                   :refer [ISeq]]
             [clojure.lang.map-entry              :refer [new-map-entry]]
             [clojure.lang.object                 :refer [identical?]]
             [clojure.lang.operators              :refer [bit-unsigned-shift-right bit-shift-left bit-and bit-or bit-xor bit-count = not= not + - * inc dec]]
@@ -18,6 +12,8 @@
             [clojure.lang.platform.atomic-entity :refer [make-atomic-entity]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.hash-map      :refer [->bitnum empty-object]]
+            [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
+                                                         IMeta IPersistentMap ISeqable ISeq]]
             [clojure.lang.seqable                :refer [seq]]
             [clojure.lang.seq                    :refer [first next]]))
 
@@ -435,6 +431,23 @@
 (def ^:private NOT-FOUND (empty-object))
 
 (defmap PersistentHashMap [-meta -count -root -has-nil? -nil-value]
+  IAssociative
+  (-assoc [this key val]
+    (if (nil? key)
+      (if (and -has-nil? (= val -nil-value))
+        this
+        (new-hash-map -meta (if -has-nil? -count (inc -count)) -root true val))
+      (let [added-leaf (new-box nil)
+            new-root (node-assoc (if -root -root EMPTY-BitmapIndexedNode)
+                                 ZERO (->bitnum (hash key)) key val added-leaf)]
+        (if (= -root new-root) ; should use identical? probably
+          this
+          (new-hash-map -meta
+                        (if (nil? (get-value added-leaf)) -count (inc -count))
+                        new-root
+                        -has-nil?
+                        -nil-value)))))
+
   ICounted
   (-count [this] -count)
 
@@ -461,22 +474,6 @@
     (new-hash-map new-meta count -root -has-nil? -nil-value))
 
   IPersistentMap
-  (-assoc [this key val]
-    (if (nil? key)
-      (if (and -has-nil? (= val -nil-value))
-        this
-        (new-hash-map -meta (if -has-nil? -count (inc -count)) -root true val))
-      (let [added-leaf (new-box nil)
-            new-root (node-assoc (if -root -root EMPTY-BitmapIndexedNode)
-                                 ZERO (->bitnum (hash key)) key val added-leaf)]
-        (if (= -root new-root) ; should use identical? probably
-          this
-          (new-hash-map -meta
-                        (if (nil? (get-value added-leaf)) -count (inc -count))
-                        new-root
-                        -has-nil?
-                        -nil-value)))))
-
   (-dissoc [this key]
     (if (nil? key)
       (if -has-nil?

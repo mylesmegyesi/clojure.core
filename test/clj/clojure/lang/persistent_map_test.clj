@@ -2,9 +2,6 @@
   (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* nil? re-pattern loop when < inc cond >])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.counted               :refer [count]]
-            [clojure.lang.icomparable           :refer [IComparable]]
-            [clojure.lang.iequivalence          :refer [IEquivalence]]
-            [clojure.lang.ihash                 :refer [IHash]]
             [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.lookup                :refer [contains? get]]
             [clojure.lang.meta                  :refer [meta with-meta]]
@@ -15,6 +12,7 @@
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
+            [clojure.lang.protocols             :refer [IComparable IEquivalence IHash]]
             [clojure.lang.show                  :refer [str]]
             [clojure.lang.seq                   :refer [first next]]))
 
