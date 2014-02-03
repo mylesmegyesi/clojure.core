@@ -1,11 +1,7 @@
 (ns clojure.lang.namespace
   (:refer-clojure :only [defn defn- assoc get-in if-let let assoc-in atom reduce fn val key -> select-keys doseq when-not contains? format apply dissoc get set concat keys update-in])
-  (:require [clojure.lang.named      :refer [namespace name]]
-            [clojure.lang.meta       :refer [meta with-meta]]
-            [clojure.lang.operators  :refer [not or =]]
-            [clojure.lang.show       :refer [str]]
-            [clojure.lang.symbol     :refer [symbol]]
-            [clojure.lang.var        :refer [-alter-var-root make-var make-unbound]]))
+  (:require [clojure.lang.var        :refer [-alter-var-root make-var make-unbound]]
+            [clojure.next            :refer :all :exclude [get contains? key val assoc dissoc atom]]))
 
 (defn create-ns [namespaces ns-sym]
   (assoc namespaces ns-sym {:mappings {}

@@ -1,11 +1,11 @@
 (ns clojure.lang.persistent-set-test
   (:refer-clojure :only [deftype let seq type])
   (:require [clojure.test                       :refer :all]
-            [clojure.lang.iseqable              :refer [ISeqable]]
-            [clojure.lang.lookup                :refer [contains?]]
             [clojure.lang.persistent-set        :refer :all]
             [clojure.lang.persistent-hash-set   :refer [hash-set]]
-            [clojure.lang.persistent-sorted-set :refer [sorted-set]]))
+            [clojure.lang.persistent-sorted-set :refer [sorted-set]]
+            [clojure.lang.protocols             :refer [ISeqable]]
+            [clojure.next                       :refer [contains?]]))
 
 (deftype FakeSeqColl [coll]
   ISeqable

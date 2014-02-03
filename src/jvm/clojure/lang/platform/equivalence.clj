@@ -1,7 +1,6 @@
 (ns clojure.lang.platform.equivalence
   (:refer-clojure :only [defmacro defprotocol extend-protocol fn defn list update-in cons])
-  (:require [clojure.lang.iequivalence :refer [IEquivalence]]
-            [clojure.lang.platform.numbers]))
+  (:require [clojure.lang.protocols :refer [IEquivalence]]))
 
 (extend-protocol IEquivalence
   Object

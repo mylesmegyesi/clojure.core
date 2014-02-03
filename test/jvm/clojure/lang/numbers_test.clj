@@ -1,15 +1,13 @@
-(ns clojure.lang.platform.numbers-test
+(ns clojure.lang.numbers-test
   (:refer-clojure :only [defmacro let doseq defn cons when
                          byte short int long bigint biginteger float double
                          /
                          ])
-  (:require [clojure.test                  :refer [deftest is testing]]
-            [clojure.lang.hash             :refer [hash]]
-            [clojure.lang.object           :refer [type]]
-            [clojure.lang.operators        :refer [= == not=]]
-            [clojure.lang.ratio            :refer [numerator denominator]]
-            [clojure.lang.show             :refer [str]]
-            [clojure.lang.platform.numbers :refer :all]))
+  (:require [clojure.test            :refer [deftest is testing]]
+            [clojure.lang.object     :refer [type]]
+            [clojure.lang.ratio      :refer [numerator denominator]]
+            [clojure.lang.numbers    :refer :all]
+            [clojure.next            :refer :all]))
 
 (defmacro all-pairs-equal [equal-var vals]
   `(let [equal-var# ~equal-var

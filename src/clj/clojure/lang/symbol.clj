@@ -1,22 +1,14 @@
 (ns clojure.lang.symbol
   (:refer-clojure :only [defmacro deftype declare satisfies? defn defn- let list* list nil? cond last butlast first count ->])
-  (:require [clojure.lang.comparison           :refer [compare]]
-            [clojure.lang.deftype              :refer [expand-methods]]
-            [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.imeta                :refer [IMeta]]
-            [clojure.lang.inamed               :refer [INamed]]
-            [clojure.lang.named                :refer [name namespace]]
-            [clojure.lang.hash                 :refer [hash hash-combine]]
-            [clojure.lang.imeta                :refer [IMeta]]
-            [clojure.lang.inamed               :refer [INamed]]
-            [clojure.lang.named                :refer [name namespace]]
+  (:require [clojure.lang.deftype              :refer [expand-methods]]
+            [clojure.lang.hash                 :refer [hash-combine]]
             [clojure.lang.object               :refer [instance?]]
-            [clojure.lang.operators            :refer [and not =]]
             [clojure.lang.platform.comparison  :refer [platform-compare-to-method]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
             [clojure.lang.platform.hash        :refer [platform-hash-method]]
             [clojure.lang.platform.show        :refer [platform-show-method]]
-            [clojure.lang.show                 :refer [str]]
+            [clojure.lang.protocols            :refer [IMeta INamed]]
+            [clojure.next                      :refer :all :exclude [count first]]
             [clojure.string]))
 
 (defmacro named-equivalence?
@@ -107,16 +99,5 @@
 (defn symbol? [obj]
   (instance? Symbol obj))
 
-(defn symbol
-  ([name]
-   (if (symbol? name)
-     name
-     (let [parts (clojure.string/split name #"/")]
-       (if (= 1 (count parts))
-         (symbol nil (first parts))
-         (symbol (clojure.string/join "/" (butlast parts)) (last parts))))))
-  ([ns name]
-   (if (nil? name)
-     (throw (Exception. "Can't create symbol with nil name")))
-   (Symbol. ns name (if ns (str ns "/" name) name)
-            (hash (hash-combine (hash name) (hash ns))) {})))
+(defn new-symbol [ns name str hash-code meta]
+  (Symbol. ns name str hash-code meta))

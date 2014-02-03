@@ -1,25 +1,16 @@
 (ns clojure.lang.persistent-hash-map
   (:refer-clojure :only [defn defn- declare defprotocol deftype -> let when even? loop format cond nil? >= < and])
   (:require [clojure.lang.apersistent-map        :refer [defmap]]
-            [clojure.lang.array                  :refer [make-array array-set! array-get array-clone! array-copy! array-length]]
+            [clojure.lang.array                  :refer [array-set! array-get array-clone! array-copy! array-length]]
             [clojure.lang.aseq                   :refer [defseq]]
-            [clojure.lang.counted                :refer [count]]
-            [clojure.lang.hash                   :refer [hash]]
-            [clojure.lang.icounted               :refer [ICounted]]
-            [clojure.lang.ilookup                :refer [ILookup]]
-            [clojure.lang.imeta                  :refer [IMeta]]
-            [clojure.lang.ipersistent-map        :refer [IPersistentMap]]
-            [clojure.lang.iseqable               :refer [ISeqable]]
-            [clojure.lang.iseq                   :refer [ISeq]]
+            [clojure.lang.atomic-ref             :refer [new-atomic-ref]]
             [clojure.lang.map-entry              :refer [new-map-entry]]
             [clojure.lang.object                 :refer [identical?]]
-            [clojure.lang.operators              :refer [bit-unsigned-shift-right bit-shift-left bit-and bit-or bit-xor bit-count = not= not + - * inc dec]]
-            [clojure.lang.persistent-map         :refer [assoc]]
-            [clojure.lang.platform.atomic-entity :refer [make-atomic-entity]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.hash-map      :refer [->bitnum empty-object]]
-            [clojure.lang.seqable                :refer [seq]]
-            [clojure.lang.seq                    :refer [first next]]))
+            [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
+                                                         IMeta IPersistentMap ISeqable ISeq]]
+            [clojure.next                        :refer :all :exclude [and]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
 (def ^:private ZERO       (->bitnum 0))
@@ -107,7 +98,7 @@
          (array-set! arr THREE val2)
          (new-hash-collision-node nil key1hash TWO arr))
        (let [added-leaf (new-box nil)
-             edit (make-atomic-entity)]
+             edit (new-atomic-ref)]
          (-> EMPTY-BitmapIndexedNode
            (node-assoc-ref edit shift key1hash key1 val1 added-leaf)
            (node-assoc-ref edit shift key2hash key2 val2 added-leaf))))))
@@ -318,7 +309,7 @@
                         (array-set! nodes i (array-get arr (inc j)))
                         (array-set! nodes i (node-assoc EMPTY-BitmapIndexedNode
                                                         (+ shift FIVE)
-                                                        (clojure.lang.hash/hash (array-get arr j))
+                                                        (clojure.next/hash (array-get arr j))
                                                         (array-get arr j)
                                                         (array-get arr (inc j))
                                                         added-leaf)))
@@ -379,7 +370,7 @@
                           (array-set! nodes i (node-assoc-ref EMPTY-BitmapIndexedNode
                                                               edit
                                                               (+ FIVE shift)
-                                                              (clojure.lang.hash/hash (array-get arr j))
+                                                              (clojure.next/hash (array-get arr j))
                                                               (array-get arr j)
                                                               (array-get arr (inc j))
                                                               added-leaf)))
@@ -435,6 +426,23 @@
 (def ^:private NOT-FOUND (empty-object))
 
 (defmap PersistentHashMap [-meta -count -root -has-nil? -nil-value]
+  IAssociative
+  (-assoc [this key val]
+    (if (nil? key)
+      (if (and -has-nil? (= val -nil-value))
+        this
+        (new-hash-map -meta (if -has-nil? -count (inc -count)) -root true val))
+      (let [added-leaf (new-box nil)
+            new-root (node-assoc (if -root -root EMPTY-BitmapIndexedNode)
+                                 ZERO (->bitnum (hash key)) key val added-leaf)]
+        (if (= -root new-root) ; should use identical? probably
+          this
+          (new-hash-map -meta
+                        (if (nil? (get-value added-leaf)) -count (inc -count))
+                        new-root
+                        -has-nil?
+                        -nil-value)))))
+
   ICounted
   (-count [this] -count)
 
@@ -461,22 +469,6 @@
     (new-hash-map new-meta count -root -has-nil? -nil-value))
 
   IPersistentMap
-  (-assoc [this key val]
-    (if (nil? key)
-      (if (and -has-nil? (= val -nil-value))
-        this
-        (new-hash-map -meta (if -has-nil? -count (inc -count)) -root true val))
-      (let [added-leaf (new-box nil)
-            new-root (node-assoc (if -root -root EMPTY-BitmapIndexedNode)
-                                 ZERO (->bitnum (hash key)) key val added-leaf)]
-        (if (= -root new-root) ; should use identical? probably
-          this
-          (new-hash-map -meta
-                        (if (nil? (get-value added-leaf)) -count (inc -count))
-                        new-root
-                        -has-nil?
-                        -nil-value)))))
-
   (-dissoc [this key]
     (if (nil? key)
       (if -has-nil?
@@ -495,21 +487,7 @@
     ;return hasNull ? new Cons(new MapEntry(null, nullValue), s) : s;
     ))
 
-(defn- new-hash-map [-meta -count -root -has-nil? -nil-value]
+(defn new-hash-map [-meta -count -root -has-nil? -nil-value]
   (PersistentHashMap. -meta -count -root -has-nil? -nil-value))
 
-(def ^:private EMPTY (new-hash-map nil ZERO nil false nil))
-
-(defn hash-map [& kvs]
-  (let [kvs-seq (seq kvs)]
-    (if kvs-seq
-      (let [size (count kvs-seq)]
-        (if (even? size)
-          (loop [s kvs-seq m EMPTY]
-            (if s
-              (recur (next (next s)) (assoc m (first s) (first (next s))))
-              m))
-          (throw (new-argument-error
-                   (format "PersistentHashMap can only be created with even number of arguments: %s arguments given"
-                           size)))))
-      EMPTY)))
+(def EMPTY-HASH-MAP (new-hash-map nil ZERO nil false nil))

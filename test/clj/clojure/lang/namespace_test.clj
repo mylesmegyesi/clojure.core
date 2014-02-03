@@ -1,12 +1,9 @@
 (ns clojure.lang.namespace-test
   (:refer-clojure :only [defn -> let get-in identity nil? set keys get assoc-in])
   (:require [clojure.test           :refer :all]
-            [clojure.lang.meta      :refer [meta with-meta]]
-            [clojure.lang.named     :refer [name namespace]]
             [clojure.lang.namespace :refer :all]
-            [clojure.lang.operators :refer [=]]
             [clojure.lang.object    :refer [identical?]]
-            [clojure.lang.symbol    :refer [symbol]]))
+            [clojure.next           :refer :all :exclude [get]]))
 
 (defn empty-ns-map []
   {})

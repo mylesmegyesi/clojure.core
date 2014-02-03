@@ -1,8 +1,8 @@
 (ns clojure.lang.operators-test
   (:refer-clojure :only [reify let nil?])
-  (:require [clojure.test                  :refer :all]
-            [clojure.lang.iequivalence     :refer [IEquivalence]]
-            [clojure.lang.operators        :refer :all]))
+  (:require [clojure.test           :refer :all]
+            [clojure.lang.protocols :refer [IEquivalence]]
+            [clojure.next           :refer :all]))
 
 (deftest and-test
   (testing "returns true with zero arguments"

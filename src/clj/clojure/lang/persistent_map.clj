@@ -1,36 +1,8 @@
 (ns clojure.lang.persistent-map
   (:refer-clojure :only [deftype defn defn- declare empty? let when-let when loop])
   (:require [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.icounted        :refer [ICounted]]
-            [clojure.lang.counted         :refer [count]]
-            [clojure.lang.ipersistent-map :refer [-assoc -dissoc]]
-            [clojure.lang.iseq            :refer [ISeq]]
-            [clojure.lang.map-entry       :refer [key val]]
-            [clojure.lang.seqable         :refer [seq]]
-            [clojure.lang.seq             :refer [first next]]))
-
-(defn assoc-seq [m kvs]
-  (if kvs
-    (let [n (next kvs)]
-      (recur (-assoc m (first kvs) (first n)) (next n)))
-    m))
-
-(defn assoc
-  ([m k v]
-   (-assoc m k v))
-  ([m k v & kvs]
-   (assoc-seq (-assoc m k v) (seq kvs))))
-
-(defn dissoc-seq [m ks]
-  (if ks
-    (recur (-dissoc m (first ks)) (next ks))
-    m))
-
-(defn dissoc
-  ([m] m)
-  ([m k] (-dissoc m k))
-  ([m k & ks]
-   (dissoc-seq (-dissoc m k) (seq ks))))
+            [clojure.lang.protocols       :refer [ICounted ISeq -assoc -dissoc]]
+            [clojure.next                 :refer :all :exclude [empty?]]))
 
 (declare new-key-seq)
 

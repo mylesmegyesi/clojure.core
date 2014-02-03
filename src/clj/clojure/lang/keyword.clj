@@ -1,19 +1,13 @@
 (ns clojure.lang.keyword
-  (:refer-clojure :only [deftype defmacro declare defn defn- + let list* list concat ->])
-  (:require [clojure.lang.comparison           :refer [compare]]
-            [clojure.lang.deftype              :refer [expand-methods]]
-            [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.imeta                :refer [IMeta]]
-            [clojure.lang.inamed               :refer [INamed]]
-            [clojure.lang.named                :refer [name namespace]]
+  (:refer-clojure :only [deftype defmacro declare defn + let list* list concat ->])
+  (:require [clojure.lang.deftype              :refer [expand-methods]]
             [clojure.lang.object               :refer [instance?]]
-            [clojure.lang.operators            :refer [=]]
             [clojure.lang.platform.comparison  :refer [platform-compare-to-method]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
             [clojure.lang.platform.hash        :refer [platform-hash-method]]
             [clojure.lang.platform.show        :refer [platform-show-method]]
-            [clojure.lang.show                 :refer [str]]
-            [clojure.lang.symbol               :refer [symbol]]))
+            [clojure.lang.protocols            :refer [IMeta INamed]]
+            [clojure.next                      :refer :all :exclude [+]]))
 
 (defmacro keyword-compare-init
   {:private true}
@@ -67,14 +61,8 @@
 
 (defkeyword Keyword)
 
-(defn keyword? [obj]
-  (instance? Keyword obj))
+(defn keyword? [x]
+  (instance? Keyword x))
 
-(defn keyword
-  ([n]
-   (let [sym (symbol n)]
-     (keyword (namespace sym) (name sym))))
-  ([ns name]
-   (let [sym (symbol ns name)
-         hash-code (hash (+ (hash sym) 0x9e3779b9))]
-     (Keyword. ns name (str ":" sym) hash-code {} sym))))
+(defn new-keyword [ns name str hash-code meta sym]
+  (Keyword. ns name str hash-code meta sym))

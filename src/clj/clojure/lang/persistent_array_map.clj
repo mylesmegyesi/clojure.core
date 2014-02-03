@@ -1,22 +1,12 @@
 (ns clojure.lang.persistent-array-map
   (:refer-clojure :only [declare defn defn- let + - dec loop < / inc when if-let even? format nil?])
   (:require [clojure.lang.apersistent-map     :refer [defmap]]
-            [clojure.lang.array               :refer [make-array array-get array-set! array-copy! into-array]]
+            [clojure.lang.array               :refer [array-get array-set! array-copy!]]
             [clojure.lang.aseq                :refer [defseq]]
-            [clojure.lang.counted             :refer [count]]
-            [clojure.lang.icounted            :refer [ICounted]]
-            [clojure.lang.ilookup             :refer [ILookup]]
-            [clojure.lang.imeta               :refer [IMeta]]
-            [clojure.lang.ipersistent-map     :refer [IPersistentMap]]
-            [clojure.lang.iseq                :refer [ISeq]]
-            [clojure.lang.iseqable            :refer [ISeqable]]
-            [clojure.lang.hash                :refer [hash]]
-            [clojure.lang.lookup              :refer [contains? get]]
-            [clojure.lang.map-entry           :refer [new-map-entry key val]]
-            [clojure.lang.operators           :refer [and not not= or =]]
+            [clojure.lang.map-entry           :refer [new-map-entry]]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
-            [clojure.lang.seqable             :refer [seq]]
-            [clojure.lang.seq                 :refer [first next]]))
+            [clojure.lang.protocols           :refer [ICounted ILookup IMeta IAssociative IPersistentMap ISeq ISeqable]]
+            [clojure.next                     :refer :all :exclude [+ - dec inc]]))
 
 (declare new-array-map)
 
@@ -46,6 +36,23 @@
         (recur (+ i 2))))))
 
 (defmap PersistentArrayMap [-arr -size -count -meta]
+  IAssociative
+  (-assoc [this k v]
+    (if-let [idx (index-of -arr -size k)] ; key exists
+      (let [value-idx (inc idx)]
+        (if (= v (array-get -arr value-idx))
+          this ; key exists and value is the same, do nothing
+          (let [new-array (make-array -size)]
+            (array-copy! -arr 0 new-array 0 -size)
+            (array-set! new-array value-idx v)
+            (new-array-map new-array -size -count -meta))))
+      (let [new-size (+ -size 2)
+            new-array (make-array new-size)]
+        (array-copy! -arr 0 new-array 2 -size)
+        (array-set! new-array 0 k)
+        (array-set! new-array 1 v)
+        (new-array-map new-array new-size (/ new-size 2) -meta))))
+
   ICounted
   (-count [this] -count)
 
@@ -67,22 +74,6 @@
       (new-array-map new-arr -size -count m)))
 
   IPersistentMap
-  (-assoc [this k v]
-    (if-let [idx (index-of -arr -size k)] ; key exists
-      (let [value-idx (inc idx)]
-        (if (= v (array-get -arr value-idx))
-          this ; key exists and value is the same, do nothing
-          (let [new-array (make-array -size)]
-            (array-copy! -arr 0 new-array 0 -size)
-            (array-set! new-array value-idx v)
-            (new-array-map new-array -size -count -meta))))
-      (let [new-size (+ -size 2)
-            new-array (make-array new-size)]
-        (array-copy! -arr 0 new-array 2 -size)
-        (array-set! new-array 0 k)
-        (array-set! new-array 1 v)
-        (new-array-map new-array new-size (/ new-size 2) -meta))))
-
   (-dissoc [this k]
     (if-let [idx (index-of -arr -size k)] ; key exists
       (let [new-size (- -size 2)
@@ -96,14 +87,5 @@
   (-seq [this]
     (new-array-map-seq -arr -count 0)))
 
-(defn- new-array-map [arr size count meta]
-  (new PersistentArrayMap arr size count meta))
-
-(defn array-map [& args]
-  (let [sargs (seq args)
-        size (count sargs)]
-    (if (even? size)
-      (new-array-map (into-array sargs) size (/ size 2) nil)
-      (throw (new-argument-error
-               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
-                       size))))))
+(defn new-array-map [arr size count meta]
+  (PersistentArrayMap. arr size count meta))

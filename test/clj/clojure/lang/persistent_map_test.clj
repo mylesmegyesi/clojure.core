@@ -1,22 +1,12 @@
 (ns clojure.lang.persistent-map-test
   (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* nil? re-pattern loop when < inc cond >])
   (:require [clojure.test                       :refer :all]
-            [clojure.lang.counted               :refer [count]]
-            [clojure.lang.icomparable           :refer [IComparable]]
-            [clojure.lang.iequivalence          :refer [IEquivalence]]
-            [clojure.lang.ihash                 :refer [IHash]]
-            [clojure.lang.hash                  :refer [hash]]
-            [clojure.lang.lookup                :refer [contains? get]]
-            [clojure.lang.meta                  :refer [meta with-meta]]
             [clojure.lang.object                :refer [identical?]]
-            [clojure.lang.operators             :refer [not not= =]]
-            [clojure.lang.persistent-map        :refer [assoc dissoc keys vals]]
-            [clojure.lang.persistent-array-map  :refer [array-map]]
-            [clojure.lang.persistent-sorted-map :refer :all]
+            [clojure.lang.persistent-map        :refer [keys vals]]
             [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
-            [clojure.lang.show                  :refer [str]]
-            [clojure.lang.seq                   :refer [first next]]))
+            [clojure.lang.protocols             :refer [IComparable IEquivalence IHash]]
+            [clojure.next                       :refer :all :exclude [inc]]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))

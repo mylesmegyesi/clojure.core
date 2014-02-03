@@ -1,16 +1,10 @@
 (ns clojure.lang.persistent-array-map-test
   (:refer-clojure :only [deftype nil? let])
   (:require [clojure.test                      :refer :all]
-            [clojure.lang.counted              :refer [count]]
-            [clojure.lang.iseqable             :refer [ISeqable]]
-            [clojure.lang.isequential          :refer [ISequential]]
-            [clojure.lang.map-entry            :refer [key val]]
             [clojure.lang.object               :refer [identical?]]
-            [clojure.lang.operators            :refer [not = not=]]
             [clojure.lang.persistent-map-test  :refer [map-test]]
-            [clojure.lang.persistent-array-map :refer [array-map]]
-            [clojure.lang.seqable              :refer [seq]]
-            [clojure.lang.seq                  :refer [first next]]))
+            [clojure.lang.protocols            :refer [ISeqable ISequential]]
+            [clojure.next                      :refer :all]))
 
 (deftype FixedSequential [seq]
   ISequential

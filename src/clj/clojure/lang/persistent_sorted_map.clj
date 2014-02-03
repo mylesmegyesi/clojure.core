@@ -2,17 +2,11 @@
   (:refer-clojure :only [cond comparator cons count dec declare defn defn- defprotocol deftype empty? even? first format let loop next nil? rest second zero? + - > < ->])
   (:require [clojure.lang.apersistent-map      :refer [defmap]]
             [clojure.lang.aseq                 :refer [defseq]]
-            [clojure.lang.comparison           :refer [compare]]
-            [clojure.lang.icounted             :refer [ICounted]]
-            [clojure.lang.ilookup              :refer [ILookup]]
-            [clojure.lang.imeta                :refer [IMeta]]
-            [clojure.lang.ipersistent-map      :refer [IPersistentMap]]
-            [clojure.lang.iseqable             :refer [ISeqable]]
-            [clojure.lang.iseq                 :refer [ISeq]]
-            [clojure.lang.map-entry            :refer [key new-map-entry val]]
-            [clojure.lang.operators            :refer [and not or = ==]]
-            [clojure.lang.persistent-map       :refer [assoc]]
-            [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]))
+            [clojure.lang.map-entry            :refer [new-map-entry]]
+            [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
+            [clojure.lang.protocols            :refer [ICounted ILookup IMeta
+                                                       IAssociative IPersistentMap ISeqable ISeq]]
+            [clojure.next                      :refer :all :exclude [+ - empty? next count first dec comparator]]))
 
 (declare red-node?)
 (declare black-node?)
@@ -398,6 +392,13 @@
     (PersistentSortedMapSeq. stack cnt)))
 
 (defmap PersistentTreeMap [-root -count -comparator -meta] ; PersistentTreeMap is the clojure class name
+  IAssociative
+  (-assoc [this k v]
+    (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
+      (if (= tree -root)
+        this
+        (make-sorted-map tree (+ -count cnt) -comparator -meta))))
+
   ICounted
   (-count [this] -count)
 
@@ -415,12 +416,6 @@
     (make-sorted-map -root -count -comparator m))
 
   IPersistentMap
-  (-assoc [this k v]
-    (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
-      (if (= tree -root)
-        this
-        (make-sorted-map tree (+ -count cnt) -comparator -meta))))
-
   (-dissoc [this k]
     (let [[tree cnt] (sorted-map-dissoc -root -comparator k)]
       (if (= tree -root)

@@ -1,11 +1,8 @@
 (ns clojure.lang.persistent-set
   (:refer-clojure :only [cons defn every? <= >=])
-  (:require [clojure.lang.ipersistent-set     :refer [-conj -difference -disj -intersection -union]]
-            [clojure.lang.counted             :refer [count]]
-            [clojure.lang.lookup              :refer [contains?]]
-            [clojure.lang.operators           :refer [and]]
-            [clojure.lang.persistent-hash-set :refer [hash-set]]
-            [clojure.lang.seqable             :refer [seq]]))
+  (:require [clojure.lang.persistent-hash-set :refer [hash-set]]
+            [clojure.lang.protocols           :refer [-conj -difference -disj -intersection -union]]
+            [clojure.next                     :refer :all :exclude [every?]]))
 
 (defn conj
   ([this x] (-conj this (cons x nil)))

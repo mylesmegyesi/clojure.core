@@ -1,10 +1,8 @@
 (ns clojure.lang.seq-test
   (:refer-clojure :only [count deftype let nth rest zero? >])
   (:require [clojure.test           :refer :all]
-            [clojure.lang.operators :refer [not =]]
-            [clojure.lang.seq       :refer :all]
-            [clojure.lang.iseq      :refer [ISeq]]
-            [clojure.lang.iseqable  :refer [ISeqable]]))
+            [clojure.lang.protocols :refer [ISeq ISeqable]]
+            [clojure.next           :refer :all :exclude [count]]))
 
 (deftype TestSeq [-list]
   ISeqable
