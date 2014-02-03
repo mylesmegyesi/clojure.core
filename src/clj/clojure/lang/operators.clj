@@ -1,18 +1,18 @@
 (ns clojure.lang.operators
   (:refer-clojure :only [apply cond declare defmacro defn defn- if-let let nil? true?])
-  (:require [clojure.lang.iequivalence         :refer [-equivalent? -equal?]]
-            [clojure.lang.platform.equivalence]
-            [clojure.lang.platform.numbers     :refer [-bit-unsigned-shift-right
-                                                       -bit-shift-left
-                                                       -bit-and
-                                                       -bit-count
-                                                       -bit-or
-                                                       -bit-xor
-                                                       -add
-                                                       -subtract
-                                                       -multiply
-                                                       -increment
-                                                       -decrement]]))
+  (:require [clojure.lang.platform.equivalence]
+            [clojure.lang.platform.numbers  :refer [-bit-unsigned-shift-right
+                                                    -bit-shift-left
+                                                    -bit-and
+                                                    -bit-count
+                                                    -bit-or
+                                                    -bit-xor
+                                                    -add
+                                                    -subtract
+                                                    -multiply
+                                                    -increment
+                                                    -decrement]]
+            [clojure.lang.protocols         :refer [-equivalent? -equal?]]))
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."

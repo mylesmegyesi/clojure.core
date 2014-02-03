@@ -3,12 +3,8 @@
   (:require [clojure.lang.comparison           :refer [compare]]
             [clojure.lang.deftype              :refer [expand-methods]]
             [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.imeta                :refer [IMeta]]
-            [clojure.lang.inamed               :refer [INamed]]
             [clojure.lang.named                :refer [name namespace]]
             [clojure.lang.hash                 :refer [hash hash-combine]]
-            [clojure.lang.imeta                :refer [IMeta]]
-            [clojure.lang.inamed               :refer [INamed]]
             [clojure.lang.named                :refer [name namespace]]
             [clojure.lang.object               :refer [instance?]]
             [clojure.lang.operators            :refer [and not =]]
@@ -16,6 +12,7 @@
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
             [clojure.lang.platform.hash        :refer [platform-hash-method]]
             [clojure.lang.platform.show        :refer [platform-show-method]]
+            [clojure.lang.protocols            :refer [IMeta INamed]]
             [clojure.lang.show                 :refer [str]]
             [clojure.string]))
 

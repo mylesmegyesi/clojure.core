@@ -1,7 +1,6 @@
 (ns clojure.lang.var
   (:refer-clojure :only [deftype defn reset!])
-  (:require [clojure.lang.imeta  :refer [IMeta]]
-            [clojure.lang.inamed :refer [INamed]]
+  (:require [clojure.lang.protocols  :refer [IMeta INamed]]
             [clojure.lang.show   :refer [str]]))
 
 (deftype Unbound [var]

@@ -1,6 +1,6 @@
 (ns clojure.lang.platform.show
   (:refer-clojure :only [defmacro extend-protocol fn defn list empty? loop first rest update-in cons])
-  (:require [clojure.lang.ishow :refer [IShow -show]])
+  (:require [clojure.lang.protocols :refer [IShow -show]])
   (:import [java.lang StringBuilder]))
 
 (defn platform-show-method [methods init-macro]

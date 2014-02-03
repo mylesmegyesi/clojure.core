@@ -3,12 +3,12 @@
   (:require [clojure.lang.counted              :refer [count]]
             [clojure.lang.deftype              :refer [expand-methods]]
             [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.ipersistent-set]
             [clojure.lang.lookup               :refer [contains?]]
             [clojure.lang.operators            :refer [=]]
             [clojure.lang.seqable              :refer [seq]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.platform.hash        :refer [platform-hash-method]]))
+            [clojure.lang.platform.hash        :refer [platform-hash-method]]
+            [clojure.lang.protocols]))
 
 (defn make-pairs [xs]
   (flatten (map #(take 2 (repeat %)) xs)))
@@ -62,18 +62,18 @@
   (list*
     'clojure.core/deftype type ['-map]
 
-    'clojure.lang.icounted/ICounted
+    'clojure.lang.protocols/ICounted
     (list '-count ['this]
       (list 'clojure.core/count (list 'clojure.core/keys '-map)))
 
-    'clojure.lang.ilookup/ILookup
+    'clojure.lang.protocols/ILookup
     (list '-lookup ['this 'x 'default]
       (list 'clojure.core/get '-map 'x 'default))
 
     (list '-includes? ['this 'x]
       (list 'clojure.core/contains? '-map 'x))
 
-    'clojure.lang.ipersistent-set/IPersistentSet
+    'clojure.lang.protocols/IPersistentSet
     (list '-conj ['this 'xs]
       (list 'clojure.core/let ['next-map (list 'clojure.core/apply 'clojure.core/assoc '-map (list 'make-pairs 'xs))]
         (list gen-next 'next-map)))
@@ -94,7 +94,7 @@
       (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-union '-map 'sets)]
         (list gen-next 'next-map)))
 
-    'clojure.lang.iseqable/ISeqable
+    'clojure.lang.protocols/ISeqable
     (list '-seq ['this]
       (list 'clojure.core/seq (list 'clojure.core/keys '-map)))
 

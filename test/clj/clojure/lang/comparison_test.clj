@@ -1,9 +1,9 @@
 (ns clojure.lang.comparison-test
   (:refer-clojure :only [deftype let <])
-  (:require [clojure.test             :refer :all]
-            [clojure.lang.icomparable :refer [IComparable]]
-            [clojure.lang.comparison  :refer :all]
-            [clojure.lang.operators   :refer [=]]))
+  (:require [clojure.test            :refer :all]
+            [clojure.lang.comparison :refer :all]
+            [clojure.lang.operators  :refer [=]]
+            [clojure.lang.protocols  :refer [IComparable]]))
 
 (deftype TenComparator []
   IComparable

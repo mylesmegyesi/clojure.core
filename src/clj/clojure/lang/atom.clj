@@ -1,15 +1,12 @@
 (ns clojure.lang.atom
   (:refer-clojure :only [apply assoc cons defn defn- deftype dissoc empty? first fn let loop if-not into rest second])
-  (:require [clojure.lang.iatom                  :refer [IAtom -compare-and-set! -reset! -swap!]]
-            [clojure.lang.ideref                 :refer [IDeref]]
-            [clojure.lang.imeta                  :refer [IMeta]]
-            [clojure.lang.ivalidatable           :refer [IValidatable]]
-            [clojure.lang.iwatchable             :refer [IWatchable]]
-            [clojure.lang.lookup                 :refer [get]]
+  (:require [clojure.lang.lookup                 :refer [get]]
             [clojure.lang.operators              :refer [=]]
             [clojure.lang.persistent-array-map   :refer [array-map]]
             [clojure.lang.platform.atomic-entity :as    ent]
-            [clojure.lang.platform.exceptions    :refer [new-illegal-state-error]]))
+            [clojure.lang.platform.exceptions    :refer [new-illegal-state-error]]
+            [clojure.lang.protocols              :refer [IAtom -compare-and-set! -reset! -swap!
+                                                         IDeref IMeta IValidatable IWatchable]]))
 
 (defn compare-and-set! [atm old-val new-val]
   (-compare-and-set! atm old-val new-val))

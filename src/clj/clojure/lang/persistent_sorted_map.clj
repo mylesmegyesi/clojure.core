@@ -3,16 +3,12 @@
   (:require [clojure.lang.apersistent-map      :refer [defmap]]
             [clojure.lang.aseq                 :refer [defseq]]
             [clojure.lang.comparison           :refer [compare]]
-            [clojure.lang.icounted             :refer [ICounted]]
-            [clojure.lang.ilookup              :refer [ILookup]]
-            [clojure.lang.imeta                :refer [IMeta]]
-            [clojure.lang.ipersistent-map      :refer [IPersistentMap]]
-            [clojure.lang.iseqable             :refer [ISeqable]]
-            [clojure.lang.iseq                 :refer [ISeq]]
             [clojure.lang.map-entry            :refer [key new-map-entry val]]
             [clojure.lang.operators            :refer [and not or = ==]]
             [clojure.lang.persistent-map       :refer [assoc]]
-            [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]))
+            [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
+            [clojure.lang.protocols            :refer [ICounted ILookup IMeta
+                                                       IAssociative IPersistentMap ISeqable ISeq]]))
 
 (declare red-node?)
 (declare black-node?)
@@ -398,6 +394,13 @@
     (PersistentSortedMapSeq. stack cnt)))
 
 (defmap PersistentTreeMap [-root -count -comparator -meta] ; PersistentTreeMap is the clojure class name
+  IAssociative
+  (-assoc [this k v]
+    (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
+      (if (= tree -root)
+        this
+        (make-sorted-map tree (+ -count cnt) -comparator -meta))))
+
   ICounted
   (-count [this] -count)
 
@@ -415,12 +418,6 @@
     (make-sorted-map -root -count -comparator m))
 
   IPersistentMap
-  (-assoc [this k v]
-    (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
-      (if (= tree -root)
-        this
-        (make-sorted-map tree (+ -count cnt) -comparator -meta))))
-
   (-dissoc [this k]
     (let [[tree cnt] (sorted-map-dissoc -root -comparator k)]
       (if (= tree -root)
