@@ -2,7 +2,7 @@
   (:refer-clojure :only [defmacro sort])
   (:require [clojure.test            :refer [is]]
             [clojure.lang.comparison :refer [compare]]
-            [clojure.lang.operators  :refer [=]]))
+            [clojure.next            :refer :all]))
 
 (defmacro is-less-than [lhs rhs]
   `(do

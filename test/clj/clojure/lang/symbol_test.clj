@@ -4,12 +4,10 @@
             [clojure.lang.assertions      :refer :all]
             [clojure.lang.hash            :refer [hash]]
             [clojure.lang.keyword         :refer [keyword]]
-            [clojure.lang.meta            :refer [meta with-meta]]
-            [clojure.lang.named           :refer [name namespace]]
             [clojure.lang.object          :refer [identical?]]
-            [clojure.lang.operators       :refer [not not= = ==]]
             [clojure.lang.show            :refer [str]]
-            [clojure.lang.symbol          :refer :all]))
+            [clojure.lang.symbol          :refer :all]
+            [clojure.next                 :refer :all :exclude [get]]))
 
 (deftest symbol-test
   (testing "creates a symbol given just a name"

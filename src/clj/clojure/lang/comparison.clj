@@ -1,8 +1,8 @@
 (ns clojure.lang.comparison
   (:refer-clojure :only [cond defn defn- fn nil? number? <])
-  (:require [clojure.lang.operators :refer [not =]]
-            [clojure.lang.protocols :refer [-compare-to]]
-            [clojure.lang.platform.comparison]))
+  (:require [clojure.lang.protocols :refer [-compare-to]]
+            [clojure.lang.platform.comparison]
+            [clojure.next           :refer :all]))
 
 (defn comparator [predicate]
   (fn [x y]

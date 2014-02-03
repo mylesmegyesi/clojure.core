@@ -1,10 +1,9 @@
 (ns clojure.lang.array
   (:refer-clojure :only [defn let loop nil? inc])
-  (:require [clojure.lang.counted          :refer [count]]
-            ;[clojure.lang.operators        :refer [inc]]
-            [clojure.lang.seqable          :refer [seq]]
-            [clojure.lang.seq              :refer [first next]]
-            [clojure.lang.platform.numbers :refer [unsafe-cast-int]])
+  (:require [clojure.lang.platform.numbers :refer [unsafe-cast-int]]
+            [clojure.next                  :refer :all
+             :exclude [inc] ; remove me
+             ])
   (:import [java.lang.reflect Array]
            [java.util ArrayList]))
 

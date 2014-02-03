@@ -3,15 +3,11 @@
   (:require [clojure.lang.apersistent-map     :refer [defmap]]
             [clojure.lang.array               :refer [make-array array-get array-set! array-copy! into-array]]
             [clojure.lang.aseq                :refer [defseq]]
-            [clojure.lang.counted             :refer [count]]
             [clojure.lang.hash                :refer [hash]]
-            [clojure.lang.lookup              :refer [contains? get]]
             [clojure.lang.map-entry           :refer [new-map-entry key val]]
-            [clojure.lang.operators           :refer [and not not= or =]]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
             [clojure.lang.protocols           :refer [ICounted ILookup IMeta IAssociative IPersistentMap ISeq ISeqable]]
-            [clojure.lang.seqable             :refer [seq]]
-            [clojure.lang.seq                 :refer [first next]]))
+            [clojure.next                     :refer :all :exclude [+ - dec inc]]))
 
 (declare new-array-map)
 

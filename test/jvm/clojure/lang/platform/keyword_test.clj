@@ -3,7 +3,7 @@
   (:require [clojure.test            :refer :all]
             [clojure.lang.hash       :refer [hash]]
             [clojure.lang.keyword    :refer [keyword]]
-            [clojure.lang.operators  :refer [not =]]))
+            [clojure.next            :refer :all]))
 
 (deftest platform-equals-test
   (testing ".equals if ns and name are equal"

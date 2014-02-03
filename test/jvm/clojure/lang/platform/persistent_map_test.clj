@@ -2,9 +2,7 @@
   (:refer-clojure :only [defn let])
   (:require [clojure.test                      :refer :all]
             [clojure.lang.hash                 :refer [hash]]
-            [clojure.lang.operators            :refer [not =]]
-            [clojure.lang.seqable              :refer [seq]]
-            [clojure.lang.seq                  :refer [first next]])
+            [clojure.next                      :refer :all])
   (:import [java.util NoSuchElementException]))
 
 (defn platform-equals-test [constructor]

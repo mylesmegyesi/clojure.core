@@ -1,8 +1,7 @@
 (ns clojure.lang.counted-test
   (:refer-clojure :only [])
-  (:require [clojure.test           :refer :all]
-            [clojure.lang.counted   :refer [count]]
-            [clojure.lang.operators :refer [=]]))
+  (:require [clojure.test :refer :all]
+            [clojure.next :refer :all]))
 
 (deftest nil-test
   (testing "(count nil) is 0"

@@ -2,12 +2,8 @@
   (:refer-clojure :only [and apply assoc fn defmacro defn dorun dotimes first flatten inc let list list* map nil? partition pcalls range rand-int repeat sort vec - / *])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.atom                :refer :all]
-            [clojure.lang.deref               :refer [deref]]
-            [clojure.lang.meta                :refer [meta reset-meta! alter-meta!]]
-            [clojure.lang.operators           :refer [not not= =]]
-            [clojure.lang.validated           :refer [get-validator set-validator!]]
-            [clojure.lang.watched             :refer [add-watch remove-watch]]
-            [clojure.lang.platform.exceptions :refer [illegal-state-error]]))
+            [clojure.lang.platform.exceptions :refer [illegal-state-error]]
+            [clojure.next                     :refer :all :exclude [- inc * first and]]))
 
 (defmacro illegal-state-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? illegal-state-error msg body)))

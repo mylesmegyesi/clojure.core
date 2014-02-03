@@ -1,14 +1,11 @@
 (ns clojure.lang.persistent-sorted-set-test
   (:refer-clojure :only [deftype first let next nil? >])
   (:require [clojure.test                       :refer :all]
-            [clojure.lang.counted               :refer [count]]
             [clojure.lang.hash                  :refer [hash]]
-            [clojure.lang.lookup                :refer [contains? get]]
-            [clojure.lang.operators             :refer [not =]]
             [clojure.lang.persistent-set        :refer [conj difference disj intersection subset? superset? union]]
             [clojure.lang.persistent-sorted-set :refer :all]
-            [clojure.lang.seqable               :refer [seq]]
-            [clojure.lang.protocols             :refer [IHash]]))
+            [clojure.lang.protocols             :refer [IHash]]
+            [clojure.next                       :refer :all :exclude [first next]]))
 
 (deftest persistent-sorted-set-test
   (testing "an empty sorted set does not contains? an item"

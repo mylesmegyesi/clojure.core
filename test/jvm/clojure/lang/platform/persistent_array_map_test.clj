@@ -1,11 +1,9 @@
 (ns clojure.lang.platform.persistent-array-map-test
   (:refer-clojure :only [let])
   (:require [clojure.test                              :refer :all]
-            [clojure.lang.operators                    :refer [=]]
             [clojure.lang.platform.persistent-map-test :refer [platform-map-test]]
             [clojure.lang.persistent-array-map         :refer [array-map]]
-            [clojure.lang.seqable                      :refer [seq]]
-            [clojure.lang.seq                          :refer [first next]]))
+            [clojure.next                              :refer :all]))
 
 (deftest array-map-platform-test
   (platform-map-test array-map))

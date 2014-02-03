@@ -2,8 +2,8 @@
   (:refer-clojure :only [deftype let <])
   (:require [clojure.test            :refer :all]
             [clojure.lang.comparison :refer :all]
-            [clojure.lang.operators  :refer [=]]
-            [clojure.lang.protocols  :refer [IComparable]]))
+            [clojure.lang.protocols  :refer [IComparable]]
+            [clojure.next            :refer :all]))
 
 (deftype TenComparator []
   IComparable

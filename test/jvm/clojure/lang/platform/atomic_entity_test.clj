@@ -1,8 +1,8 @@
 (ns clojure.lang.platform.atomic-entity-test
   (:refer-clojure :only [and let])
   (:require [clojure.test                        :refer :all]
-            [clojure.lang.operators              :refer [not =]]
-            [clojure.lang.platform.atomic-entity :refer :all]))
+            [clojure.lang.platform.atomic-entity :refer :all]
+            [clojure.next                        :refer :all :exclude [and]]))
 
 (deftest atomic-entity-test
   (testing "the entity is set in the constructor"

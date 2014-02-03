@@ -3,19 +3,16 @@
   (:require [clojure.lang.apersistent-map        :refer [defmap]]
             [clojure.lang.array                  :refer [make-array array-set! array-get array-clone! array-copy! array-length]]
             [clojure.lang.aseq                   :refer [defseq]]
-            [clojure.lang.counted                :refer [count]]
             [clojure.lang.hash                   :refer [hash]]
             [clojure.lang.map-entry              :refer [new-map-entry]]
             [clojure.lang.object                 :refer [identical?]]
-            [clojure.lang.operators              :refer [bit-unsigned-shift-right bit-shift-left bit-and bit-or bit-xor bit-count = not= not + - * inc dec]]
             [clojure.lang.persistent-map         :refer [assoc]]
             [clojure.lang.platform.atomic-entity :refer [make-atomic-entity]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.hash-map      :refer [->bitnum empty-object]]
             [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
                                                          IMeta IPersistentMap ISeqable ISeq]]
-            [clojure.lang.seqable                :refer [seq]]
-            [clojure.lang.seq                    :refer [first next]]))
+            [clojure.next                        :refer :all :exclude [and]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
 (def ^:private ZERO       (->bitnum 0))
