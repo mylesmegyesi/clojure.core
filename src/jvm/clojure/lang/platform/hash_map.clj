@@ -1,6 +1,6 @@
 (ns clojure.lang.platform.hash-map
   (:refer-clojure :only [defmacro defn])
-  (:require [clojure.lang.platform.numbers :refer [unsafe-cast-int]]))
+  (:require [clojure.lang.numbers :refer [unsafe-cast-int]]))
 
 (defmacro ->bitnum [n]
   `(unsafe-cast-int ~n))

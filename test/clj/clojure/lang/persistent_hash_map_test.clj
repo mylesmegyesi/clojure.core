@@ -1,10 +1,8 @@
 (ns clojure.lang.persistent-hash-map-test
   (:refer-clojure :only [nil? let defn- loop])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.map-entry           :refer [key val]]
             [clojure.lang.object              :refer [identical?]]
             [clojure.lang.persistent-map-test :refer [map-test]]
-            [clojure.lang.persistent-hash-map :refer [hash-map]]
             [clojure.lang.persistent-hash-set :refer [hash-set]]
             [clojure.lang.persistent-set      :refer [union]]
             [clojure.next                     :refer :all]))

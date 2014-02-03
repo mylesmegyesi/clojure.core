@@ -2,7 +2,6 @@
   (:refer-clojure :only [let])
   (:require [clojure.test                              :refer :all]
             [clojure.lang.platform.persistent-map-test :refer [platform-map-test]]
-            [clojure.lang.persistent-array-map         :refer [array-map]]
             [clojure.next                              :refer :all]))
 
 (deftest array-map-platform-test

@@ -1,5 +1,5 @@
 (ns clojure.lang.numbers
-  (:refer-clojure :only [and or defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> not= = /])
+  (:refer-clojure :only [and or defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> /])
   (:require [clojure.lang.object    :refer [type instance?]]
             [clojure.lang.protocols :refer [IEquivalence -equivalent? IHash IRatio]]
             [clojure.lang.ratio     :refer [denominator numerator]])

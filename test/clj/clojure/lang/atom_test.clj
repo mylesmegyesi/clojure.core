@@ -1,9 +1,8 @@
 (ns clojure.lang.atom-test
   (:refer-clojure :only [and apply assoc fn defmacro defn dorun dotimes first flatten inc let list list* map nil? partition pcalls range rand-int repeat sort vec - / *])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.atom                :refer :all]
             [clojure.lang.platform.exceptions :refer [illegal-state-error]]
-            [clojure.next                     :refer :all :exclude [- inc * first and]]))
+            [clojure.next                     :refer :all :exclude [- inc * first and assoc]]))
 
 (defmacro illegal-state-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? illegal-state-error msg body)))
@@ -44,23 +43,23 @@
 
   (testing "swap! the atom's state with a function"
     (let [atm (atom [1, 2])]
-      (is (and (= 1 (swap! atm first))
-               (= 1 (deref atm))))))
+      (is (= 1 (swap! atm first)))
+      (is (= 1 (deref atm)))))
 
   (testing "swap! the atom's state with a function and an argument"
     (let [atm (atom 7)]
-      (is (and (= 6 (swap! atm - 1))
-               (= 6 (deref atm))))))
+      (is (= 6 (swap! atm - 1)))
+      (is (= 6 (deref atm)))))
 
   (testing "swap! the atom's state with a function and two arguments"
     (let [atm (atom 7)]
-      (is (and (= 4 (swap! atm - 1 2))
-               (= 4 (deref atm))))))
+      (is (= 4 (swap! atm - 1 2)))
+      (is (= 4 (deref atm)))))
 
   (testing "swap! the atom's state with a function and arbitrary arguments"
     (let [atm (atom 7)]
-      (is (and (= -3 (swap! atm - 1 2 3 4))
-               (= -3 (deref atm))))))
+      (is (= -3 (swap! atm - 1 2 3 4)))
+      (is (= -3 (deref atm)))))
 
   (testing "swap! validates the new state"
     (let [atm (atom 2 :validator #(not= 3 %))]
@@ -142,8 +141,8 @@
   (testing "set-validator! will set the current validator function"
     (let [validator-fn #(not= 3 %)
           atm (atom 2)]
-      (is (and (nil? (set-validator! atm validator-fn))
-               (= validator-fn (get-validator atm))))))
+      (is (nil? (set-validator! atm validator-fn)))
+      (is (= validator-fn (get-validator atm)))))
 
   (testing "add-watch will add a function to be invoked on state changes"
     (let [received-key (atom nil)

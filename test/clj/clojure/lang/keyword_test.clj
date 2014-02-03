@@ -2,11 +2,7 @@
   (:refer-clojure :only [let defmacro])
   (:require [clojure.test            :refer :all]
             [clojure.lang.assertions :refer :all]
-            [clojure.lang.hash       :refer [hash]]
-            [clojure.lang.keyword    :refer :all]
             [clojure.lang.object     :refer [identical?]]
-            [clojure.lang.show       :refer [str]]
-            [clojure.lang.symbol     :refer [symbol]]
             [clojure.next            :refer :all]))
 
 (deftest keyword-test

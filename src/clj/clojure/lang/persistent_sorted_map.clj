@@ -2,13 +2,11 @@
   (:refer-clojure :only [cond comparator cons count dec declare defn defn- defprotocol deftype empty? even? first format let loop next nil? rest second zero? + - > < ->])
   (:require [clojure.lang.apersistent-map      :refer [defmap]]
             [clojure.lang.aseq                 :refer [defseq]]
-            [clojure.lang.comparison           :refer [compare]]
-            [clojure.lang.map-entry            :refer [key new-map-entry val]]
-            [clojure.lang.persistent-map       :refer [assoc]]
+            [clojure.lang.map-entry            :refer [new-map-entry]]
             [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
             [clojure.lang.protocols            :refer [ICounted ILookup IMeta
                                                        IAssociative IPersistentMap ISeqable ISeq]]
-            [clojure.next                      :refer :all :exclude [+ - empty? next count first dec]]))
+            [clojure.next                      :refer :all :exclude [+ - empty? next count first dec comparator]]))
 
 (declare red-node?)
 (declare black-node?)

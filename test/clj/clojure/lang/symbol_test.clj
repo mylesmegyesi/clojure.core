@@ -2,11 +2,7 @@
   (:refer-clojure :only [let get nil? defn])
   (:require [clojure.test                 :refer :all]
             [clojure.lang.assertions      :refer :all]
-            [clojure.lang.hash            :refer [hash]]
-            [clojure.lang.keyword         :refer [keyword]]
             [clojure.lang.object          :refer [identical?]]
-            [clojure.lang.show            :refer [str]]
-            [clojure.lang.symbol          :refer :all]
             [clojure.next                 :refer :all :exclude [get]]))
 
 (deftest symbol-test

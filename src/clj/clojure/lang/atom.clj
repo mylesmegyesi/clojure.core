@@ -1,23 +1,11 @@
 (ns clojure.lang.atom
   (:refer-clojure :only [apply assoc cons defn defn- deftype dissoc empty? first fn let loop if-not into rest second])
-  (:require [clojure.lang.persistent-array-map   :refer [array-map]]
-            [clojure.lang.platform.atomic-entity :as    ent]
+  (:require [clojure.lang.atomic-ref             :refer [new-atomic-ref ref-set!
+                                                         ref-get ref-compare-and-set!]]
             [clojure.lang.platform.exceptions    :refer [new-illegal-state-error]]
-            [clojure.lang.protocols              :refer [IAtom -compare-and-set! -reset! -swap!
-                                                         IDeref IMeta IValidatable IWatchable]]
-            [clojure.next                        :refer :all :exclude [first empty?]]))
-
-(defn compare-and-set! [atm old-val new-val]
-  (-compare-and-set! atm old-val new-val))
-
-(defn reset! [atm new-val]
-  (-reset! atm new-val))
-
-(defn swap!
-  ([atm f] (-swap! atm f []))
-  ([atm f x] (-swap! atm f [x]))
-  ([atm f x y] (-swap! atm f [x y]))
-  ([atm f x y & args] (-swap! atm f (into [x y] args))))
+            [clojure.lang.protocols              :refer [IAtom IDeref IMeta IValidatable IWatchable
+                                                         -reset-meta!]]
+            [clojure.next                        :refer :all :exclude [first empty? assoc dissoc]]))
 
 (defn- validate-with-exception [validator-fn input]
   (if validator-fn
@@ -33,85 +21,67 @@
         (watch-fn watch-key atm old-value new-value)
         (recur (rest watches))))))
 
-(deftype Atom [-state -meta -validator -watches]
+(deftype Atom [-state
+               ^:unsynchronized-mutable -meta
+               ^:volatile-mutable -validator
+               ^:volatile-mutable -watches]
   IDeref
-  (-deref [this] (ent/get-entity -state))
+  (-deref [this] (ref-get -state))
 
   IMeta
-  (-meta [this] (ent/get-entity -meta))
+  (-meta [this] -meta)
 
   (-reset-meta! [this new-meta]
-    (do
-      (ent/set-entity! -meta new-meta)
-      new-meta))
+    (set! -meta new-meta)
+    new-meta)
 
   (-alter-meta! [this f args]
-    (let [meta-args (cons (ent/get-entity -meta) args)
+    (let [meta-args (cons -meta args)
           new-meta (apply f meta-args)]
-      (ent/set-entity! -meta new-meta)
-      new-meta))
+      (-reset-meta! this new-meta)))
 
   IAtom
   (-compare-and-set! [this old-state new-state]
     (do
-      (validate-with-exception (ent/get-entity -validator) new-state)
-      (if (ent/compare-and-set-entity! -state old-state new-state)
+      (validate-with-exception -validator new-state)
+      (if (ref-compare-and-set! -state old-state new-state)
         (do
-          (notify-watches (ent/get-entity -watches) this old-state new-state)
+          (notify-watches -watches this old-state new-state)
           true)
         false)))
 
   (-reset! [this new-state]
-    (let [old-state (ent/get-entity -state)
-          self this]
-      (validate-with-exception (ent/get-entity -validator) new-state)
-      (ent/set-entity! -state new-state)
-      (notify-watches (ent/get-entity -watches) self old-state new-state)
+    (let [old-state (ref-get -state)]
+      (validate-with-exception -validator new-state)
+      (ref-set! -state new-state)
+      (notify-watches -watches this old-state new-state)
       new-state))
 
   (-swap! [this f args]
     (loop []
-      (let [entity (ent/get-entity -state)
-            arg-list (cons entity args)
-            updated-entity (apply f arg-list)
-            self this]
-        (validate-with-exception (ent/get-entity -validator) updated-entity)
-        (if (ent/compare-and-set-entity! -state entity updated-entity)
+      (let [old-value (ref-get -state)
+            new-value (apply f old-value args)]
+        (validate-with-exception -validator new-value)
+        (if (ref-compare-and-set! -state old-value new-value)
           (do
-            (notify-watches (ent/get-entity -watches) self entity updated-entity)
-            updated-entity)
+            (notify-watches -watches this old-value new-value)
+            new-value)
           (recur)))))
 
   IValidatable
-  (-get-validator [this] (ent/get-entity -validator))
+  (-get-validator [this] -validator)
 
-  (-set-validator! [this f] (ent/set-entity! -validator f))
+  (-set-validator! [this f] (set! -validator f) nil)
 
   IWatchable
   (-add-watch [this k f]
     (do
-      (ent/set-entity! -watches
-        (assoc (ent/get-entity -watches) k f))
+      (set! -watches (assoc -watches k f))
       this))
 
   (-remove-watch [this k]
-    (let [watches (ent/get-entity -watches)
-          new-watches (dissoc watches k)
-          self this]
-      (ent/set-entity! -watches new-watches)
-      self)))
+    (set! -watches (dissoc -watches k))
+    this))
 
-(def ^{:private true} default-meta nil)
-(def ^{:private true} default-validator nil)
-
-(defn atom
-  ([state]
-    (atom state :meta default-meta :validator default-validator))
-  ([state & args]
-    (let [config    (apply array-map args)
-          meta      (get config :meta default-meta)
-          validator (get config :validator default-validator)]
-      (Atom. (ent/make-atomic-entity state)
-             (ent/make-atomic-entity meta)
-             (ent/make-atomic-entity validator)
-             (ent/make-atomic-entity {})))))
+(defn new-atom [state meta validator watches]
+  (Atom. state meta validator watches))

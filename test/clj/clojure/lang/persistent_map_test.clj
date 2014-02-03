@@ -1,15 +1,11 @@
 (ns clojure.lang.persistent-map-test
   (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* nil? re-pattern loop when < inc cond >])
   (:require [clojure.test                       :refer :all]
-            [clojure.lang.hash                  :refer [hash]]
             [clojure.lang.object                :refer [identical?]]
-            [clojure.lang.persistent-map        :refer [assoc dissoc keys vals]]
-            [clojure.lang.persistent-array-map  :refer [array-map]]
-            [clojure.lang.persistent-sorted-map :refer :all]
+            [clojure.lang.persistent-map        :refer [keys vals]]
             [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
             [clojure.lang.protocols             :refer [IComparable IEquivalence IHash]]
-            [clojure.lang.show                  :refer [str]]
             [clojure.next                       :refer :all :exclude [inc]]))
 
 (defmacro argument-error-is-thrown? [msg & body]

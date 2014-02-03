@@ -1,8 +1,7 @@
 (ns clojure.lang.platform.persistent-map-test
   (:refer-clojure :only [defn let])
-  (:require [clojure.test                      :refer :all]
-            [clojure.lang.hash                 :refer [hash]]
-            [clojure.next                      :refer :all])
+  (:require [clojure.test :refer :all]
+            [clojure.next :refer :all])
   (:import [java.util NoSuchElementException]))
 
 (defn platform-equals-test [constructor]

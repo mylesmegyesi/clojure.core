@@ -2,15 +2,15 @@
   (:refer-clojure :only [apply declare defn defn- hash-map])
   (:require [clojure.lang.apersistent-set :refer [defset make-pairs]]))
 
-(declare make-hash-set)
+(declare new-hash-set)
 
-(defset PersistentHashSet make-hash-set)
+(defset PersistentHashSet new-hash-set)
 
-(defn- make-hash-set [-hash-map]
+(defn new-hash-set [-hash-map]
   (PersistentHashSet. -hash-map))
 
 (defn hash-set
-  ([] (make-hash-set (hash-map)))
+  ([] (new-hash-set (hash-map)))
   ([& xs]
-    (make-hash-set
+    (new-hash-set
       (apply hash-map (make-pairs xs)))))

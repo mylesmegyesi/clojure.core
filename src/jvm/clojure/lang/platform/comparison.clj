@@ -1,7 +1,6 @@
 (ns clojure.lang.platform.comparison
   (:refer-clojure :only [defmacro defprotocol extend-protocol fn defn list update-in cons])
-  (:require [clojure.lang.platform.numbers]
-            [clojure.lang.protocols :refer [IComparable]]))
+  (:require [clojure.lang.protocols :refer [IComparable]]))
 
 (extend-protocol IComparable
   Object

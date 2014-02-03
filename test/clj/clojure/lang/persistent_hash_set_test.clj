@@ -1,7 +1,6 @@
 (ns clojure.lang.persistent-hash-set-test
   (:refer-clojure :only [deftype first let next nil?])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.hash                :refer [hash]]
             [clojure.lang.persistent-set      :refer [conj difference disj intersection subset? superset? union]]
             [clojure.lang.persistent-hash-set :refer :all]
             [clojure.lang.protocols           :refer [IHash]]

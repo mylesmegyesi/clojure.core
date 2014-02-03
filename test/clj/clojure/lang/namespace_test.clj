@@ -3,7 +3,6 @@
   (:require [clojure.test           :refer :all]
             [clojure.lang.namespace :refer :all]
             [clojure.lang.object    :refer [identical?]]
-            [clojure.lang.symbol    :refer [symbol]]
             [clojure.next           :refer :all :exclude [get]]))
 
 (defn empty-ns-map []

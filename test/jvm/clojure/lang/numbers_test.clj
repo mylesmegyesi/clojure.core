@@ -4,10 +4,8 @@
                          /
                          ])
   (:require [clojure.test            :refer [deftest is testing]]
-            [clojure.lang.hash       :refer [hash]]
             [clojure.lang.object     :refer [type]]
             [clojure.lang.ratio      :refer [numerator denominator]]
-            [clojure.lang.show       :refer [str]]
             [clojure.lang.numbers    :refer :all]
             [clojure.next            :refer :all]))
 

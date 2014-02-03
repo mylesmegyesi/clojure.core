@@ -1,10 +1,9 @@
 (ns clojure.lang.persistent-array-map
   (:refer-clojure :only [declare defn defn- let + - dec loop < / inc when if-let even? format nil?])
   (:require [clojure.lang.apersistent-map     :refer [defmap]]
-            [clojure.lang.array               :refer [make-array array-get array-set! array-copy! into-array]]
+            [clojure.lang.array               :refer [array-get array-set! array-copy!]]
             [clojure.lang.aseq                :refer [defseq]]
-            [clojure.lang.hash                :refer [hash]]
-            [clojure.lang.map-entry           :refer [new-map-entry key val]]
+            [clojure.lang.map-entry           :refer [new-map-entry]]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
             [clojure.lang.protocols           :refer [ICounted ILookup IMeta IAssociative IPersistentMap ISeq ISeqable]]
             [clojure.next                     :refer :all :exclude [+ - dec inc]]))
@@ -88,14 +87,5 @@
   (-seq [this]
     (new-array-map-seq -arr -count 0)))
 
-(defn- new-array-map [arr size count meta]
-  (new PersistentArrayMap arr size count meta))
-
-(defn array-map [& args]
-  (let [sargs (seq args)
-        size (count sargs)]
-    (if (even? size)
-      (new-array-map (into-array sargs) size (/ size 2) nil)
-      (throw (new-argument-error
-               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
-                       size))))))
+(defn new-array-map [arr size count meta]
+  (PersistentArrayMap. arr size count meta))
