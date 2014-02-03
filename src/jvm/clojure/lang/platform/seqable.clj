@@ -1,5 +1,5 @@
 (ns clojure.lang.platform.seqable
-  (:refer-clojure :only [extend-type fn defn deftype declare when])
+  (:refer-clojure :only [extend-type fn defn deftype declare when-let])
   (:require [clojure.lang.aseq     :refer [defseq]]
             [clojure.lang.icounted :refer [ICounted]]
             [clojure.lang.iseqable :refer [ISeqable]]
@@ -18,7 +18,7 @@
     (old-seq->new-seq (clojure.core/next old))))
 
 (defn old-seq->new-seq [old]
-  (when old
+  (when-let [old (clojure.core/seq old)]
     (OldSeqAdapter. old)))
 
 (extend-type clojure.lang.ISeq
