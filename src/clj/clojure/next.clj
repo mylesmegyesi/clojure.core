@@ -202,6 +202,12 @@
     (pred (first s)) (recur pred (next s))
     :else false))
 
+(defn nth
+  ([coll n]
+    (-nth coll n))
+  ([coll n not-found]
+    (-nth coll n not-found)))
+
 (defn empty? [seqable]
   (not (seq seqable)))
 
