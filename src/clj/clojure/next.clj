@@ -224,6 +224,21 @@
   ([type size]
    (arr/make-array type size)))
 
+(defn aset [arr i val]
+  (arr/array-set! arr i val))
+
+(defn aget [arr i]
+  (arr/array-get arr i))
+
+(defn alength [arr]
+  (arr/array-length arr))
+
+(defn aclone [arr]
+  (arr/array-clone arr))
+
+(defn acopy [src src-pos dest dest-pos length]
+  (arr/array-copy src src-pos dest dest-pos length))
+
 (defn into-array
   ([seqable] (into-array Object seqable))
   ([type seqable]
@@ -234,7 +249,7 @@
        (if (nil? s)
          arr
          (do
-           (arr/array-set! arr i (first s))
+           (aset arr i (first s))
            (recur (clojure.core/inc i) (next s))))))))
 
 (require ['clojure.lang.persistent-array-map :refer ['new-array-map]])

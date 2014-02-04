@@ -1,7 +1,6 @@
 (ns clojure.lang.persistent-hash-map
   (:refer-clojure :only [defn defn- declare defprotocol deftype -> let when even? loop format cond nil? >= < and])
   (:require [clojure.lang.apersistent-map        :refer [defmap]]
-            [clojure.lang.array                  :refer [array-set! array-get array-clone! array-copy! array-length]]
             [clojure.lang.aseq                   :refer [defseq]]
             [clojure.lang.atomic-ref             :refer [new-atomic-ref]]
             [clojure.lang.map-entry              :refer [new-map-entry]]
@@ -67,24 +66,24 @@
   ([this edit i a]
    (let [editable (ensure-editable this edit)
          editable-array (get-array editable)]
-     (array-set! editable-array i a)
+     (aset editable-array i a)
      editable))
   ([this edit i a j b]
    (let [editable (ensure-editable this edit)
          editable-array (get-array editable)]
-     (array-set! editable-array i a)
-     (array-set! editable-array j b)
+     (aset editable-array i a)
+     (aset editable-array j b)
      editable)))
 
 (defn- clone-and-set!
   ([arr i a]
-    (let [clone (array-clone! arr)]
-      (array-set! clone i a)
+    (let [clone (aclone arr)]
+      (aset clone i a)
       clone))
   ([arr i a j b]
-   (let [clone (array-clone! arr)]
-     (array-set! clone i a)
-     (array-set! clone j b)
+   (let [clone (aclone arr)]
+     (aset clone i a)
+     (aset clone j b)
      clone)))
 
 (defn- create-node
@@ -92,10 +91,10 @@
    (let [key1hash (->bitnum (hash key1))]
      (if (= key1hash key2hash)
        (let [arr (make-array FOUR)]
-         (array-set! arr ZERO key1)
-         (array-set! arr ONE val1)
-         (array-set! arr TWO key2)
-         (array-set! arr THREE val2)
+         (aset arr ZERO key1)
+         (aset arr ONE val1)
+         (aset arr TWO key2)
+         (aset arr THREE val2)
          (new-hash-collision-node nil key1hash TWO arr))
        (let [added-leaf (new-box nil)
              edit (new-atomic-ref)]
@@ -106,10 +105,10 @@
    (let [key1hash (->bitnum (hash key1))]
      (if (= key1hash key2hash)
        (let [arr (make-array FOUR)]
-         (array-set! arr ZERO key1)
-         (array-set! arr ONE val1)
-         (array-set! arr TWO key2)
-         (array-set! arr THREE val2)
+         (aset arr ZERO key1)
+         (aset arr ONE val1)
+         (aset arr TWO key2)
+         (aset arr THREE val2)
          (new-hash-collision-node nil key1hash TWO arr))
        (let [added-leaf (new-box nil)]
          (-> EMPTY-BitmapIndexedNode
@@ -119,17 +118,17 @@
 (defn- find-index [array count key]
   (loop [i ZERO]
     (if (< i (* TWO count))
-      (if (= key (array-get array i))
+      (if (= key (aget array i))
         i
         (recur (+ i TWO)))
       NEG-ONE)))
 
 (defn- remove-pair [arr i]
-  (let [new-size (- (array-length arr) TWO)
+  (let [new-size (- (alength arr) TWO)
         new-arr (make-array new-size)
         two*i (* TWO i)]
-    (array-copy! arr ZERO new-arr ZERO two*i)
-    (array-copy! arr (* TWO (inc i)) new-arr two*i (- new-size two*i))
+    (acopy arr ZERO new-arr ZERO two*i)
+    (acopy arr (* TWO (inc i)) new-arr two*i (- new-size two*i))
     new-arr))
 
 (defseq ^:private NodeSeq [meta arr i s]
@@ -143,7 +142,7 @@
   ISeq
   (-first [this]
     (if (nil? s)
-      (new-map-entry (array-get arr i) (array-get arr (inc i)))
+      (new-map-entry (aget arr i) (aget arr (inc i)))
       (first s)))
 
   (-next [this]
@@ -156,10 +155,10 @@
   ([arr] (new-node-seq arr ZERO nil))
   ([arr i s]
    (if (nil? s)
-     (loop [j i max (array-length arr)]
+     (loop [j i max (alength arr)]
        (if (< j max)
-         (if (nil? (array-get arr j))
-           (let [node (array-get arr (inc j))]
+         (if (nil? (aget arr j))
+           (let [node (aget arr (inc j))]
              (if (nil? node)
                (recur (+ TWO j) max)
                (let [seq (node-seq node)]
@@ -174,14 +173,14 @@
   INode
   (node-find [this shift hash key not-found]
     (let [idx (mask hash shift)
-          node (array-get array idx)]
+          node (aget array idx)]
       (if (nil? node)
         not-found
         (node-find node (+ shift FIVE) hash key not-found))))
 
   (node-assoc [this shift hash key val added-leaf]
     (let [idx (mask hash shift)
-          node (array-get array idx)]
+          node (aget array idx)]
       (if (nil? node)
         (new-array-node nil (inc count) (clone-and-set!
                                           array idx
@@ -204,8 +203,8 @@
       (cond
         (< idx ZERO)
         not-found
-        (= key (array-get array idx))
-        (array-get array (inc idx))
+        (= key (aget array idx))
+        (aget array (inc idx))
         :else
         not-found)))
 
@@ -213,18 +212,18 @@
     (if (= hash -hash)
       (let [idx (find-index array count key)]
         (if (not= idx NEG-ONE)
-          (if (= (array-get array (inc idx)) val)
+          (if (= (aget array (inc idx)) val)
             this
             (new-hash-collision-node nil hash count (clone-and-set! array (inc idx) val)))
           (let [new-arr (make-array (* TWO (inc count)))]
-            (array-copy! array ZERO new-arr ZERO (* TWO count))
-            (array-set! new-arr (* TWO count) key)
-            (array-set! new-arr (inc (* TWO count)) val)
+            (acopy array ZERO new-arr ZERO (* TWO count))
+            (aset new-arr (* TWO count) key)
+            (aset new-arr (inc (* TWO count)) val)
             (set-value! added-leaf added-leaf)
             (new-hash-collision-node edit hash (inc count) new-arr))))
       (let [new-arr (make-array TWO)]
-        (array-set! new-arr ZERO nil)
-        (array-set! new-arr ONE this)
+        (aset new-arr ZERO nil)
+        (aset new-arr ONE this)
         (node-assoc (new-bitmap-node nil (bit-pos hash shift) new-arr)
                     shift hash key val added-leaf))))
   )
@@ -251,7 +250,7 @@
       (let [n (bit-count bitmap)
             arr-size (if (>= n ZERO) (* TWO (inc n)) FOUR)
             new-arr (make-array arr-size)]
-        (array-copy! arr ZERO new-arr ZERO (* TWO n))
+        (acopy arr ZERO new-arr ZERO (* TWO n))
         (new-bitmap-node -edit bitmap new-arr))))
 
   (node-find [this shift hash key not-found]
@@ -259,8 +258,8 @@
       (if (= (bit-and bitmap bit) ZERO)
         not-found
         (let [idx (bit-index bitmap bit)
-              key-or-nil (array-get arr (* TWO idx))
-              val-or-node (array-get arr (inc (* TWO idx)))]
+              key-or-nil (aget arr (* TWO idx))
+              val-or-node (aget arr (inc (* TWO idx)))]
           (cond
             (nil? key-or-nil)
             (node-find val-or-node (+ FIVE shift) hash key not-found)
@@ -272,8 +271,8 @@
     (let [bit (bit-pos hash shift)
           idx (bit-index bitmap bit)]
       (if (not= (bit-and bitmap bit) ZERO)
-        (let [key-or-nil (array-get arr (* TWO idx))
-              val-or-node (array-get arr (inc (* TWO idx)))]
+        (let [key-or-nil (aget arr (* TWO idx))
+              val-or-node (aget arr (inc (* TWO idx)))]
           (cond
             (nil? key-or-nil)
             (let [n (node-assoc val-or-node (+ FIVE shift) hash key val added-leaf)]
@@ -300,36 +299,36 @@
                   jdx (mask hash shift)
                   jdx-node (node-assoc EMPTY-BitmapIndexedNode
                                        (+ shift FIVE) hash key val added-leaf)]
-              (array-set! nodes jdx jdx-node)
+              (aset nodes jdx jdx-node)
               (loop [i ZERO j ZERO]
                 (when (< i THIRTY-TWO)
                   (if (not= (bit-and (bit-unsigned-shift-right bitmap i) ONE) ZERO)
                     (do
-                      (if (nil? (array-get arr j))
-                        (array-set! nodes i (array-get arr (inc j)))
-                        (array-set! nodes i (node-assoc EMPTY-BitmapIndexedNode
+                      (if (nil? (aget arr j))
+                        (aset nodes i (aget arr (inc j)))
+                        (aset nodes i (node-assoc EMPTY-BitmapIndexedNode
                                                         (+ shift FIVE)
-                                                        (clojure.next/hash (array-get arr j))
-                                                        (array-get arr j)
-                                                        (array-get arr (inc j))
+                                                        (clojure.next/hash (aget arr j))
+                                                        (aget arr j)
+                                                        (aget arr (inc j))
                                                         added-leaf)))
                       (recur (inc i) (+ j TWO)))
                     (recur (inc i) j))))
               (new-array-node nil (inc n) nodes))
             (let [new-arr (make-array (* TWO (inc n)))]
-              (array-copy! arr ZERO new-arr ZERO (* TWO idx))
-              (array-set! new-arr (* TWO idx) key)
+              (acopy arr ZERO new-arr ZERO (* TWO idx))
+              (aset new-arr (* TWO idx) key)
               (set-value! added-leaf added-leaf)
-              (array-set! new-arr (inc (* TWO idx)) val)
-              (array-copy! arr (* TWO idx) new-arr (* TWO (inc idx)) (* TWO (- n idx)))
+              (aset new-arr (inc (* TWO idx)) val)
+              (acopy arr (* TWO idx) new-arr (* TWO (inc idx)) (* TWO (- n idx)))
               (new-bitmap-node nil (bit-or bitmap bit) new-arr)))))))
 
   (node-assoc-ref [this edit shift hash key val added-leaf]
       (let [bit (bit-pos hash shift)
             idx (bit-index bitmap bit)]
         (if (not= (bit-and bitmap bit) ZERO)
-          (let [key-or-nil (array-get arr (* TWO idx))
-                val-or-node (array-get arr (inc (* TWO idx)))]
+          (let [key-or-nil (aget arr (* TWO idx))
+                val-or-node (aget arr (inc (* TWO idx)))]
             (cond
               (nil? key-or-nil)
               (let [n (node-assoc-ref val-or-node edit (+ FIVE shift) hash key val added-leaf)]
@@ -347,14 +346,14 @@
                               (create-node edit (+ FIVE shift) key-or-nil val-or-node hash key val)))))
           (let [n (bit-count bitmap)]
             (cond
-              (< (* TWO n) (array-length arr))
+              (< (* TWO n) (alength arr))
               (do
                 (set-value! added-leaf added-leaf)
                 (let [editable (ensure-editable this edit)
                       editable-arr (get-array editable)]
-                  (array-copy! editable-arr (* TWO idx) (get-array editable) (* TWO (inc idx)) (* TWO (- n idx)))
-                  (array-set! editable-arr (* TWO idx) key)
-                  (array-set! editable-arr (inc (* TWO idx)) val)
+                  (acopy editable-arr (* TWO idx) (get-array editable) (* TWO (inc idx)) (* TWO (- n idx)))
+                  (aset editable-arr (* TWO idx) key)
+                  (aset editable-arr (inc (* TWO idx)) val)
                   (set-bitmap! editable (bit-or (get-bitmap editable) bit))
                   editable))
               (>= n SIXTEEN)
@@ -365,25 +364,25 @@
                   (when (< i THIRTY-TWO)
                     (if (not= (bit-and (bit-unsigned-shift-right i) ONE) ZERO)
                       (do
-                        (if (nil? (array-get arr j))
-                          (array-set! nodes i (array-get (inc j)))
-                          (array-set! nodes i (node-assoc-ref EMPTY-BitmapIndexedNode
+                        (if (nil? (aget arr j))
+                          (aset nodes i (aget (inc j)))
+                          (aset nodes i (node-assoc-ref EMPTY-BitmapIndexedNode
                                                               edit
                                                               (+ FIVE shift)
-                                                              (clojure.next/hash (array-get arr j))
-                                                              (array-get arr j)
-                                                              (array-get arr (inc j))
+                                                              (clojure.next/hash (aget arr j))
+                                                              (aget arr j)
+                                                              (aget arr (inc j))
                                                               added-leaf)))
                       (recur (inc i) (+ j TWO)))
                     (recur (inc i) j))))
                 (new-array-node edit (inc n) nodes))
               :else
               (let [new-array (make-array (* TWO (+ FOUR n)))]
-                (array-copy! arr ZERO new-array ZERO (* TWO idx))
-                (array-set! new-array (* TWO idx) key)
+                (acopy arr ZERO new-array ZERO (* TWO idx))
+                (aset new-array (* TWO idx) key)
                 (set-value! added-leaf added-leaf)
-                (array-set! new-array (inc (* TWO idx)) val)
-                (array-copy! arr (* TWO idx) new-array (* TWO (inc idx)) (* TWO (- n idx)))
+                (aset new-array (inc (* TWO idx)) val)
+                (acopy arr (* TWO idx) new-array (* TWO (inc idx)) (* TWO (- n idx)))
                 (let [editable (ensure-editable this edit)]
                   (set-array! editable new-array)
                   (set-bitmap! editable (bit-or (get-bitmap editable) bit))
@@ -394,8 +393,8 @@
       (if (= (bit-and bitmap bit) ZERO)
         this
         (let [idx (bit-index bitmap bit)
-              key-or-nil (array-get arr (* TWO idx))
-              val-or-node (array-get arr (inc (* TWO idx)))]
+              key-or-nil (aget arr (* TWO idx))
+              val-or-node (aget arr (inc (* TWO idx)))]
           (cond
             (nil? key-or-nil)
             (let [n (node-dissoc val-or-node (+ FIVE shift) hash key)]
