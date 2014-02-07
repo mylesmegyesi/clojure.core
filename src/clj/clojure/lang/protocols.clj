@@ -68,7 +68,8 @@
   (-union        [this sets]))
 
 (defprotocol IPersistentVector
-  (-cons [this x]))
+  (-cons [this x])
+  (-assoc-n [this n x]))
 
 (defprotocol IRatio
   (-numerator [this])

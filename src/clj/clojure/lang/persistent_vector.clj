@@ -1,9 +1,10 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [declare defn- defn defprotocol deftype dec inc let loop when < > ->])
+  (:refer-clojure :only [cond declare defn- defn defprotocol deftype dec inc let loop when < > >= ->])
   (:require [clojure.next                   :refer :all :exclude [dec inc]]
+            [clojure.lang.exceptions        :refer [out-of-bounds-exception]]
             [clojure.lang.numbers           :refer [->int]]
             [clojure.lang.platform.hash-map :refer [->bitnum]]
-            [clojure.lang.protocols         :refer [-as-transient -conj! -nth -persistent ICounted IEditableCollection IMeta IPersistentVector ISeq ISeqable ITransientCollection Indexed]]))
+            [clojure.lang.protocols         :refer [-as-transient -conj! -nth -persistent -cons ICounted IEditableCollection IMeta IPersistentVector ISeq ISeqable ITransientCollection Indexed]]))
 
 (declare make-vector-seq)
 
@@ -107,8 +108,21 @@
     (acopy tail 0 new-arr 0 (alength tail))
     new-arr))
 
+(defn n-in-range? [n length]
+  (and (> (->bitnum n) 0) (< (->bitnum n) (->bitnum length))))
+
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))
+
+(defn- do-assoc [level node n x]
+  (let [new-node (make-node (get-edit node) (aclone (get-array node)))]
+    (if (= level 0)
+      (do
+        (aset (get-array new-node) (bit-and (->bitnum n) (->bitnum 0x01f)) x)
+        new-node)
+      (let [subidx (bit-and (bit-unsigned-shift-right (->bitnum n) (->bitnum level)) (->bitnum 0x01f))]
+        (aset (get-array new-node) subidx (do-assoc (- level 5) (aget (get-array node) subidx) n x))
+        new-node))))
 
 (deftype PersistentVector [-meta -length -shift -root -tail -seq]
   IPersistentVector
@@ -129,6 +143,21 @@
             (make-vector -meta (inc -length) (+ (->bitnum -shift) (->bitnum 5)) new-root new-arr))
           (let [new-root (push-tail -shift -root tail-node -length -root)]
             (make-vector -meta (inc -length) -shift new-root new-arr))))))
+
+  (-assoc-n [this n x]
+    (cond
+      (n-in-range? n -length)
+      (if (>= n (tailoff -length))
+        (let [tail-length (alength -tail)
+              new-tail (make-array tail-length)]
+          (acopy -tail 0 new-tail 0 tail-length)
+          (aset new-tail (bit-and (->bitnum n) (->bitnum 0x01f)) x)
+          (make-vector -meta -length -shift -root new-tail))
+        (make-vector -meta -length -shift (do-assoc -shift -root n x) -tail))
+      (= n -length)
+      (-cons this x)
+      :else
+      out-of-bounds-exception))
 
   ICounted
   (-count [this]
@@ -154,7 +183,7 @@
     (aget -tail n))
 
   (-nth [this n not-found]
-    (if (and (> (->bitnum n) 0) (< (->bitnum n) (->bitnum -length)))
+    (if (n-in-range? n -length)
       (-nth this n)
       not-found))
 )
