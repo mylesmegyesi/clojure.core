@@ -46,3 +46,11 @@
   (testing "lazily traverses infinite seq"
     (= true (first (lazy-seq (repeatedly-true))))
     (= true (first (next (lazy-seq (repeatedly-true)))))))
+
+(deftest lazy-seq-meta-test
+  (testing "the initial meta is nil"
+    (is (nil? (meta (lazy-seq)))))
+
+  (testing "with-meta resets the meta value"
+    (let [lazy-seq-with-meta (with-meta (lazy-seq) {:so :meta})]
+      (is (= {:so :meta} (meta lazy-seq-with-meta))))))
