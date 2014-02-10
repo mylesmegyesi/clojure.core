@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [apply cond cons declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         loop / format into < butlast last])
+                         list list* loop / format into < butlast last])
   (:require [clojure.lang.numbers  :refer [-bit-unsigned-shift-right
                                            -bit-shift-left
                                            -bit-and
@@ -157,8 +157,15 @@
 (defn namespace [named]
   (-namespace named))
 
-(defn seq [i]
-  (-seq i))
+(defn seq [s]
+  (-seq s))
+
+(declare atom)
+(declare reset!)
+(require ['clojure.lang.lazy-seq])
+
+(defmacro lazy-seq [& s-body]
+  (list 'clojure.lang.lazy-seq/make-lazy-seq (list* 'clojure.core/fn [] s-body)))
 
 (extend-type nil
   ISeqable
