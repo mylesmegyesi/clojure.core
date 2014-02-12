@@ -1,8 +1,8 @@
 (ns clojure.lang.lazy-seq-test
-  (:refer-clojure :only [count defn deftype let nil? nth rest zero?])
+  (:refer-clojure :only [defn deftype let nil? nth rest zero?])
   (:require [clojure.test           :refer :all]
             [clojure.lang.protocols :refer [ISeq ISeqable]]
-            [clojure.next           :refer :all :exclude [count]]))
+            [clojure.next           :refer :all]))
 
 (deftype TestSeq [-list]
   ISeqable
@@ -20,7 +20,7 @@
 (deftype TestSeqable [-list]
   ISeqable
   (-seq [this]
-    (if (zero? (count -list))
+    (if (zero? (clojure.core/count -list))
       nil
       (TestSeq. -list))))
 
@@ -37,7 +37,11 @@
     (is (= (first s1) (first (lazy-seq test-seqable))))
     (is (= (first s2) (first (next (lazy-seq test-seqable)))))
     (is (= (first s3) (first (next (next (lazy-seq test-seqable))))))
-    (is (nil? (next (next (next (lazy-seq test-seqable)))))))))
+    (is (nil? (next (next (next (lazy-seq test-seqable))))))))
+
+  (testing "counting a lazy seq"
+    (is (= 0 (count (lazy-seq))))
+    (is (= 1 (count (lazy-seq (TestSeqable. '(1))))))))
 
 (defn repeatedly-true []
   (TestSeqable. '(true (lazy-seq (repeatedly-true)))))
