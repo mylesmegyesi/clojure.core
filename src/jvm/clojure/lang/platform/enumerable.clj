@@ -1,6 +1,6 @@
 (ns clojure.lang.platform.enumerable
   (:refer-clojure :only [deftype let reset! defn update-in fn cons list])
-  (:require [clojure.next :refer [first next]]))
+  (:require [clojure.next :refer [first next] :exclude [cons]]))
 
 (deftype SeqIterator [^:unsynchronized-mutable -current-seq]
   java.util.Iterator
