@@ -1,5 +1,5 @@
 (ns clojure.lang.lazy-seq
-  (:refer-clojure :only [declare defn defn- deftype inc instance? let loop])
+  (:refer-clojure :only [declare defn defn- deftype inc instance? let locking loop])
   (:require [clojure.lang.protocols :refer [ICounted IMeta ISeq ISeqable -seq -first -next]]
             [clojure.next           :refer :all :exclude [inc]]))
 
@@ -22,15 +22,16 @@
 
   ISeqable
   (-seq [this]
-    (if (deref fn-atm)
-      (let [s (loop [sv ((deref fn-atm))]
-                (if (instance? LazySeq sv)
-                  (recur (-seq sv))
-                  (-seq sv)))]
-        (reset! seq-atm s)
-        (reset! fn-atm nil)
-        s)
-      (deref seq-atm)))
+    (locking seq-atm
+      (if (deref fn-atm)
+        (let [s (loop [sv ((deref fn-atm))]
+                  (if (instance? LazySeq sv)
+                    (recur (-seq sv))
+                    (-seq sv)))]
+          (reset! seq-atm s)
+          (reset! fn-atm nil)
+          s)
+        (deref seq-atm))))
 
   ISeq
   (-first [this]
