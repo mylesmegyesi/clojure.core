@@ -1,11 +1,19 @@
 (ns clojure.lang.lazy-seq
-  (:refer-clojure :only [declare defn defn- deftype instance? let loop])
-  (:require [clojure.lang.protocols :refer [IMeta ISeq ISeqable -seq -first -next]]
-            [clojure.next           :refer :all]))
+  (:refer-clojure :only [declare defn defn- deftype inc instance? let loop])
+  (:require [clojure.lang.protocols :refer [ICounted IMeta ISeq ISeqable -seq -first -next]]
+            [clojure.next           :refer :all :exclude [inc]]))
 
 (declare make-lazy-seq)
 
 (deftype LazySeq [-meta fn-atm seq-atm]
+  ICounted
+  (-count [this]
+    (loop [s (-seq this)
+           cnt 0]
+      (if s
+        (recur (-next s) (inc cnt))
+        cnt)))
+
   IMeta
   (-meta [this] -meta)
 
