@@ -1,8 +1,7 @@
 (ns clojure.lang.numbers
   (:refer-clojure :only [and or defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> /])
   (:require [clojure.lang.object    :refer [type instance?]]
-            [clojure.lang.protocols :refer [IEquivalence -equivalent? IHash IRatio]]
-            [clojure.lang.ratio     :refer [denominator numerator]])
+            [clojure.lang.protocols :refer [IEquivalence -equivalent? IHash IRatio -denominator -numerator]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]
@@ -24,18 +23,18 @@
 (defprotocol Categorized
   (category [this]))
 
-(deftype Ratio [-numerator -denominator]
+(deftype Ratio [numerator denominator]
   Object
   (equals [this other]
     (if (and (not (nil? other)) (instance? Ratio other))
       (and
-        (.equals -numerator (numerator other))
-        (.equals -denominator (denominator other)))
+        (.equals numerator (-numerator other))
+        (.equals denominator (-denominator other)))
     false))
 
   IRatio
-  (-numerator   [this] -numerator)
-  (-denominator [this] -denominator)
+  (-numerator   [this] numerator)
+  (-denominator [this] denominator)
 
   Categorized
   (category [this] :ratio)
@@ -47,14 +46,14 @@
   (->float  [this] (.floatValue (->double this)))
   (->double [this]
     (let [mc java.math.MathContext/DECIMAL64
-          big-decimal-numerator (BigDecimal. -numerator)
-          big-decimal-denominator (BigDecimal. -denominator)]
+          big-decimal-numerator (BigDecimal. numerator)
+          big-decimal-denominator (BigDecimal. denominator)]
       (.doubleValue (.divide big-decimal-numerator big-decimal-denominator mc))))
-  (->bigint [this] (.divide -numerator -denominator))
+  (->bigint [this] (.divide numerator denominator))
   (->bigdec [this]
     (let [mc java.math.MathContext/UNLIMITED
-          big-decimal-numerator (BigDecimal. -numerator)
-          big-decimal-denominator (BigDecimal. -denominator)]
+          big-decimal-numerator (BigDecimal. numerator)
+          big-decimal-denominator (BigDecimal. denominator)]
       (.divide big-decimal-numerator big-decimal-denominator mc))))
 
 (defn- gcd [a b]
@@ -499,8 +498,8 @@
   Ratio
   (-hash [this]
     (-bit-xor
-      (.hashCode (numerator this))
-      (.hashCode (denominator this))))
+      (.hashCode (-numerator this))
+      (.hashCode (-denominator this))))
 
   )
 

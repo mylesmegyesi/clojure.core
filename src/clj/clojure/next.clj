@@ -139,6 +139,12 @@
   ([coll k] (-lookup coll k nil))
   ([coll k not-found] (-lookup coll k not-found)))
 
+(defn numerator [ratio]
+  (-numerator ratio))
+
+(defn denominator [ratio]
+  (-denominator ratio))
+
 (defn alter-meta! [this f & args]
   (-alter-meta! this f args))
 
