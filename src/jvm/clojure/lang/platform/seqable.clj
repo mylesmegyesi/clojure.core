@@ -1,11 +1,10 @@
 (ns clojure.lang.platform.seqable
   (:refer-clojure :only [extend-type fn defn deftype declare when-let])
-  (:require [clojure.lang.aseq      :refer [defseq]]
-            [clojure.lang.protocols :refer [ICounted ISeqable ISeq]]))
+  (:require [clojure.lang.protocols :refer [ICounted ISeqable ISeq]]))
 
 (declare old-seq->new-seq)
 
-(defseq OldSeqAdapter [old]
+(clojure.lang.aseq/defseq OldSeqAdapter [old]
   ICounted
   (-count [this] (clojure.core/count old))
 

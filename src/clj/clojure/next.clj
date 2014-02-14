@@ -1,5 +1,5 @@
 (ns clojure.next ; eventually, this will be clojure.core
-  (:refer-clojure :only [apply cond cons declare defmacro defn defn-
+  (:refer-clojure :only [apply cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
                          list list* loop / format into < butlast last])
   (:require [clojure.lang.numbers  :refer [-bit-unsigned-shift-right
@@ -166,6 +166,12 @@
 (defn seq [s]
   (-seq s))
 
+(defn sequential? [s]
+  (satisfies? ISequential s))
+
+(require ['clojure.lang.aseq])
+(require ['clojure.lang.platform.seqable])
+
 (declare atom)
 (declare reset!)
 (require ['clojure.lang.lazy-seq])
@@ -173,28 +179,31 @@
 (defmacro lazy-seq [& s-body]
   (list 'clojure.lang.lazy-seq/make-lazy-seq (list* 'clojure.core/fn [] s-body)))
 
+(require ['clojure.lang.cons :refer ['make-cons]])
+
+(defn cons [elem seqable]
+  (if (nil? seqable)
+    (list elem)
+    (make-cons elem (seq seqable))))
+
 (extend-type nil
   ISeqable
   (-seq [this] nil))
 
 (defn first [s]
-  (-first s))
+  (-first (seq s)))
 
 (defn next [s]
-  (-next s))
+  (-next (seq s)))
 
-(defn every? [pred seqable]
-  (let [s (seq seqable)]
-    (cond
-      (nil? s) true
-      (pred (first s)) (recur pred (next s))
-      :else false)))
+(defn every? [pred s]
+  (cond
+    (nil? s) true
+    (pred (first s)) (recur pred (next s))
+    :else false))
 
 (defn empty? [seqable]
   (not (seq seqable)))
-
-(defn sequential? [s]
-  (satisfies? ISequential s))
 
 (require 'clojure.lang.platform.seqable)
 
@@ -359,7 +368,7 @@
   ([x]
    (if (nil? x) "" (-show x)))
   ([x & more]
-   (build-string (cons x more))))
+   (build-string (clojure.core/cons x more))))
 
 (defn symbol? [x]
   (sym/symbol? x))

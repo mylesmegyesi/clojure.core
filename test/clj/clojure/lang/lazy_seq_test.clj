@@ -1,36 +1,16 @@
 (ns clojure.lang.lazy-seq-test
-  (:refer-clojure :only [defn deftype let nil? nth rest zero?])
-  (:require [clojure.test           :refer :all]
-            [clojure.lang.protocols :refer [ISeq ISeqable]]
-            [clojure.next           :refer :all]))
-
-(deftype TestSeq [-list]
-  ISeqable
-  (-seq [this] this)
-
-  ISeq
-  (-first [this]
-    (nth -list 0))
-
-  (-next [this]
-    (if (= '() (rest -list))
-      nil
-      (TestSeq. (rest -list)))))
-
-(deftype TestSeqable [-list]
-  ISeqable
-  (-seq [this]
-    (if (zero? (clojure.core/count -list))
-      nil
-      (TestSeq. -list))))
+  (:refer-clojure :only [defn let nil?])
+  (:require [clojure.test             :refer :all]
+            [clojure.next             :refer :all]
+            [clojure.support.test-seq :refer [test-seq test-seqable]]))
 
 (deftest lazy-seq-test
   (testing "retrieving the first element"
-    (let [test-seqable (TestSeqable. '(1))]
+    (let [test-seqable (test-seqable '(1))]
       (is (= 1 (first (lazy-seq test-seqable))))))
 
   (testing "retrieving the next sequences"
-    (let [test-seqable (TestSeqable. '(1 2 3))
+    (let [test-seqable (test-seqable '(1 2 3))
           s1 (seq test-seqable)
           s2 (next s1)
           s3 (next s2)]
@@ -41,10 +21,10 @@
 
   (testing "counting a lazy seq"
     (is (= 0 (count (lazy-seq))))
-    (is (= 1 (count (lazy-seq (TestSeqable. '(1))))))))
+    (is (= 1 (count (lazy-seq (test-seqable '(1))))))))
 
 (defn repeatedly-true []
-  (TestSeqable. '(true (lazy-seq (repeatedly-true)))))
+  (test-seqable '(true (lazy-seq (repeatedly-true)))))
 
 (deftest infinite-lazy-seq-test
   (testing "lazily traverses infinite seq"

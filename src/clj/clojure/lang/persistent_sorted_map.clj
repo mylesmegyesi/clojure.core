@@ -6,7 +6,7 @@
             [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
             [clojure.lang.protocols            :refer [ICounted ILookup IMeta
                                                        IAssociative IPersistentMap ISeqable ISeq]]
-            [clojure.next                      :refer :all :exclude [+ - empty? next count first dec comparator]]))
+            [clojure.next                      :refer :all :exclude [+ - cons empty? next count first dec comparator]]))
 
 (declare red-node?)
 (declare black-node?)

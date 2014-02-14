@@ -1,5 +1,5 @@
 (ns clojure.lang.numbers-test
-  (:refer-clojure :only [defmacro let doseq defn cons when
+  (:refer-clojure :only [defmacro let doseq defn when
                          byte short int long bigint biginteger float double
                          /
                          ])
