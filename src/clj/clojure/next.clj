@@ -245,6 +245,9 @@
   ([m k & ks]
    (dissoc-seq (-dissoc m k) (seq ks))))
 
+(defn contains-key? [m k]
+  (-contains-key? m k))
+
 (require ['clojure.lang.array :as 'arr])
 
 (defn make-array

@@ -1,8 +1,16 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [defn let nil? range apply])
-  (:require [clojure.test                   :refer :all]
-            [clojure.lang.persistent-vector :refer [vector]]
-            [clojure.next                   :refer :all]))
+  (:refer-clojure :only [defn defmacro apply list list* let nil? re-pattern range])
+  (:require [clojure.test                     :refer :all]
+            [clojure.lang.persistent-vector   :refer [vector]]
+            [clojure.lang.exceptions          :refer [out-of-bounds-exception]]
+            [clojure.lang.platform.exceptions :refer [argument-error]]
+            [clojure.next                     :refer :all]))
+
+(defmacro argument-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? argument-error msg body)))
+
+(defmacro out-of-bounds-exception-is-thrown? [& body]
+  (list 'is (list* 'thrown? out-of-bounds-exception body)))
 
 (deftest vector-test
   (testing "returns the count"
@@ -26,6 +34,35 @@
       (is (= :a (nth new-vec 0)))
       (is (= :c (nth new-vec 2)))
       (is (= :not-found (nth new-vec 8 :not-found)))))
+
+  (testing "cons"
+    (let [new-vec (vector 1 2 3)
+          cons-vec (cons 4 new-vec)
+          next-cons (cons 5 cons-vec)]
+      (is (= 4 (first cons-vec)))
+      (is (= 5 (first next-cons)))))
+
+  (testing "assoc the index key with the value"
+    (let [new-vec (vector 1 2 3)
+          assoc-vec (assoc new-vec 0 :a)
+          assoc-vec (assoc assoc-vec 2 :b)]
+      (is (= :a (nth assoc-vec 0)))
+      (is (= :b (nth assoc-vec 2)))))
+
+  (testing "throws argument error if key is not an integer"
+    (let [new-vec (vector 1 2 3)]
+      (argument-error-is-thrown? (re-pattern "Key must be an integer")
+        (assoc new-vec :a :b))))
+
+  (testing "throws out of bounds exception if index is out of bounds"
+    (let [new-vec (vector 1 2 3)]
+      (out-of-bounds-exception-is-thrown?
+        (assoc new-vec 5 :b))))
+
+  (testing "contains-key"
+    (let [new-vec (vector :a :b :c :d)]
+      (is (contains-key? new-vec 3))
+      (is (not (contains-key? new-vec 5)))))
 )
 
 (deftest vector-seq-test

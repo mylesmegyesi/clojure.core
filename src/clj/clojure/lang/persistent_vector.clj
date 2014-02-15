@@ -1,14 +1,17 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [cond declare defn- defn defprotocol deftype dec inc let loop when < > >= ->])
-  (:require [clojure.next                   :refer :all :exclude [dec inc]]
-            [clojure.lang.exceptions        :refer [out-of-bounds-exception]]
-            [clojure.lang.numbers           :refer [->int]]
-            [clojure.lang.platform.hash-map :refer [->bitnum]]
-            [clojure.lang.protocols         :refer [-as-transient -conj! -nth -persistent -cons ICounted IEditableCollection IMeta IPersistentVector ISeq ISeqable ITransientCollection Indexed]]))
+  (:refer-clojure :only [cond declare defn- defn defprotocol deftype dec inc integer? let loop when < > >= ->])
+  (:require [clojure.next                     :refer :all :exclude [dec inc]]
+            [clojure.lang.exceptions          :refer [new-out-of-bounds-exception]]
+            [clojure.lang.platform.exceptions :refer [new-argument-error]]
+            [clojure.lang.numbers             :refer [->int]]
+            [clojure.lang.platform.hash-map   :refer [->bitnum]]
+            [clojure.lang.protocols           :refer [-as-transient -assoc-n -conj! -persistent
+                                                      IAssociative ICounted IEditableCollection IMeta IPersistentVector
+                                                      ISeq ISeqable ITransientCollection Indexed]]))
 
 (declare make-vector-seq)
 
-(deftype ^:private PersistentVectorSeq [-first -arr -length -position]
+(deftype ^:private ChunkedSeq [-first -arr -length -position]
   ICounted
   (-count [this]
     -length)
@@ -27,7 +30,7 @@
 
 (defn- make-vector-seq [arr length position]
   (when (not= 0 length)
-    (PersistentVectorSeq. (aget arr position) arr length position)))
+    (ChunkedSeq. (aget arr position) arr length position)))
 
 (defprotocol ^:private INode
   (get-array [this])
@@ -109,7 +112,7 @@
     new-arr))
 
 (defn n-in-range? [n length]
-  (and (> (->bitnum n) 0) (< (->bitnum n) (->bitnum length))))
+  (and (>= (->bitnum n) 0) (< (->bitnum n) (->bitnum length))))
 
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))
@@ -155,9 +158,20 @@
           (make-vector -meta -length -shift -root new-tail))
         (make-vector -meta -length -shift (do-assoc -shift -root n x) -tail))
       (= n -length)
-      (-cons this x)
+      (cons this x)
       :else
-      out-of-bounds-exception))
+      (throw (new-out-of-bounds-exception ""))))
+
+  IAssociative
+  (-assoc [this k v]
+    (if (integer? k)
+      (-assoc-n this k v)
+      (throw (new-argument-error "Key must be an integer"))))
+
+  (-contains-key? [this k]
+    (if (integer? k)
+      (n-in-range? k -length)
+      false))
 
   ICounted
   (-count [this]
@@ -184,7 +198,7 @@
 
   (-nth [this n not-found]
     (if (n-in-range? n -length)
-      (-nth this n)
+      (nth this n)
       not-found))
 )
 

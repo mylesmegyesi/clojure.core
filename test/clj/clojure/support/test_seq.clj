@@ -1,7 +1,7 @@
 (ns clojure.support.test-seq
   (:refer-clojure :only [count defn deftype nth rest zero?])
   (:require [clojure.lang.protocols :refer [ICounted ISeq ISeqable]]
-            [clojure.next           :refer :all :exclude [count]]))
+            [clojure.next           :refer :all :exclude [nth count]]))
 
 (deftype TestSeq [-list]
   ICounted
