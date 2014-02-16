@@ -6,7 +6,8 @@
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]
            [clojure.lang BigInt]
-           [clojure.lang.platform NumberOps]))
+           [clojure.lang.platform NumberOps]
+           [clojure.lang.platform Ratio]))
 
 (defprotocol NumberCoercions
   (->byte   [this])
@@ -23,38 +24,22 @@
 (defprotocol Categorized
   (category [this]))
 
-(deftype Ratio [numerator denominator]
-  Object
-  (equals [this other]
-    (if (and (not (nil? other)) (instance? Ratio other))
-      (and
-        (.equals numerator (-numerator other))
-        (.equals denominator (-denominator other)))
-    false))
-
+(extend-type Ratio
   IRatio
-  (-numerator   [this] numerator)
-  (-denominator [this] denominator)
+  (-numerator [this] (.getNumerator this))
+  (-denominator [this] (.getDenominator this))
 
   Categorized
   (category [this] :ratio)
 
   NumberCoercions
-  (->ratio  [this] this)
-  (->int    [this] (.intValue (->double this)))
-  (->long   [this] (.longValue (->bigint this)))
-  (->float  [this] (.floatValue (->double this)))
-  (->double [this]
-    (let [mc java.math.MathContext/DECIMAL64
-          big-decimal-numerator (BigDecimal. numerator)
-          big-decimal-denominator (BigDecimal. denominator)]
-      (.doubleValue (.divide big-decimal-numerator big-decimal-denominator mc))))
-  (->bigint [this] (.divide numerator denominator))
-  (->bigdec [this]
-    (let [mc java.math.MathContext/UNLIMITED
-          big-decimal-numerator (BigDecimal. numerator)
-          big-decimal-denominator (BigDecimal. denominator)]
-      (.divide big-decimal-numerator big-decimal-denominator mc))))
+  (->ratio  [this] (.ratioValue this))
+  (->int    [this] (.intValue this))
+  (->long   [this] (.longValue this))
+  (->float  [this] (.floatValue this))
+  (->double [this] (.doubleValue this))
+  (->bigint [this] (.bigIntegerValue this))
+  (->bigdec [this] (.bigDecimalValue this)))
 
 (defn- gcd [a b]
   (if (zero? b)
@@ -496,10 +481,7 @@
       (.hashCode (.stripTrailingZeros this))))
 
   Ratio
-  (-hash [this]
-    (-bit-xor
-      (.hashCode (-numerator this))
-      (.hashCode (-denominator this))))
+  (-hash [this] (.hashCode this))
 
   )
 
@@ -514,67 +496,10 @@
   (-increment [x])
   (-decrement [x]))
 
-(extend-type Ratio
-  IEquivalence
-  (-equivalent? [this other]
-    (if (or (instance? Number other) (instance? Ratio other))
-      (equivalent? this other)
-      false))
-
-  (-equal? [this other]
-    (if (instance? Ratio other)
-      (-equivalent? this other)
-      false))
-
-  BitOperations
-  (-bit-and [this other]
-    (-> (no-overflow-ops (type this) (type other))
-      (ops-bit-and this other)))
-
-  (-bit-count [i]
-    (ops-bit-count (make-ops i) i))
-
-  (-bit-or [this other]
-    (-> (no-overflow-ops (type this) (type other))
-      (ops-bit-or this other)))
-
-  (-bit-xor [this other]
-    (-> (no-overflow-ops (type this) (type other))
-      (ops-bit-xor this other)))
-
-  (-bit-shift-left [this shift]
-    (-> (no-overflow-ops (type this) (type shift))
-      (ops-bit-shift-left this shift)))
-
-  (-bit-unsigned-shift-right [this shift]
-    (-> (no-overflow-ops (type this) (type shift))
-      (ops-bit-unsigned-shift-right this shift)))
-
-  MathOperations
-  (-add [x y]
-    (-> (no-overflow-ops (type x) (type y))
-      (ops-add x y)))
-
-  (-subtract [x y]
-    (-> (no-overflow-ops (type x) (type y))
-      (ops-subtract x y)))
-
-  (-multiply [x y]
-    (-> (no-overflow-ops (type x) (type y))
-      (ops-multiply x y)))
-
-  (-increment [i]
-    (ops-increment (make-ops i) i))
-
-  (-decrement [i]
-    (ops-decrement (make-ops i) i))
-
-  )
-
 (extend-type Number
   IEquivalence
   (-equivalent? [this other]
-    (if (or (instance? Number other) (instance? Ratio other))
+    (if (instance? Number other)
       (equivalent? this other)
       false))
 
