@@ -7,7 +7,7 @@
             [clojure.lang.platform.hash-map   :refer [->bitnum]]
             [clojure.lang.protocols           :refer [-as-transient -assoc-n -conj! -persistent
                                                       IAssociative ICounted IEditableCollection IMeta IPersistentVector
-                                                      ISeq ISeqable ITransientCollection Indexed]]))
+                                                      ISeq ISeqable ITransientCollection IIndexed]]))
 
 (declare make-vector-seq)
 
@@ -192,7 +192,7 @@
   (-seq [this]
     -seq)
 
-  Indexed
+  IIndexed
   (-nth [this n]
     (aget -tail n))
 

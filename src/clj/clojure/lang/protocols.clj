@@ -36,6 +36,9 @@
   be used to override an existing platform hash method."
   (-hash [this]))
 
+(defprotocol IIndexed
+  (-nth [this n] [this n not-found]))
+
 (defprotocol ILookup
   (-includes? [this k])
   (-lookup [this k not-found]))
@@ -53,9 +56,6 @@
 (defprotocol INamed
   (-name [this])
   (-namespace [this]))
-
-(defprotocol Indexed
-  (-nth [this n] [this n not-found]))
 
 (defprotocol IPersistentMap
   (-dissoc [this k]))
