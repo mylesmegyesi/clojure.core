@@ -202,6 +202,12 @@
     (pred (first s)) (recur pred (next s))
     :else false))
 
+(defn nth
+  ([coll n]
+    (-nth coll n))
+  ([coll n not-found]
+    (-nth coll n not-found)))
+
 (defn empty? [seqable]
   (not (seq seqable)))
 
@@ -238,6 +244,9 @@
   ([m k] (-dissoc m k))
   ([m k & ks]
    (dissoc-seq (-dissoc m k) (seq ks))))
+
+(defn contains-key? [m k]
+  (-contains-key? m k))
 
 (require ['clojure.lang.array :as 'arr])
 

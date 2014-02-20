@@ -22,6 +22,9 @@
 (defprotocol IDeref
   (-deref [this]))
 
+(defprotocol IEditableCollection
+  (-as-transient [this]))
+
 (defprotocol IEquivalence
   "This protocol should not be directly used in a deftype. It should only
   be used to override an existing platform equality method."
@@ -32,6 +35,9 @@
   "This protocol should not be directly used in a deftype. It should only
   be used to override an existing platform hash method."
   (-hash [this]))
+
+(defprotocol IIndexed
+  (-nth [this n] [this n not-found]))
 
 (defprotocol ILookup
   (-includes? [this k])
@@ -61,6 +67,10 @@
   (-intersection [this sets])
   (-union        [this sets]))
 
+(defprotocol IPersistentVector
+  (-cons [this x])
+  (-assoc-n [this n x]))
+
 (defprotocol IRatio
   (-numerator [this])
   (-denominator [this]))
@@ -77,6 +87,10 @@
 
 (defprotocol IShow
   (-show [this]))
+
+(defprotocol ITransientCollection
+  (-conj! [this value])
+  (-persistent [this]))
 
 (defprotocol IValidatable
   (-get-validator  [this])
