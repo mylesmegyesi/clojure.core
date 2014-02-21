@@ -400,3 +400,17 @@
    (let [sym (symbol ns name)
          hash-code (hash (clojure.core/+ (hash sym) 0x9e3779b9))]
      (kwd/new-keyword ns name (str ":" sym) hash-code {} sym))))
+
+(defn reduce
+  ([f coll]
+   (if-let [s (seq coll)]
+     (reduce f (first s) (next s))
+     (f)))
+  ([f v coll]
+    (loop [s coll
+           acc v]
+      (if (nil? s)
+        acc
+        (let [next-s (seq s)
+              next-acc (f acc (first next-s))]
+          (recur (next next-s) next-acc))))))
