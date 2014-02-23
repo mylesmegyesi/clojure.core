@@ -87,35 +87,35 @@ public final class Addition {
     return (Number) Division.divide((BigInteger) ynXxd.add(xnXyd), (BigInteger) ydXxd);
   }
 
-  public Number add(Ratio x, Integer y) {
+  public static Number add(Ratio x, Integer y) {
     return (Number) add(x, Coercion.toRatio(y));
   }
 
-  public Number add(Integer x, Ratio y) {
+  public static Number add(Integer x, Ratio y) {
     return (Number) add(Coercion.toRatio(x), y);
   }
 
-  public Number add(Ratio x, Long y) {
+  public static Number add(Ratio x, Long y) {
     return (Number) add(x, Coercion.toRatio(y));
   }
 
-  public Number add(Long x, Ratio y) {
+  public static Number add(Long x, Ratio y) {
     return (Number) add(Coercion.toRatio(x), y);
   }
 
-  public Number add(Ratio x, BigInt y) {
+  public static Number add(Ratio x, BigInt y) {
     return (Number) add(x, Coercion.toRatio(y));
   }
 
-  public Number add(BigInt x, Ratio y) {
+  public static Number add(BigInt x, Ratio y) {
     return (Number) add(Coercion.toRatio(x), y);
   }
 
-  public Number add(Ratio x, BigInteger y) {
+  public static Number add(Ratio x, BigInteger y) {
     return (Number) add(x, Coercion.toRatio(y));
   }
 
-  public Number add(BigInteger x, Ratio y) {
+  public static Number add(BigInteger x, Ratio y) {
     return (Number) add(Coercion.toRatio(x), y);
   }
 
@@ -187,52 +187,10 @@ public final class Addition {
     return (Number) add(((Number) x).doubleValue(), ((Float) y).doubleValue());
   }
 
-  // Cast and fallback to LongOps
+  // Fallback to LongOps
 
   public static Number add(Number x, Number y) {
-    Class xclass = x.getClass();
-
-    if(xclass == Integer.class)
-      x = (Integer) x;
-    else if(xclass == Long.class)
-      x = (Long) x;
-    else if(xclass == BigInt.class)
-      x = (BigInt) x;
-    else if(xclass == BigInteger.class)
-      x = (BigInteger) x;
-    else if(xclass == Ratio.class)
-      x = (Ratio) x;
-    else if(xclass == BigDecimal.class)
-      x = (BigDecimal) x;
-    else if(xclass == Float.class)
-      x = (Float) x;
-    else if(xclass == Double.class)
-      x = (Double) x;
-    else
-      x = (Long) ((Number) x).longValue();
-
-    Class yclass = y.getClass();
-
-    if(yclass == Integer.class)
-      y = (Integer) y;
-    else if(yclass == Long.class)
-      y = (Long) y;
-    else if(yclass == BigInt.class)
-      y = (BigInt) y;
-    else if(yclass == BigInteger.class)
-      y = (BigInteger) y;
-    else if(yclass == Ratio.class)
-      y = (Ratio) y;
-    else if(yclass == BigDecimal.class)
-      y = (BigDecimal) y;
-    else if(yclass == Double.class)
-      y = (Double) y;
-    else if(yclass == Float.class)
-      y = (Float) y;
-    else
-      y = (Long) ((Number) y).longValue();
-
-    return (Number) add(x, y);
+    return (Number) add((Long) ((Number) x).longValue(), (Long) ((Number) y).longValue());
   }
 
 }

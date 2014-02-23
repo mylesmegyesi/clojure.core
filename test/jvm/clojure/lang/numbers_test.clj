@@ -1,12 +1,13 @@
 (ns clojure.lang.numbers-test
-  (:refer-clojure :only [defmacro let loop doseq defn- if-let when
+  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let when
                          byte short int long bigint biginteger float double
                          / < >
                          ])
   (:require [clojure.test            :refer [deftest is testing]]
             [clojure.lang.object     :refer [type]]
             [clojure.lang.numbers    :refer :all]
-            [clojure.next            :refer :all]))
+            [clojure.next            :refer :all])
+  (:import  [clojure.lang.platform FallBackNumber]))
 
 (defmacro all-pairs-equal [equal-var vals]
   `(let [equal-var# ~equal-var
@@ -205,9 +206,12 @@
                 (str "expected type " test-subject " but got " (type (operation (t2 left-side) (t1 right-side))))))))
         (recur (clojure.core/rest types)))))
 
+(defn- bigdecimal [n] (BigDecimal. n))
+(defn- number [n] (FallBackNumber. n))
+
 (deftest integer-addition-test
-  (op-test {Long [[int long] [int long]]
-            clojure.lang.BigInt [[bigint biginteger] [int long bigint biginteger]]}
+  (op-test {Long [[int long] [number int long]]
+            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
            add
            3 1 2))
 
@@ -223,42 +227,39 @@
           r2 (make-ratio 1 3)]
       (is (= (make-ratio 2 3) (add r1 r2)))))
 
-; TODO: Find out why a cast Ratio can not find it's overloaded method
-;
-;  (testing "adding a ratio to an int and vica-versa"
-;    (let [t1 (int 1)
-;          t2 (make-ratio 2 1)]
-;      (is (= Long (type (add t1 t2))))
-;      (is (= Long (type (add t2 t1))))
-;      (is (= 3 (add t1 t2)))
-;      (is (= 3 (add t2 t1)))))
-;
-;  (testing "adding a ratio to a long and vica-versa"
-;    (let [t1 (long 1)
-;          t2 (make-ratio 2 1)]
-;      (is (= Long (type (add t1 t2))))
-;      (is (= Long (type (add t2 t1))))
-;      (is (= 3 (add t1 t2)))
-;      (is (= 3 (add t2 t1)))))
-;
-;  (testing "adding a ratio to a biginteger and vica-versa"
-;    (let [t1 (biginteger 1)
-;          t2 (make-ratio 2 1)]
-;      (is (= clojure.lang.BigInt (type (add t1 t2))))
-;      (is (= clojure.lang.BigInt (type (add t2 t1))))
-;      (is (= 3 (add t1 t2)))
-;      (is (= 3 (add t2 t1)))))
+  (testing "adding a ratio to an int and vica-versa"
+    (let [t1 (int 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1)))))
+
+  (testing "adding a ratio to a long and vica-versa"
+    (let [t1 (long 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1)))))
+
+  (testing "adding a ratio to a biginteger and vica-versa"
+    (let [t1 (biginteger 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1)))))
+
 )
 
-(defn- bigdecimal [n] (BigDecimal. n))
-
 (deftest big-decimal-addition-test
-  (op-test {BigDecimal [[bigdecimal] [int long bigint biginteger bigdecimal]]}
+  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
            add
            (bigdecimal 3.0) 1.0 2.0))
 
 (deftest decimal-addition-test
-  (op-test {Double [[double float] [int long bigint biginteger bigdecimal double float]]}
+  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
            add
            3.0 1.0 2.0))
 
@@ -315,6 +316,18 @@
       (let [result2 (add t2 t1)]
         (is (and (< 3.29 result2) (> 3.31 result2)))))))
 
+(deftest long-addition-number-fallback-test
+  (testing "falling back to long ops for non-covered Numbers"
+    (let [t1 (number 1)
+          t2 (number 2)]
+      (is (= Long (type (add t1 t2))))
+      (is (= 3 (add t1 t2))))))
+
+(deftest integer-division-test
+  (op-test {Long [[int long] [int long]]
+            clojure.lang.BigInt [[bigint biginteger] [int long bigint biginteger]]}
+           divide
+           2 10 5))
 
 (deftest ratio-test
   (testing "numerator of a ratio"

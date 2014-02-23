@@ -7,7 +7,7 @@
   :dependencies [[org.clojure/clojure "1.5.1"]]
 
   :source-paths ["src/clj" "src/jvm"]
-  :java-source-paths ["src/jvm"]
+  :java-source-paths ["src/jvm" "test/jvm"]
   :test-paths   ["test/clj" "test/jvm"]
 
   )
