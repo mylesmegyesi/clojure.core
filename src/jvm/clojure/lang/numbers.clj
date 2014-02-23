@@ -7,7 +7,9 @@
            [java.util.concurrent.atomic AtomicInteger AtomicLong]
            [clojure.lang BigInt]
            [clojure.lang.platform NumberOps]
-           [clojure.lang.platform Ratio]))
+           [clojure.lang.platform Ratio]
+           [clojure.lang.platform.numbers Addition]
+           [clojure.lang.platform.numbers Division]))
 
 (defprotocol NumberCoercions
   (->byte   [this])
@@ -495,6 +497,12 @@
   (-multiply  [x y])
   (-increment [x])
   (-decrement [x]))
+
+(defn add [x y]
+  (. Addition (add x y)))
+
+(defn divide [x y]
+  (. Division (divide x y)))
 
 (extend-type Number
   IEquivalence
