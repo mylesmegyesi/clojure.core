@@ -28,6 +28,8 @@ public final class Addition {
     return (Number) add(x, ((Integer) y).longValue());
   }
 
+  // Note: Fallback is to Long Ops, no need to specify further base types
+
   // BigIntOps
 
   public static Number add(BigInt x, BigInt y) {
@@ -78,6 +80,22 @@ public final class Addition {
     return (Number) add(Coercion.toBigInt(x), y);
   }
 
+  public static Number add(BigInt x, Number y) {
+    return (Number) add(x, Coercion.toBigInt(y));
+  }
+
+  public static Number add(Number x, BigInt y) {
+    return (Number) add(Coercion.toBigInt(x), y);
+  }
+
+  public static Number add(BigInteger x, Number y) {
+    return (Number) add(Coercion.toBigInt(x), Coercion.toBigInt(y));
+  }
+
+  public static Number add(Number x, BigInteger y) {
+    return (Number) add(Coercion.toBigInt(x), Coercion.toBigInt(y));
+  }
+
   // RatioOps
 
   public static Number add(Ratio x, Ratio y) {
@@ -116,6 +134,14 @@ public final class Addition {
   }
 
   public static Number add(BigInteger x, Ratio y) {
+    return (Number) add(Coercion.toRatio(x), y);
+  }
+
+  public static Number add(Ratio x, Number y) {
+    return (Number) add(x, Coercion.toRatio(y));
+  }
+
+  public static Number add(Number x, Ratio y) {
     return (Number) add(Coercion.toRatio(x), y);
   }
 
@@ -165,10 +191,126 @@ public final class Addition {
     return (Number) add(Coercion.toBigDecimal(x), y);
   }
 
+  public static Number add(BigDecimal x, Number y) {
+    return (Number) add(x, Coercion.toBigDecimal(y));
+  }
+
+  public static Number add(Number x, BigDecimal y) {
+    return (Number) add(Coercion.toBigDecimal(x), y);
+  }
+
   // DoubleOps
 
   public static Number add(Double x, Double y) {
     return (Number) Double.valueOf(x + y);
+  }
+
+  public static Number add(Float x, Float y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Double x, Float y) {
+    return (Number) add(x, ((Number) y).doubleValue());
+  }
+
+  public static Number add(Float x, Double y) {
+    return (Number) add(((Number) x).doubleValue(), y);
+  }
+
+  public static Number add(Double x, Integer y) {
+    return (Number) add(x, ((Number) y).doubleValue());
+  }
+
+  public static Number add(Integer x, Double y) {
+    return (Number) add(((Number) x).doubleValue(), y);
+  }
+
+  public static Number add(Float x, Integer y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Integer x, Float y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Double x, Long y) {
+    return (Number) add(x, ((Number) y).doubleValue());
+  }
+
+  public static Number add(Long x, Double y) {
+    return (Number) add(((Number) x).doubleValue(), y);
+  }
+
+  public static Number add(Float x, Long y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Long x, Float y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Double x, BigInt y) {
+    return (Number) add(x, ((Number) y).doubleValue());
+  }
+
+  public static Number add(BigInt x, Double y) {
+    return (Number) add(((Number) x).doubleValue(), y);
+  }
+
+  public static Number add(Float x, BigInt y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(BigInt x, Float y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Double x, BigInteger y) {
+    return (Number) add(x, ((Number) y).doubleValue());
+  }
+
+  public static Number add(BigInteger x, Double y) {
+    return (Number) add(((Number) x).doubleValue(), y);
+  }
+
+  public static Number add(Float x, BigInteger y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(BigInteger x, Float y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Double x, Ratio y) {
+    return (Number) add(x, ((Number) y).doubleValue());
+  }
+
+  public static Number add(Ratio x, Double y) {
+    return (Number) add(((Number) x).doubleValue(), y);
+  }
+
+  public static Number add(Float x, Ratio y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Ratio x, Float y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(Double x, BigDecimal y) {
+    return (Number) add(x, ((Number) y).doubleValue());
+  }
+
+  public static Number add(BigDecimal x, Double y) {
+    return (Number) add(((Number) x).doubleValue(), y);
+  }
+
+  public static Number add(Float x, BigDecimal y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number add(BigDecimal x, Float y) {
+    return (Number) add(((Number) x).doubleValue(), ((Number) y).doubleValue());
   }
 
   public static Number add(Double x, Number y) {

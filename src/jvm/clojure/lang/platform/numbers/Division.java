@@ -50,6 +50,8 @@ public final class Division {
     return (Number) divide(x, ((Integer) y).longValue());
   }
 
+  // Note: Fallback is to Long Ops, no need to specify further base types
+
   // BigIntOps
 
   public static Number divide(BigInteger x, BigInteger y) {
@@ -97,12 +99,44 @@ public final class Division {
     return (Number) divide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
   }
 
+  public static Number divide(BigInt x, Integer y) {
+    return (Number) divide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
+  }
+
+  public static Number divide(Integer x, BigInt y) {
+    return (Number) divide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
+  }
+
+  public static Number divide(BigInt x, Long y) {
+    return (Number) divide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
+  }
+
+  public static Number divide(Long x, BigInt y) {
+    return (Number) divide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
+  }
+
   public static Number divide(BigInteger x, BigInt y) {
     return (Number) divide(x, Coercion.toBigInteger(y));
   }
 
   public static Number divide(BigInt x, BigInteger y) {
     return (Number) divide(Coercion.toBigInteger(x), y);
+  }
+
+  public static Number divide(BigInteger x, Number y) {
+    return (Number) divide(x, Coercion.toBigInteger(y));
+  }
+
+  public static Number divide(Number x, BigInteger y) {
+    return (Number) divide(Coercion.toBigInteger(x), y);
+  }
+
+  public static Number divide(BigInt x, Number y) {
+    return (Number) divide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
+  }
+
+  public static Number divide(Number x, BigInt y) {
+    return (Number) divide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
   }
 
   // RatioOps
@@ -141,6 +175,14 @@ public final class Division {
   }
 
   public static Number divide(BigInt x, Ratio y) {
+    return (Number) divide(Coercion.toRatio(x), y);
+  }
+
+  public static Number divide(Ratio x, Number y) {
+    return (Number) divide(x, Coercion.toRatio(y));
+  }
+
+  public static Number divide(Number x, Ratio y) {
     return (Number) divide(Coercion.toRatio(x), y);
   }
 
@@ -190,10 +232,126 @@ public final class Division {
     return (Number) divide(Coercion.toBigDecimal(x), y);
   }
 
+  public static Number divide(BigDecimal x, Number y) {
+    return (Number) divide(x, Coercion.toBigDecimal(y));
+  }
+
+  public static Number divide(Number x, BigDecimal y) {
+    return (Number) divide(Coercion.toBigDecimal(x), y);
+  }
+
   // DoubleOps
 
   public static Number divide(Double x, Double y) {
     return (Number) Double.valueOf(x / y);
+  }
+
+  public static Number divide(Float x, Float y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Double x, Float y) {
+    return (Number) divide(x, ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Float x, Double y) {
+    return (Number) divide(((Number) x).doubleValue(), y);
+  }
+
+  public static Number divide(Double x, Integer y) {
+    return (Number) divide(x, ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Integer x, Double y) {
+    return (Number) divide(((Number) x).doubleValue(), y);
+  }
+
+  public static Number divide(Float x, Integer y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Integer x, Float y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Double x, Long y) {
+    return (Number) divide(x, ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Long x, Double y) {
+    return (Number) divide(((Number) x).doubleValue(), y);
+  }
+
+  public static Number divide(Float x, Long y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Long x, Float y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Double x, BigInt y) {
+    return (Number) divide(x, ((Number) y).doubleValue());
+  }
+
+  public static Number divide(BigInt x, Double y) {
+    return (Number) divide(((Number) x).doubleValue(), y);
+  }
+
+  public static Number divide(Float x, BigInt y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(BigInt x, Float y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Double x, BigInteger y) {
+    return (Number) divide(x, ((Number) y).doubleValue());
+  }
+
+  public static Number divide(BigInteger x, Double y) {
+    return (Number) divide(((Number) x).doubleValue(), y);
+  }
+
+  public static Number divide(Float x, BigInteger y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(BigInteger x, Float y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Double x, Ratio y) {
+    return (Number) divide(x, ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Ratio x, Double y) {
+    return (Number) divide(((Number) x).doubleValue(), y);
+  }
+
+  public static Number divide(Float x, Ratio y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Ratio x, Float y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(Double x, BigDecimal y) {
+    return (Number) divide(x, ((Number) y).doubleValue());
+  }
+
+  public static Number divide(BigDecimal x, Double y) {
+    return (Number) divide(((Number) x).doubleValue(), y);
+  }
+
+  public static Number divide(Float x, BigDecimal y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
+  }
+
+  public static Number divide(BigDecimal x, Float y) {
+    return (Number) divide(((Number) x).doubleValue(), ((Number) y).doubleValue());
   }
 
   public static Number divide(Double x, Number y) {
