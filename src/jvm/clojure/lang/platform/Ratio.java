@@ -3,7 +3,7 @@ package clojure.lang.platform;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 
-public class Ratio extends Number {
+public final class Ratio extends Number {
 
   final private BigInteger numerator;
   final private BigInteger denominator;

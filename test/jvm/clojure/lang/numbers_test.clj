@@ -1,12 +1,13 @@
 (ns clojure.lang.numbers-test
-  (:refer-clojure :only [defmacro let doseq defn when
+  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let when
                          byte short int long bigint biginteger float double
-                         /
+                         / < >
                          ])
   (:require [clojure.test            :refer [deftest is testing]]
             [clojure.lang.object     :refer [type]]
             [clojure.lang.numbers    :refer :all]
-            [clojure.next            :refer :all]))
+            [clojure.next            :refer :all])
+  (:import  [clojure.lang.platform FallBackNumber]))
 
 (defmacro all-pairs-equal [equal-var vals]
   `(let [equal-var# ~equal-var
@@ -18,7 +19,7 @@
                   equal-var# " " val2# " (" (type val2#) ")"))))))
 
 
-(defn all-pairs-hash-consistent-with-= [vals]
+(defn- all-pairs-hash-consistent-with-= [vals]
   (doseq [val1 vals]
     (doseq [val2 vals]
       (when (= val1 val2)
@@ -26,7 +27,7 @@
             (str "Test that (hash " val1 ") (" (type val1) ") "
                  " = (hash " val2 ") (" (type val2) ")"))))))
 
-(defn all-integer-types [val]
+(defn- all-integer-types [val]
   [(byte val)       ; java.lang.Byte
    (short val)      ; java.lang.Short
    (int val)        ; java.lang.Integer
@@ -35,7 +36,7 @@
    (biginteger val) ; java.math.BigInteger
    ])
 
-(defn all-floating-types [val]
+(defn- all-floating-types [val]
   [(float val)  ; java.lang.Float
    (double val) ; java.lang.Double
    ])
@@ -184,6 +185,330 @@
     )
 
   )
+
+(defn- op-test [types-to-op operation result left-side right-side]
+  (loop [types types-to-op]
+    (if (not (clojure.core/empty? types))
+      (let [test-subject (clojure.core/key (clojure.core/first types))
+            t1s (clojure.core/first (clojure.core/val (clojure.core/first types)))
+            t2s (clojure.core/second (clojure.core/val (clojure.core/first types)))]
+        (doseq [t1 t1s]
+          (doseq [t2 t2s]
+            (is (= result (operation (t1 left-side) (t2 right-side)))
+                (str "adding " (t1 left-side) " (" (type (t1 left-side)) ") "
+                               (t2 right-side) " (" (type (t2 right-side)) ")"))
+            (is (= result (operation (t2 left-side) (t1 right-side)))
+                (str "adding " (t2 left-side) " (" (type (t2 left-side)) ") "
+                               (t1 right-side) " (" (type (t1 right-side)) ")"))
+            (is (= test-subject (type (operation (t1 left-side) (t2 right-side))))
+                (str "expected type " test-subject " but got " (type (operation (t1 left-side) (t2 right-side)))))
+            (is (= test-subject (type (operation (t2 left-side) (t1 right-side))))
+                (str "expected type " test-subject " but got " (type (operation (t2 left-side) (t1 right-side))))))))
+        (recur (clojure.core/rest types)))))
+
+(defn- bigdecimal [n] (BigDecimal. n))
+(defn- number [n] (FallBackNumber. n))
+
+(deftest integer-addition-test
+  (op-test {Long [[int long] [number int long]]
+            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+           add
+           3 1 2))
+
+(deftest ratio-addition-test
+  (testing "adding an integer ratio to an integer ratio"
+    (let [r1 (make-ratio 1 1)
+          r2 (make-ratio 2 1)]
+      (is (= 3 (add r1 r2)))
+      (is (= clojure.lang.BigInt (type (add r1 r2))))))
+
+  (testing "adding a decimal ratio to a decimal ratio"
+    (let [r1 (make-ratio 1 3)
+          r2 (make-ratio 1 3)]
+      (is (= (make-ratio 2 3) (add r1 r2)))))
+
+  (testing "adding a ratio to an int and vica-versa"
+    (let [t1 (int 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1)))))
+
+  (testing "adding a ratio to a long and vica-versa"
+    (let [t1 (long 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1)))))
+
+  (testing "adding a ratio to a biginteger and vica-versa"
+    (let [t1 (biginteger 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1)))))
+
+  (testing "adding a ratio to a bigint and vica-versa"
+    (let [t1 (bigint 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1)))))
+
+  (testing "adding a ratio to a bigdecimal and vica-versa"
+    (let [t1 (bigdecimal 0.5)
+          t2 (make-ratio 1 2)]
+      (is (= BigDecimal (type (add t1 t2))))
+      (is (= BigDecimal (type (add t2 t1))))
+      (is (and (> 1.1 (add t1 t2)) (< 0.9 (add t1 t2))))
+      (is (and (> 1.1 (add t2 t1)) (< 0.9 (add t2 t1))))))
+
+  (testing "adding a ratio to a float and vica-versa"
+    (let [t1 (float 0.5)
+          t2 (make-ratio 1 2)]
+      (is (= Double (type (add t1 t2))))
+      (is (= Double (type (add t2 t1))))
+      (is (and (> 1.1 (add t1 t2)) (< 0.9 (add t1 t2))))
+      (is (and (> 1.1 (add t2 t1)) (< 0.9 (add t2 t1))))))
+
+  (testing "adding a ratio to a double and vica-versa"
+    (let [t1 (double 0.5)
+          t2 (make-ratio 1 2)]
+      (is (= Double (type (add t1 t2))))
+      (is (= Double (type (add t2 t1))))
+      (is (and (> 1.1 (add t1 t2)) (< 0.9 (add t1 t2))))
+      (is (and (> 1.1 (add t2 t1)) (< 0.9 (add t2 t1))))))
+
+  (testing "adding a ratio to a non-specified Number type and vica-versa"
+    (let [t1 (number 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.BigInt (type (add t1 t2))))
+      (is (= clojure.lang.BigInt (type (add t2 t1))))
+      (is (= 3 (add t1 t2)))
+      (is (= 3 (add t2 t1))))))
+
+(deftest big-decimal-addition-test
+  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
+           add
+           (bigdecimal 3.0) 1.0 2.0))
+
+(deftest decimal-addition-test
+  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
+           add
+           3.0 1.0 2.0))
+
+(deftest decimal-with-decimal-addition-test
+  (testing "adding a double to a double"
+    (let [t1 (double 1.1)
+          t2 (double 2.2)
+          result (add t1 t2)]
+      (is (= Double (type result)))
+      (is (and (< 3.29 result) (> 3.31 result)))))
+
+  (testing "adding a float to a float"
+    (let [t1 (float 1.1)
+          t2 (float 2.2)
+          result (add t1 t2)]
+      (is (= Double (type result)))
+      (is (and (< 3.29 result) (> 3.31 result)))))
+
+  (testing "adding a float to a double and vica-versa"
+    (let [t1 (float 1.1)
+          t2 (double 2.2)]
+      (is (= Double (type (add t1 t2))))
+      (is (= Double (type (add t2 t1))))
+      (let [result1 (add t1 t2)]
+        (is (and (< 3.29 result1) (> 3.31 result1))))
+      (let [result2 (add t2 t1)]
+        (is (and (< 3.29 result2) (> 3.31 result2))))))
+
+  (testing "adding a float to a bigdecimal and vica-versa"
+    (let [t1 (float 1.1)
+          t2 (bigdecimal 2.2)]
+      (is (= Double (type (add t1 t2))))
+      (is (= Double (type (add t2 t1))))
+      (let [result1 (add t1 t2)]
+        (is (and (< 3.29 result1) (> 3.31 result1))))
+      (let [result2 (add t2 t1)]
+        (is (and (< 3.29 result2) (> 3.31 result2))))))
+
+  (testing "adding a double to a bigdecimal and vica-versa"
+    (let [t1 (double 1.1)
+          t2 (bigdecimal 2.2)]
+      (is (= Double (type (add t1 t2))))
+      (is (= Double (type (add t2 t1))))
+      (let [result1 (add t1 t2)]
+        (is (and (< 3.29 result1) (> 3.31 result1))))
+      (let [result2 (add t2 t1)]
+        (is (and (< 3.29 result2) (> 3.31 result2)))))))
+
+(deftest long-addition-number-fallback-test
+  (testing "falling back to long ops for adding non-covered Numbers"
+    (let [t1 (number 1)
+          t2 (number 2)]
+      (is (= Long (type (add t1 t2))))
+      (is (= 3 (add t1 t2))))))
+
+(deftest integer-division-test
+  (op-test {Long [[int long] [number int long]]
+            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+           divide
+           2 10 5))
+
+(deftest ratio-division-test
+  (testing "dividing an integer by a ratio by an integer ratio"
+    (let [r1 (make-ratio 10 1)
+          r2 (make-ratio 5 1)]
+      (is (= clojure.lang.BigInt (type (divide r1 r2))))
+      (is (= 2 (divide r1 r2)))))
+
+  (testing "dividing a decimal by a ratio to a decimal ratio"
+    (let [r1 (make-ratio 1 3)
+          r2 (make-ratio 1 4)]
+      (is (= clojure.lang.platform.Ratio (type (divide r1 r2))))
+      (is (= (make-ratio 4 3) (divide r1 r2)))))
+
+  (testing "dividing a ratio by an int and vica-versa"
+    (let [t1 (int 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.platform.Ratio (type (divide t1 t2))))
+      (is (= clojure.lang.BigInt (type (divide t2 t1))))
+      (is (= (make-ratio 1 2) (divide t1 t2)))
+      (is (= 2 (divide t2 t1)))))
+
+  (testing "dividing a ratio by a long and vica-versa"
+    (let [t1 (long 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.platform.Ratio (type (divide t1 t2))))
+      (is (= clojure.lang.BigInt (type (divide t2 t1))))
+      (is (= (make-ratio 1 2) (divide t1 t2)))
+      (is (= 2 (divide t2 t1)))))
+
+  (testing "dividing a ratio by a biginteger and vica-versa"
+    (let [t1 (biginteger 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.platform.Ratio (type (divide t1 t2))))
+      (is (= clojure.lang.BigInt (type (divide t2 t1))))
+      (is (= (make-ratio 1 2) (divide t1 t2)))
+      (is (= 2 (divide t2 t1)))))
+
+  (testing "dividing a ratio by a bigint and vica-versa"
+    (let [t1 (bigint 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.platform.Ratio (type (divide t1 t2))))
+      (is (= clojure.lang.BigInt (type (divide t2 t1))))
+      (is (= (make-ratio 1 2) (divide t1 t2)))
+      (is (= 2 (divide t2 t1)))))
+
+  (testing "dividng a ratio by a bigdecimal and vica-versa"
+    (let [t1 (bigdecimal 0.4)
+          t2 (make-ratio 5 2)]
+      (is (= BigDecimal (type (divide t1 t2))))
+      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2)))))
+    (let [t1 (make-ratio 2 5)
+          t2 (bigdecimal 2.5)]
+      (is (= BigDecimal (type (divide t1 t2))))
+      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2))))))
+
+  (testing "dividing a ratio by a float and vica-versa"
+    (let [t1 (float 0.4)
+          t2 (make-ratio 5 2)]
+      (is (= Double (type (divide t1 t2))))
+      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2)))))
+    (let [t1 (make-ratio 2 5)
+          t2 (float 2.5)]
+      (is (= Double (type (divide t1 t2))))
+      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2))))))
+
+  (testing "dividing a ratio by a double and vica-versa"
+    (let [t1 (double 0.4)
+          t2 (make-ratio 5 2)]
+      (is (= Double (type (divide t1 t2))))
+      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2)))))
+    (let [t1 (make-ratio 2 5)
+          t2 (double 2.5)]
+      (is (= Double (type (divide t1 t2))))
+      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2))))))
+
+  (testing "dividng a ratio by a non-specified Number type and vica-versa"
+    (let [t1 (number 1)
+          t2 (make-ratio 2 1)]
+      (is (= clojure.lang.platform.Ratio (type (divide t1 t2))))
+      (is (= clojure.lang.BigInt (type (divide t2 t1))))
+      (is (= (make-ratio 1 2) (divide t1 t2)))
+      (is (= 2 (divide t2 t1))))))
+
+(deftest big-decimal-division-test
+  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
+           divide
+           (bigdecimal 1.0) 2.0 2.0))
+
+(deftest decimal-division-test
+  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
+           divide
+           1.0 2.0 2.0))
+
+(deftest decimal-with-decimal-division-test
+  (testing "dividing a double by a double"
+    (let [t1 (double 2.1)
+          t2 (double 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result))))
+
+  (testing "dividing a float by a float"
+    (let [t1 (float 2.1)
+          t2 (float 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result))))
+
+  (testing "dividing a float by a double and vica-versa"
+    (let [t1 (float 2.1)
+          t2 (double 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result)))
+    (let [t1 (double 2.1)
+          t2 (float 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result))))
+
+  (testing "dividng a float by a bigdecimal and vica-versa"
+    (let [t1 (float 2.1)
+          t2 (bigdecimal 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result)))
+    (let [t1 (bigdecimal 2.1)
+          t2 (float 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result))))
+
+  (testing "dividng a double by a bigdecimal and vica-versa"
+    (let [t1 (double 2.1)
+          t2 (bigdecimal 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result)))
+    (let [t1 (bigdecimal 2.1)
+          t2 (double 1.2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (and (> 1.76 result)) (< 1.74 result)))))
+
+(deftest long-division-number-fallback-test
+  (testing "falling back to long ops for dividing non-covered Numbers"
+    (let [t1 (number 10)
+          t2 (number 5)]
+      (is (= Long (type (divide t1 t2))))
+      (is (= 2 (divide t1 t2))))))
 
 (deftest ratio-test
   (testing "numerator of a ratio"
