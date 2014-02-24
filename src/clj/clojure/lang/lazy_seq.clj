@@ -1,5 +1,5 @@
 (ns clojure.lang.lazy-seq
-  (:refer-clojure :only [declare defn defn- deftype inc instance? let locking loop])
+  (:refer-clojure :only [declare defn defn- deftype inc let locking loop])
   (:require [clojure.lang.protocols :refer [ICounted IMeta ISeq ISeqable -seq -first -next]]
             [clojure.next           :refer :all :exclude [inc]]))
 

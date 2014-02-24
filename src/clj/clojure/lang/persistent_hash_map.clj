@@ -4,7 +4,6 @@
             [clojure.lang.aseq                   :refer [defseq]]
             [clojure.lang.atomic-ref             :refer [new-atomic-ref]]
             [clojure.lang.map-entry              :refer [new-map-entry]]
-            [clojure.lang.object                 :refer [identical?]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.hash-map      :refer [->bitnum empty-object]]
             [clojure.lang.protocols              :refer [IAssociative ICounted ILookup

@@ -1,8 +1,7 @@
 (ns clojure.lang.persistent-vector
   (:refer-clojure :only [cond declare defn- defn defprotocol deftype dec inc integer? let loop when < > >= ->])
   (:require [clojure.next                     :refer :all :exclude [dec inc]]
-            [clojure.lang.exceptions          :refer [new-out-of-bounds-exception]]
-            [clojure.lang.platform.exceptions :refer [new-argument-error]]
+            [clojure.lang.platform.exceptions :refer [new-argument-error new-out-of-bounds-exception]]
             [clojure.lang.numbers             :refer [->int]]
             [clojure.lang.platform.hash-map   :refer [->bitnum]]
             [clojure.lang.protocols           :refer [-as-transient -assoc-n -conj! -persistent

@@ -2,7 +2,6 @@
   (:refer-clojure :only [let defmacro])
   (:require [clojure.test            :refer :all]
             [clojure.lang.assertions :refer :all]
-            [clojure.lang.object     :refer [identical?]]
             [clojure.next            :refer :all]))
 
 (deftest keyword-test

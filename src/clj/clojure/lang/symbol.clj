@@ -2,7 +2,6 @@
   (:refer-clojure :only [defmacro deftype declare satisfies? defn defn- let list* list nil? cond last butlast first count ->])
   (:require [clojure.lang.deftype              :refer [expand-methods]]
             [clojure.lang.hash                 :refer [hash-combine]]
-            [clojure.lang.object               :refer [instance?]]
             [clojure.lang.platform.comparison  :refer [platform-compare-to-method]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]
             [clojure.lang.platform.hash        :refer [platform-hash-method]]
