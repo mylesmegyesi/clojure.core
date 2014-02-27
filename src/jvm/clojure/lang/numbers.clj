@@ -1,7 +1,7 @@
 (ns clojure.lang.numbers
   (:refer-clojure :only [and or defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> /])
-  (:require [clojure.lang.object    :refer [type instance?]]
-            [clojure.lang.protocols :refer [IEquivalence -equivalent? IHash IRatio -denominator -numerator]])
+  (:require [clojure.lang.protocols :refer [IEquivalence -equivalent? IHash IRatio -denominator -numerator]]
+            [clojure.next           :refer [type instance?]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]

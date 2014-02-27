@@ -4,7 +4,6 @@
                          / < >
                          ])
   (:require [clojure.test            :refer [deftest is testing]]
-            [clojure.lang.object     :refer [type]]
             [clojure.lang.numbers    :refer :all]
             [clojure.next            :refer :all])
   (:import  [clojure.lang.platform FallBackNumber]))

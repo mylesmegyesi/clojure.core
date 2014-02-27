@@ -2,8 +2,7 @@
   (:refer-clojure :only [defn defmacro apply list list* let nil? re-pattern range])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.persistent-vector   :refer [vector]]
-            [clojure.lang.exceptions          :refer [out-of-bounds-exception]]
-            [clojure.lang.platform.exceptions :refer [argument-error]]
+            [clojure.lang.platform.exceptions :refer [argument-error out-of-bounds-exception]]
             [clojure.next                     :refer :all]))
 
 (defmacro argument-error-is-thrown? [msg & body]

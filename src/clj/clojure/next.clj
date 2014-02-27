@@ -2,20 +2,32 @@
   (:refer-clojure :only [apply cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
                          list list* loop / format into < butlast last])
-  (:require [clojure.lang.numbers  :refer [-bit-unsigned-shift-right
-                                           -bit-shift-left
-                                           -bit-and
-                                           -bit-count
-                                           -bit-or
-                                           -bit-xor
-                                           -add
-                                           -subtract
-                                           -multiply
-                                           -increment
-                                           -decrement]]
-            [clojure.lang.platform.equivalence]
+  (:require [clojure.lang.platform.equivalence]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
             [clojure.lang.protocols :refer :all]))
+
+(require ['clojure.lang.platform.object :as 'platform-object])
+
+(defn instance? [c x]
+  (platform-object/instance? c x))
+
+(defn identical? [x y]
+  (platform-object/identical? x y))
+
+(defn type [x]
+  (platform-object/type x))
+
+(require ['clojure.lang.numbers  :refer ['-bit-unsigned-shift-right
+                                         '-bit-shift-left
+                                         '-bit-and
+                                         '-bit-count
+                                         '-bit-or
+                                         '-bit-xor
+                                         '-add
+                                         '-subtract
+                                         '-multiply
+                                         '-increment
+                                         '-decrement]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."

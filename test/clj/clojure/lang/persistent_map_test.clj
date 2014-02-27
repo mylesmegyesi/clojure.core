@@ -1,7 +1,6 @@
 (ns clojure.lang.persistent-map-test
   (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* nil? re-pattern loop when < inc cond >])
   (:require [clojure.test                       :refer :all]
-            [clojure.lang.object                :refer [identical?]]
             [clojure.lang.persistent-map        :refer [keys vals]]
             [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]

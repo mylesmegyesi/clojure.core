@@ -2,7 +2,6 @@
   (:refer-clojure :only [let get nil? defn])
   (:require [clojure.test                 :refer :all]
             [clojure.lang.assertions      :refer :all]
-            [clojure.lang.object          :refer [identical?]]
             [clojure.next                 :refer :all :exclude [get]]))
 
 (deftest symbol-test
