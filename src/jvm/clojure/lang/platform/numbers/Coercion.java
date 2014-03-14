@@ -24,7 +24,7 @@ public final class Coercion {
   }
   public static BigDecimal toBigDecimal(BigInteger x) { return new BigDecimal(((BigInteger) x)); }
   public static BigDecimal toBigDecimal(Ratio x) {
-    return (BigDecimal) Division.divide((BigDecimal) new BigDecimal((BigInteger) x.getNumerator()), (BigInteger) x.getDenominator());
+    return (BigDecimal) Division.bigDecimalDivide((BigDecimal) new BigDecimal((BigInteger) x.getNumerator()), (BigDecimal) new BigDecimal((BigInteger) x.getDenominator()));
   }
   public static BigDecimal toBigDecimal(Number x) { return BigDecimal.valueOf(((Number) x).longValue()); }
 

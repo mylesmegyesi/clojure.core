@@ -1,5 +1,5 @@
 (ns clojure.lang.numbers
-  (:refer-clojure :only [and or defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> /])
+  (:refer-clojure :only [and or case cond contains? defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> / =])
   (:require [clojure.lang.protocols :refer [IEquivalence -equivalent? IHash IRatio -denominator -numerator]]
             [clojure.next           :refer [type instance?]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
@@ -161,6 +161,7 @@
 
   NumberCoercions
   (->ratio  [this] (make-ratio this BigInteger/ONE))
+  (->double [this] (.doubleValue this))
   (->bigint [this] this)
   (->bigdec [this] (BigDecimal. this)))
 
@@ -170,6 +171,7 @@
 
   NumberCoercions
   (->ratio  [this] (make-ratio this BigInteger/ONE))
+  (->double [this] (.doubleValue this))
   (->bigint [this] (.toBigInteger this))
   (->bigdec [this] (BigDecimal. (.toBigInteger this))))
 
@@ -178,7 +180,8 @@
   (category [this] :decimal)
 
   NumberCoercions
-  (->bigdec [this] this))
+  (->bigdec [this] this)
+  (->double [this] (.doubleValue this)))
 
 (defprotocol Ops
   (ops-add                      [ops x y])
@@ -501,8 +504,29 @@
 (defn add [x y]
   (. Addition (add x y)))
 
+(def bigint-types [BigInteger BigInt])
+
+(defn- find-op-type [x y]
+  (let [x-type (type x)
+        y-type (type y)]
+    (cond
+      (or (= Double x-type) (= Float x-type) (= Double y-type) (= Float y-type)) :double
+      (or (= BigDecimal x-type) (= BigDecimal y-type)) :big-decimal
+      (or (= Ratio x-type) (= Ratio y-type)) :ratio
+      (or (= BigInt x-type) (= BigInteger x-type) (= BigInt y-type) (= BigInteger y-type)) :big-int
+      :else :long)))
+
+(defn- division-op [op-type x y]
+  (case op-type
+    :double (. Division (doubleDivide (->double x) (->double y)))
+    :big-decimal (. Division (bigDecimalDivide (->bigdec x) (->bigdec y)))
+    :ratio (. Division (ratioDivide (->ratio x) (->ratio y)))
+    :big-int (. Division (bigIntDivide (->bigint x) (->bigint y)))
+    :long (. Division (longDivide (->long x) (->long y)))))
+
 (defn divide [x y]
-  (. Division (divide x y)))
+  (let [op-type (find-op-type x y)]
+    (division-op op-type x y)))
 
 (extend-type Number
   IEquivalence
@@ -542,6 +566,13 @@
   (-bit-unsigned-shift-right [this shift]
     (-> (no-overflow-ops (type this) (type shift))
       (ops-bit-unsigned-shift-right this shift)))
+
+  NumberCoercions
+  (->long   [this] (.longValue this))
+  (->double [this] (.doubleValue this))
+  (->bigint [this] (. BigInteger (valueOf (.longValue this))))
+  (->ratio  [this] (make-ratio (->bigint this) BigInteger/ONE))
+  (->bigdec [this] (. BigDecimal (valueOf (.longValue this))))
 
   MathOperations
   (-add [x y]

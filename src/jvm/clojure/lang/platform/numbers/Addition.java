@@ -102,7 +102,7 @@ public final class Addition {
     BigInteger ynXxd = ((BigInteger) y.getNumerator()).multiply((BigInteger) x.getDenominator());
     BigInteger xnXyd = ((BigInteger) x.getNumerator()).multiply((BigInteger) y.getDenominator());
     BigInteger ydXxd = ((BigInteger) y.getDenominator()).multiply((BigInteger) x.getDenominator());
-    return (Number) Division.divide((BigInteger) ynXxd.add(xnXyd), (BigInteger) ydXxd);
+    return (Number) Division.bigIntDivide((BigInteger) ynXxd.add(xnXyd), (BigInteger) ydXxd);
   }
 
   public static Number add(Ratio x, Integer y) {
