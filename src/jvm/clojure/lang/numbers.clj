@@ -500,9 +500,6 @@
   (-increment [x])
   (-decrement [x]))
 
-(defn add [x y]
-  (. Addition (add x y)))
-
 (defn- cast->long [n]
   (.longValue n))
 
@@ -550,12 +547,24 @@
       (or (= BigInt x-type) (= BigInteger x-type) (= BigInt y-type) (= BigInteger y-type)) :big-int
       :else :long)))
 
+(defn- addition-op [op-type x y]
+  (case op-type
+    :double (. Addition (doubleAdd (cast->double x) (cast->double y)))
+    :big-decimal (. Addition (bigDecimalAdd (cast->big-decimal x) (cast->big-decimal y)))
+    :ratio (. Addition (ratioAdd (cast->ratio x) (cast->ratio y)))
+    :big-int (. Addition (bigIntAdd (cast->big-int x) (cast->big-int y)))
+    :long (. Addition (longAdd (cast->long x) (cast->long y)))))
+
+(defn add [x y]
+  (let [op-type (find-op-type x y)]
+    (addition-op op-type x y)))
+
 (defn- division-op [op-type x y]
   (case op-type
     :double (. Division (doubleDivide (cast->double x) (cast->double y)))
     :big-decimal (. Division (bigDecimalDivide (cast->big-decimal x) (cast->big-decimal y)))
     :ratio (. Division (ratioDivide (cast->ratio x) (cast->ratio y)))
-    :big-int (. Division (bigIntDivide (cast->big-int x) (cast->big-int y)))
+    :big-int (. Division (bigIntegerDivide (cast->big-integer x) (cast->big-integer y)))
     :long (. Division (longDivide (cast->long x) (cast->long y)))))
 
 (defn divide [x y]

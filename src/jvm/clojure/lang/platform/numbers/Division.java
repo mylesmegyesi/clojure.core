@@ -36,7 +36,7 @@ public final class Division {
     return new Ratio(BigInteger.valueOf(num), BigInteger.valueOf(denom));
   }
 
-  public static Number bigIntDivide(BigInteger x, BigInteger y) {
+  public static Number bigIntegerDivide(BigInteger x, BigInteger y) {
     if (y.equals(BigInteger.ZERO)) {
       throw new ArithmeticException("Divide by zero");
     }
@@ -62,8 +62,8 @@ public final class Division {
   }
 
   public static Number ratioDivide(Ratio x, Ratio y) {
-    return (Number) bigIntDivide(((BigInteger) y.getDenominator()).multiply(((BigInteger) x.getNumerator())),
-                                 ((BigInteger) y.getNumerator()).multiply(((BigInteger) x.getDenominator())));
+    return (Number) bigIntegerDivide(((BigInteger) y.getDenominator()).multiply(((BigInteger) x.getNumerator())),
+                                     ((BigInteger) y.getNumerator()).multiply(((BigInteger) x.getDenominator())));
   }
 
   public static Number bigDecimalDivide(BigDecimal x, BigDecimal y) {
