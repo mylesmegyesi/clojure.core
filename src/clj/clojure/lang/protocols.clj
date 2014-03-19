@@ -99,3 +99,18 @@
 (defprotocol IWatchable
   (-add-watch    [this watch-key callback-fn])
   (-remove-watch [this watch-key]))
+
+(defprotocol MathOperations
+  (-add       [x y])
+  (-subtract  [x] [x y])
+  (-multiply  [x y])
+  (-increment [x])
+  (-decrement [x]))
+
+(defprotocol BitOperations
+  (-bit-and                  [x y])
+  (-bit-count                [x])
+  (-bit-or                   [x y])
+  (-bit-xor                  [x y])
+  (-bit-shift-left           [x shift])
+  (-bit-unsigned-shift-right [x shift]))

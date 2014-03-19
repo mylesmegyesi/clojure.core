@@ -4,7 +4,7 @@
                          list list* loop / format into < butlast last])
   (:require [clojure.lang.platform.equivalence]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
-            [clojure.lang.protocols :refer :all]))
+            [clojure.lang.protocols           :refer :all]))
 
 (require ['clojure.lang.platform.object :as 'platform-object])
 
@@ -16,18 +16,6 @@
 
 (defn type [x]
   (platform-object/type x))
-
-(require ['clojure.lang.numbers  :refer ['-bit-unsigned-shift-right
-                                         '-bit-shift-left
-                                         '-bit-and
-                                         '-bit-count
-                                         '-bit-or
-                                         '-bit-xor
-                                         '-add
-                                         '-subtract
-                                         '-multiply
-                                         '-increment
-                                         '-decrement]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -118,15 +106,6 @@
 
 (defn bit-count [i]
   (-bit-count i))
-
-(defn + [x y]
-  (-add x y))
-
-(defn - [x y]
-  (-subtract x y))
-
-(defn * [x y]
-  (-multiply x y))
 
 (defn inc [i]
   (-increment i))
@@ -295,70 +274,6 @@
            (aset arr i (first s))
            (recur (clojure.core/inc i) (next s))))))))
 
-(require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
-
-(defn array-map [& args]
-  (let [sargs (seq args)
-        size (count sargs)]
-    (if (even? size)
-      (new-array-map (into-array sargs) size (/ size 2) nil)
-      (throw (new-argument-error
-               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
-                       size))))))
-
-(require ['clojure.lang.persistent-hash-map :refer ['new-hash-map 'EMPTY-HASH-MAP]])
-
-(defn hash-map [& kvs]
-  (let [kvs-seq (seq kvs)]
-    (if kvs-seq
-      (let [size (count kvs-seq)]
-        (if (even? size)
-          (loop [s kvs-seq m EMPTY-HASH-MAP]
-            (if s
-              (recur (next (next s)) (assoc m (first s) (first (next s))))
-              m))
-          (throw (new-argument-error
-                   (format "PersistentHashMap can only be created with even number of arguments: %s arguments given"
-                           size)))))
-      EMPTY-HASH-MAP)))
-
-(defn get-validator [this]
-  (-get-validator this))
-
-(defn set-validator! [this validator-fn]
-  (-set-validator! this validator-fn))
-
-(defn add-watch [this k f]
-  (-add-watch this k f))
-
-(defn remove-watch [this k]
-  (-remove-watch this k))
-
-(defn compare-and-set! [atm old-val new-val]
-  (-compare-and-set! atm old-val new-val))
-
-(defn reset! [atm new-val]
-  (-reset! atm new-val))
-
-(defn swap!
-  ([atm f] (-swap! atm f []))
-  ([atm f x] (-swap! atm f [x]))
-  ([atm f x y] (-swap! atm f [x y]))
-  ([atm f x y & args] (-swap! atm f (into [x y] args))))
-
-(require ['clojure.lang.atomic-ref :refer ['new-atomic-ref]])
-(require ['clojure.lang.atom :refer ['new-atom]])
-
-(defn atom
-  ([state]
-    (atom state :meta nil :validator nil))
-  ([state & args]
-    (let [config (apply array-map args)]
-      (new-atom (new-atomic-ref state)
-                (get config :meta)
-                (get config :validator)
-                {}))))
-
 (defn comparator [predicate]
   (fn [x y]
     (if (predicate x y) -1 0)))
@@ -435,3 +350,91 @@
         (let [next-s (seq s)
               next-acc (f acc (first next-s))]
           (recur (next next-s) next-acc))))))
+
+(defn -
+  "If no ys are supplied, returns the negation of x, else subtracts
+  the ys from x and returns the result. Does not auto-promote
+  longs, will throw on overflow. See also: -'"
+  ([x] (-subtract x))
+  ([x y] (-subtract x y))
+  ([x y & more] (reduce - (- x y) more)))
+
+(defn *
+  "Returns the product of nums. (*) returns 1. Does not auto-promote
+  longs, will throw on overflow. See also: *'"
+  ([] 1)
+  ([x] x)
+  ([x y] (-multiply x y))
+  ([x y & more] (reduce * (* x y) more)))
+
+(defn +
+  "Returns the sum of nums. (+) returns 0. Does not auto-promote
+  longs, will throw on overflow. See also: +'"
+  ([] 0)
+  ([x] x)
+  ([x y] (-add x y))
+  ([x y & more] (reduce + (+ x y) more)))
+
+(require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
+
+(defn array-map [& args]
+  (let [sargs (seq args)
+        size (count sargs)]
+    (if (even? size)
+      (new-array-map (into-array sargs) size (/ size 2) nil)
+      (throw (new-argument-error
+               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
+                       size))))))
+
+(require ['clojure.lang.persistent-hash-map :refer ['new-hash-map 'EMPTY-HASH-MAP]])
+
+(defn hash-map [& kvs]
+  (let [kvs-seq (seq kvs)]
+    (if kvs-seq
+      (let [size (count kvs-seq)]
+        (if (even? size)
+          (loop [s kvs-seq m EMPTY-HASH-MAP]
+            (if s
+              (recur (next (next s)) (assoc m (first s) (first (next s))))
+              m))
+          (throw (new-argument-error
+                   (format "PersistentHashMap can only be created with even number of arguments: %s arguments given"
+                           size)))))
+      EMPTY-HASH-MAP)))
+
+(defn get-validator [this]
+  (-get-validator this))
+
+(defn set-validator! [this validator-fn]
+  (-set-validator! this validator-fn))
+
+(defn add-watch [this k f]
+  (-add-watch this k f))
+
+(defn remove-watch [this k]
+  (-remove-watch this k))
+
+(defn compare-and-set! [atm old-val new-val]
+  (-compare-and-set! atm old-val new-val))
+
+(defn reset! [atm new-val]
+  (-reset! atm new-val))
+
+(defn swap!
+  ([atm f] (-swap! atm f []))
+  ([atm f x] (-swap! atm f [x]))
+  ([atm f x y] (-swap! atm f [x y]))
+  ([atm f x y & args] (-swap! atm f (into [x y] args))))
+
+(require ['clojure.lang.atomic-ref :refer ['new-atomic-ref]])
+(require ['clojure.lang.atom :refer ['new-atom]])
+
+(defn atom
+  ([state]
+    (atom state :meta nil :validator nil))
+  ([state & args]
+    (let [config (apply array-map args)]
+      (new-atom (new-atomic-ref state)
+                (get config :meta)
+                (get config :validator)
+                {}))))

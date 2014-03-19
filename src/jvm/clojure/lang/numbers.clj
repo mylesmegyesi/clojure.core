@@ -1,6 +1,6 @@
 (ns clojure.lang.numbers
   (:refer-clojure :only [and or defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> /])
-  (:require [clojure.lang.protocols :refer [IEquivalence -equivalent? IHash IRatio -denominator -numerator]]
+  (:require [clojure.lang.protocols :refer :all]
             [clojure.next           :refer [type instance?]])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
@@ -444,14 +444,6 @@
 (defmethod no-overflow-ops [BigDecimal BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
 (defmethod no-overflow-ops [BigDecimal BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
 
-(defprotocol BitOperations
-  (-bit-and                  [this other])
-  (-bit-count                [this])
-  (-bit-or                   [this other])
-  (-bit-xor                  [this other])
-  (-bit-shift-left           [this shift])
-  (-bit-unsigned-shift-right [this shift]))
-
 (defn- long-hash-code [lpart]
   (unsafe-cast-int
     (-bit-xor
@@ -490,13 +482,6 @@
 (defn- equivalent? [this other]
   (-> (no-overflow-ops (type this) (type other))
     (ops-equals this other)))
-
-(defprotocol MathOperations
-  (-add       [x y])
-  (-subtract  [x y])
-  (-multiply  [x y])
-  (-increment [x])
-  (-decrement [x]))
 
 (defn add [x y]
   (. Addition (add x y)))

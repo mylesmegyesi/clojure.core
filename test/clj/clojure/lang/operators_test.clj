@@ -1,7 +1,7 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [reify let nil?])
+  (:refer-clojure :only [defprotocol deftype extend-protocol fn reify let nil?])
   (:require [clojure.test           :refer :all]
-            [clojure.lang.protocols :refer [IEquivalence]]
+            [clojure.lang.protocols :refer [IEquivalence MathOperations]]
             [clojure.next           :refer :all]))
 
 (deftest and-test
@@ -92,5 +92,94 @@
       (is (== item1 item2 item4))
       (is (not== item1 item4 item2))
       (is (not== item1 item4 item5))))
+
+  )
+
+(defprotocol MathResultValue
+  (-unbox-math-result [this]))
+
+(extend-protocol MathResultValue
+  Object
+  (-unbox-math-result [this] this))
+
+(deftype AddResult [lhs rhs]
+  MathOperations
+  (-add [x y] (AddResult. x y))
+
+  MathResultValue
+  (-unbox-math-result [this] [(-unbox-math-result lhs)
+                              (-unbox-math-result rhs)]))
+
+(deftest +-test
+  (testing "returns 0 if there are no arguments"
+    (is (= 0 (+))))
+
+  (testing "just returns the argument if there are is only one argument"
+    (is (= :x (+ :x))))
+
+  (testing "calls the -add method on the lhs when two arguments"
+    (let [just-ret-args (reify MathOperations (-add [x y] [x y]))]
+      (is (= (+ just-ret-args 6)
+             [just-ret-args 6]))))
+
+  (testing "sums all args together"
+    (let [adder (reify MathOperations (-add [x y] (AddResult. x y)))
+          res   (+ adder 6 7 8)]
+      (is (= (-unbox-math-result res)
+             [[[adder 6] 7] 8]))))
+
+  )
+
+(deftype SubtractResult [lhs rhs]
+  MathOperations
+  (-subtract [x y] (SubtractResult. x y))
+
+  MathResultValue
+  (-unbox-math-result [this] [(-unbox-math-result lhs)
+                              (-unbox-math-result rhs)]))
+
+(deftest --test
+  (testing "calls -subtract on the argument if there are is only one argument"
+    (let [just-ret-arg (reify MathOperations (-subtract [x] x))]
+      (is (= just-ret-arg (- just-ret-arg)))))
+
+  (testing "calls the -subtract method on the lhs when two arguments"
+    (let [just-ret-args (reify MathOperations (-subtract [x y] [x y]))]
+      (is (= (- just-ret-args 6)
+             [just-ret-args 6]))))
+
+  (testing "subtracts all args together"
+    (let [subtracter (reify MathOperations (-subtract [x y] (SubtractResult. x y)))
+          res (- subtracter 6 7 8)]
+      (is (= (-unbox-math-result res)
+             [[[subtracter 6] 7] 8]))))
+
+  )
+
+(deftype MultResult [lhs rhs]
+  MathOperations
+  (-multiply [x y] (MultResult. x y))
+
+  MathResultValue
+  (-unbox-math-result [this] [(-unbox-math-result lhs)
+                              (-unbox-math-result rhs)]))
+
+(deftest +-test
+  (testing "returns 1 with no args"
+    (is (= 1 (*))))
+
+  (testing "returns the argument when one argument is given"
+    (is (= :x (* :x))))
+
+  (testing "calls -multiply on the argument when two args given"
+    (let [just-ret-args (reify MathOperations (-multiply [x y] [x y]))]
+      (is (= (* just-ret-args 6)
+             [just-ret-args 6]))))
+
+  (testing "multiplies all args together"
+    (let [multiplier (reify MathOperations (-multiply [x y] (MultResult. x y)))
+          res (* multiplier 6 7 8)]
+      (is (= (-unbox-math-result res)
+             [[[multiplier 6] 7] 8]))))
 
   )
