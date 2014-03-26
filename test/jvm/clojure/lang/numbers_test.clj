@@ -404,34 +404,47 @@
       (is (= 2 (divide t2 t1)))))
 
   (testing "dividng a ratio by a bigdecimal and vica-versa"
+    (cast->big-decimal (bigdecimal 0.4))
     (let [t1 (bigdecimal 0.4)
-          t2 (make-ratio 5 2)]
-      (is (= BigDecimal (type (divide t1 t2))))
-      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2)))))
+          t2 (make-ratio 5 2)
+          result (divide t1 t2)]
+      (is (= BigDecimal (type result)))
+      (is (< result 0.161))
+      (is (> result 0.159)))
     (let [t1 (make-ratio 2 5)
-          t2 (bigdecimal 2.5)]
-      (is (= BigDecimal (type (divide t1 t2))))
-      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2))))))
+          t2 (bigdecimal 2.5)
+          result (divide t1 t2)]
+      (is (= BigDecimal (type result)))
+      (is (< result 0.161))
+      (is (> result 0.159))))
 
   (testing "dividing a ratio by a float and vica-versa"
     (let [t1 (float 0.4)
-          t2 (make-ratio 5 2)]
-      (is (= Double (type (divide t1 t2))))
-      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2)))))
+          t2 (make-ratio 5 2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (< result 0.161))
+      (is (> result 0.159)))
     (let [t1 (make-ratio 2 5)
-          t2 (float 2.5)]
-      (is (= Double (type (divide t1 t2))))
-      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2))))))
+          t2 (float 2.5)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (< result 0.161))
+      (is (> result 0.159))))
 
   (testing "dividing a ratio by a double and vica-versa"
     (let [t1 (double 0.4)
-          t2 (make-ratio 5 2)]
-      (is (= Double (type (divide t1 t2))))
-      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2)))))
+          t2 (make-ratio 5 2)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (< result 0.161))
+      (is (> result 0.159)))
     (let [t1 (make-ratio 2 5)
-          t2 (double 2.5)]
-      (is (= Double (type (divide t1 t2))))
-      (is (and (> 0.161 (divide t1 t2)) (< 0.159 (divide t1 t2))))))
+          t2 (double 2.5)
+          result (divide t1 t2)]
+      (is (= Double (type result)))
+      (is (< result 0.161))
+      (is (> result 0.159))))
 
   (testing "dividng a ratio by a non-specified Number type and vica-versa"
     (let [t1 (number 1)
@@ -457,50 +470,58 @@
           t2 (double 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result))))
+      (is (< result 1.76))
+      (is (> result 1.74))))
 
   (testing "dividing a float by a float"
     (let [t1 (float 2.1)
           t2 (float 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result))))
+      (is (< result 1.76))
+      (is (> result 1.74))))
 
   (testing "dividing a float by a double and vica-versa"
     (let [t1 (float 2.1)
           t2 (double 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result)))
+      (is (< result 1.76))
+      (is (> result 1.74)))
     (let [t1 (double 2.1)
           t2 (float 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result))))
+      (is (< result 1.76))
+      (is (> result 1.74))))
 
   (testing "dividng a float by a bigdecimal and vica-versa"
     (let [t1 (float 2.1)
           t2 (bigdecimal 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result)))
+      (is (< result 1.76))
+      (is (> result 1.74)))
     (let [t1 (bigdecimal 2.1)
           t2 (float 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result))))
+      (is (< result 1.76))
+      (is (> result 1.74))))
 
   (testing "dividng a double by a bigdecimal and vica-versa"
     (let [t1 (double 2.1)
           t2 (bigdecimal 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result)))
+      (is (< result 1.76))
+      (is (> result 1.74)))
     (let [t1 (bigdecimal 2.1)
           t2 (double 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
-      (is (and (> 1.76 result)) (< 1.74 result)))))
+      (is (< result 1.76))
+      (is (> result 1.74)))))
 
 (deftest long-division-number-fallback-test
   (testing "falling back to long ops for dividing non-covered Numbers"
