@@ -7,6 +7,21 @@ import clojure.lang.platform.Ratio;
 
 public final class Division {
 
+  public static Number numberDivide(Number x, Number y) {
+    Ops type = OpType.findOpType(x, y);
+    if (type == Ops.DOUBLE) {
+      return Division.doubleDivide(Coercion.toDouble(x), Coercion.toDouble(y));
+    } else if (type == Ops.BIGDECIMAL) {
+      return Division.bigDecimalDivide(Coercion.toBigDecimal(x), Coercion.toBigDecimal(y));
+    } else if (type == Ops.RATIO) {
+      return Division.ratioDivide(Coercion.toRatio(x), Coercion.toRatio(y));
+    } else if (type == Ops.BIGINT) {
+      return Division.bigIntegerDivide(Coercion.toBigInteger(x), Coercion.toBigInteger(y));
+    } else {
+      return Division.longDivide(Coercion.toLong(x), Coercion.toLong(y));
+    }
+  }
+
   private static long gcd(long x, long y) {
     while (y != 0) {
       long rem = x % y;
@@ -17,7 +32,7 @@ public final class Division {
   }
 
   private final static long LONG_ZERO = Long.valueOf(0);
-  public static Number longDivide(Long x, Long y) {
+  public static Number longDivide(long x, long y) {
     long gcd = gcd(x, y);
     if (gcd == 0) {
       return LONG_ZERO;
@@ -70,7 +85,7 @@ public final class Division {
     return (Number) x.divide(y);
   }
 
-  public static Number doubleDivide(Double x, Double y) {
+  public static Number doubleDivide(double x, double y) {
     return (Number) Double.valueOf(x / y);
   }
 

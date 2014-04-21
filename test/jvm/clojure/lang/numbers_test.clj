@@ -211,7 +211,7 @@
 (deftest integer-addition-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
-           add
+           #(add %1 %2)
            3 1 2))
 
 (deftest ratio-addition-test
@@ -292,12 +292,12 @@
 
 (deftest big-decimal-addition-test
   (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
-           add
+           #(add %1 %2)
            (bigdecimal 3.0) 1.0 2.0))
 
 (deftest decimal-addition-test
   (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
-           add
+           #(add %1 %2)
            3.0 1.0 2.0))
 
 (deftest decimal-with-decimal-addition-test
@@ -355,7 +355,7 @@
 (deftest integer-division-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
-           divide
+           #(divide %1 %2)
            2 10 5))
 
 (deftest ratio-division-test
@@ -404,7 +404,6 @@
       (is (= 2 (divide t2 t1)))))
 
   (testing "dividng a ratio by a bigdecimal and vica-versa"
-    (cast->big-decimal (bigdecimal 0.4))
     (let [t1 (bigdecimal 0.4)
           t2 (make-ratio 5 2)
           result (divide t1 t2)]
@@ -456,12 +455,12 @@
 
 (deftest big-decimal-division-test
   (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
-           divide
+           #(divide %1 %2)
            (bigdecimal 1.0) 2.0 2.0))
 
 (deftest decimal-division-test
   (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
-           divide
+           #(divide %1 %2)
            1.0 2.0 2.0))
 
 (deftest decimal-with-decimal-division-test
