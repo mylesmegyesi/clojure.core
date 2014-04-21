@@ -1,7 +1,7 @@
 (ns clojure.lang.numbers-test
   (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let when
                          byte short int long bigint biginteger float double
-                         / < >
+                         < >
                          ])
   (:require [clojure.test            :refer [deftest is testing]]
             [clojure.lang.numbers    :refer :all]

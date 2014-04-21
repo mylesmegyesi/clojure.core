@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [apply cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         list list* loop / format into < butlast last])
+                         list list* loop format into < butlast last])
   (:require [clojure.lang.platform.equivalence]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
             [clojure.lang.protocols :refer :all]))
@@ -27,7 +27,8 @@
                                          '-subtract
                                          '-multiply
                                          '-increment
-                                         '-decrement]])
+                                         '-decrement
+                                         'divide]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -127,6 +128,11 @@
 
 (defn * [x y]
   (-multiply x y))
+
+(defn /
+  ([x] (/ 1 x))
+  ([x y] (divide x y))
+  ([x y & more] (clojure.core/reduce / (/ x y) more)))
 
 (defn inc [i]
   (-increment i))
