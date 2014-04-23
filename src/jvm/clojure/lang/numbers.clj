@@ -9,6 +9,7 @@
            [clojure.lang.platform NumberOps]
            [clojure.lang.platform Ratio]
            [clojure.lang.platform.numbers Addition]
+           [clojure.lang.platform.numbers Multiplication]
            [clojure.lang.platform.numbers Division]))
 
 (defprotocol NumberCoercions
@@ -502,6 +503,9 @@
 
 (defmacro add [x y]
   `(. Addition (numberAdd ~x ~y)))
+
+(defmacro multiply [x y]
+  `(. Multiplication (numberMultiply ~x ~y)))
 
 (defmacro divide [x y]
   `(. Division (numberDivide ~x ~y)))

@@ -352,6 +352,150 @@
       (is (= Long (type (add t1 t2))))
       (is (= 3 (add t1 t2))))))
 
+(deftest integer-multiplication-test
+  (op-test {Long [[int long] [number int long]]
+            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+           #(multiply %1 %2)
+           6 2 3))
+
+(deftest ratio-multiplication-test
+  (testing "multiplying an integer ratio by an integer ratio"
+    (let [r1 (make-ratio 3 1)
+          r2 (make-ratio 2 1)]
+      (is (= 6 (multiply r1 r2)))
+      (is (= clojure.lang.BigInt (type (multiply r1 r2))))))
+
+  (testing "multiplying a decimal ratio by a decimal ratio"
+    (let [r1 (make-ratio 1 3)
+          r2 (make-ratio 1 3)]
+      (is (= (make-ratio 1 9) (multiply r1 r2)))))
+
+  (testing "multiplying a ratio by an int and vica-versa"
+    (let [t1 (int 2)
+          t2 (make-ratio 3 1)]
+      (is (= clojure.lang.BigInt (type (multiply t1 t2))))
+      (is (= clojure.lang.BigInt (type (multiply t2 t1))))
+      (is (= 6 (multiply t1 t2)))
+      (is (= 6 (multiply t2 t1)))))
+
+  (testing "multiplying a ratio by a long and vica-versa"
+    (let [t1 (long 2)
+          t2 (make-ratio 3 1)]
+      (is (= clojure.lang.BigInt (type (multiply t1 t2))))
+      (is (= clojure.lang.BigInt (type (multiply t2 t1))))
+      (is (= 6 (multiply t1 t2)))
+      (is (= 6 (multiply t2 t1)))))
+
+  (testing "multiplying a ratio by a biginteger and vica-versa"
+    (let [t1 (biginteger 2)
+          t2 (make-ratio 3 1)]
+      (is (= clojure.lang.BigInt (type (multiply t1 t2))))
+      (is (= clojure.lang.BigInt (type (multiply t2 t1))))
+      (is (= 6 (multiply t1 t2)))
+      (is (= 6 (multiply t2 t1)))))
+
+  (testing "multiplying a ratio by a bigint and vica-versa"
+    (let [t1 (bigint 2)
+          t2 (make-ratio 3 1)]
+      (is (= clojure.lang.BigInt (type (multiply t1 t2))))
+      (is (= clojure.lang.BigInt (type (multiply t2 t1))))
+      (is (= 6 (multiply t1 t2)))
+      (is (= 6 (multiply t2 t1)))))
+
+  (testing "multiplying a ratio by a bigdecimal and vica-versa"
+    (let [t1 (bigdecimal 0.5)
+          t2 (make-ratio 1 2)]
+      (is (= BigDecimal (type (multiply t1 t2))))
+      (is (= BigDecimal (type (multiply t2 t1))))
+      (is (and (> 0.26 (multiply t1 t2)) (< 0.24 (multiply t1 t2))))
+      (is (and (> 0.26 (multiply t2 t1)) (< 0.24 (multiply t2 t1))))))
+
+  (testing "multiplying a ratio by a float and vica-versa"
+    (let [t1 (float 0.5)
+          t2 (make-ratio 1 2)]
+      (is (= Double (type (multiply t1 t2))))
+      (is (= Double (type (multiply t2 t1))))
+      (is (and (> 0.26 (multiply t1 t2)) (< 0.24 (multiply t1 t2))))
+      (is (and (> 0.26 (multiply t2 t1)) (< 0.24 (multiply t2 t1))))))
+
+  (testing "multiplying a ratio by a double and vica-versa"
+    (let [t1 (double 0.5)
+          t2 (make-ratio 1 2)]
+      (is (= Double (type (multiply t1 t2))))
+      (is (= Double (type (multiply t2 t1))))
+      (is (and (> 0.26 (multiply t1 t2)) (< 0.24 (multiply t1 t2))))
+      (is (and (> 0.26 (multiply t2 t1)) (< 0.24 (multiply t2 t1))))))
+
+  (testing "multiplying a ratio by a non-specified Number type and vica-versa"
+    (let [t1 (number 2)
+          t2 (make-ratio 3 1)]
+      (is (= clojure.lang.BigInt (type (multiply t1 t2))))
+      (is (= clojure.lang.BigInt (type (multiply t2 t1))))
+      (is (= 6 (multiply t1 t2)))
+      (is (= 6 (multiply t2 t1))))))
+
+(deftest big-decimal-multiplication-test
+  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
+           #(multiply %1 %2)
+           (bigdecimal 6.0) 3.0 2.0))
+
+(deftest decimal-multiplication-test
+  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
+           #(multiply %1 %2)
+           6.0 2.0 3.0))
+
+(deftest decimal-with-decimal-multiplication-test
+  (testing "multiplying a double by a double"
+    (let [t1 (double 1.1)
+          t2 (double 2.2)
+          result (multiply t1 t2)]
+      (is (= Double (type result)))
+      (is (and (< 2.41 result) (> 2.43 result)))))
+
+  (testing "multiplying a float by a float"
+    (let [t1 (float 1.1)
+          t2 (float 2.2)
+          result (multiply t1 t2)]
+      (is (= Double (type result)))
+      (is (and (< 2.41 result) (> 2.43 result)))))
+
+  (testing "multiplying a float by a double and vica-versa"
+    (let [t1 (float 1.1)
+          t2 (double 2.2)]
+      (is (= Double (type (multiply t1 t2))))
+      (is (= Double (type (multiply t2 t1))))
+      (let [result1 (multiply t1 t2)]
+        (is (and (< 2.41 result1) (> 2.43 result1))))
+      (let [result2 (multiply t2 t1)]
+        (is (and (< 2.41 result2) (> 2.43 result2))))))
+
+  (testing "multiplying a float by a bigdecimal and vica-versa"
+    (let [t1 (float 1.1)
+          t2 (bigdecimal 2.2)]
+      (is (= Double (type (multiply t1 t2))))
+      (is (= Double (type (multiply t2 t1))))
+      (let [result1 (multiply t1 t2)]
+        (is (and (< 2.41 result1) (> 2.43 result1))))
+      (let [result2 (multiply t2 t1)]
+        (is (and (< 2.41 result2) (> 2.43 result2))))))
+
+  (testing "multiplying a double by a bigdecimal and vica-versa"
+    (let [t1 (double 1.1)
+          t2 (bigdecimal 2.2)]
+      (is (= Double (type (multiply t1 t2))))
+      (is (= Double (type (multiply t2 t1))))
+      (let [result1 (multiply t1 t2)]
+        (is (and (< 2.41 result1) (> 2.43 result1))))
+      (let [result2 (multiply t2 t1)]
+        (is (and (< 2.41 result2) (> 2.43 result2)))))))
+
+(deftest long-multiplication-number-fallback-test
+  (testing "falling back to long ops for multiplying non-covered Numbers"
+    (let [t1 (number 2)
+          t2 (number 3)]
+      (is (= Long (type (multiply t1 t2))))
+      (is (= 6 (multiply t1 t2))))))
+
 (deftest integer-division-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
