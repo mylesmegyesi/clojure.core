@@ -94,3 +94,17 @@
       (is (not== item1 item4 item5))))
 
   )
+
+(deftest divide-test
+  (testing "ratio creation with a single argument"
+    (let [ratio (/ 2)]
+      (is (= 1 (numerator ratio)))
+      (is (= 2 (denominator ratio)))))
+
+  (testing "divides two numbers"
+    (is (= 2 (/ 4 2))))
+
+  (testing "divides many numbers"
+    (is 2 (/ 12 2 3)))
+
+  )
