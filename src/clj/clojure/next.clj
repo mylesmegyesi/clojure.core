@@ -359,6 +359,16 @@
                 (get config :validator)
                 {}))))
 
+(defn memoize [f]
+  (let [cache-atom (atom (hash-map))]
+    (fn [& args]
+      (let [cache (deref cache-atom)]
+        (if (contains? cache args)
+          (get cache args)
+          (let [return-value (apply f args)]
+            (swap! cache-atom assoc args return-value)
+            return-value))))))
+
 (defn comparator [predicate]
   (fn [x y]
     (if (predicate x y) -1 0)))

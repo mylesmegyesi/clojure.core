@@ -203,3 +203,13 @@
                (nil? (deref received-new-val))))))
 
   )
+
+(deftest memoize-test
+  (testing "produces a wrapper which passes through"
+    (is (= 42 ((memoize (fn [] 42))))))
+
+  (testing "memoizes the result of function calls"
+    (let [memoized-fn (memoize (fn [_] (rand-int 100)))]
+      (is (= (memoized-fn :foo) (memoized-fn :foo)))))
+
+  )
