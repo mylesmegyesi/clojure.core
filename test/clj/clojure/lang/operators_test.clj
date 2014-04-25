@@ -1,8 +1,12 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [reify let nil?])
-  (:require [clojure.test           :refer :all]
-            [clojure.lang.protocols :refer [IEquivalence]]
-            [clojure.next           :refer :all]))
+  (:refer-clojure :only [defmacro reify let list list* nil?])
+  (:require [clojure.test                     :refer :all]
+            [clojure.lang.platform.exceptions :refer [class-cast-exception]]
+            [clojure.lang.protocols           :refer [IEquivalence]]
+            [clojure.next                     :refer :all]))
+
+(defmacro class-cast-exception-thrown? [& body]
+  (list 'is (list* 'thrown? class-cast-exception body)))
 
 (deftest and-test
   (testing "returns true with zero arguments"
@@ -95,7 +99,45 @@
 
   )
 
-(deftest divide-test
+(deftest +-test
+  (testing "returns 0 without arguments"
+    (is (= 0 (+))))
+
+  (testing "acts as an identity function with 1 argument"
+    (is (= 42 (+ 42))))
+
+  (testing "adds two numbers together"
+    (is (= 42 (+ 22 20))))
+
+  (testing "adds many numbers together"
+    (is (= 42 (+ 1 1 40))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (+ "Foo"))
+    (class-cast-exception-thrown? (+ 1 "Foo")))
+
+  )
+
+(deftest *-test
+  (testing "returns 1 without arguments"
+    (is (= 1 (*))))
+
+  (testing "acts as an identity function with 1 argument"
+    (is (= 42 (* 42))))
+
+  (testing "multiplies two numbers together"
+    (is (= 42 (* 21 2))))
+
+  (testing "multiplies many numbers together"
+    (is (= 42 (* 1 2 21))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (* "Foo"))
+    (class-cast-exception-thrown? (* 1 "Foo")))
+
+  )
+
+(deftest divide-test ; / is not a valid character
   (testing "ratio creation with a single argument"
     (let [ratio (/ 2)]
       (is (= 1 (numerator ratio)))
@@ -106,5 +148,9 @@
 
   (testing "divides many numbers"
     (is 2 (/ 12 2 3)))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (/ "Foo"))
+    (class-cast-exception-thrown? (/ 1 "Foo")))
 
   )

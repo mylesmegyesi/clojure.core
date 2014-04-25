@@ -19,3 +19,8 @@
 
 (defmacro new-out-of-bounds-exception [& args]
   (list* 'new out-of-bounds-exception args))
+
+(def class-cast-exception ClassCastException)
+
+(defmacro new-class-cast-exception [& args]
+  (list* 'new class-cast-exception args))

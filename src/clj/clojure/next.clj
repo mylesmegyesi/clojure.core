@@ -17,18 +17,18 @@
 (defn type [x]
   (platform-object/type x))
 
-(require ['clojure.lang.numbers  :refer ['-bit-unsigned-shift-right
-                                         '-bit-shift-left
-                                         '-bit-and
-                                         '-bit-count
-                                         '-bit-or
-                                         '-bit-xor
-                                         '-add
-                                         '-subtract
-                                         '-multiply
-                                         '-increment
-                                         '-decrement
-                                         'divide]])
+(require ['clojure.lang.numbers :refer ['-bit-unsigned-shift-right
+                                        '-bit-shift-left
+                                        '-bit-and
+                                        '-bit-count
+                                        '-bit-or
+                                        '-bit-xor
+                                        '-subtract
+                                        '-increment
+                                        '-decrement
+                                        'add
+                                        'multiply
+                                        'divide]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -120,14 +120,20 @@
 (defn bit-count [i]
   (-bit-count i))
 
-(defn + [x y]
-  (-add x y))
+(defn +
+  ([] 0)
+  ([x] (add x 0))
+  ([x y] (add x y))
+  ([x y & more] (clojure.core/reduce + (+ x y) more)))
 
 (defn - [x y]
   (-subtract x y))
 
-(defn * [x y]
-  (-multiply x y))
+(defn *
+  ([] 1)
+  ([x] (multiply x 1))
+  ([x y] (multiply x y))
+  ([x y & more] (clojure.core/reduce * (* x y) more)))
 
 (defn /
   ([x] (/ 1 x))
