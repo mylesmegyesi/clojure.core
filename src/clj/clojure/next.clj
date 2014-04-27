@@ -23,11 +23,11 @@
                                         '-bit-count
                                         '-bit-or
                                         '-bit-xor
-                                        '-subtract
                                         '-increment
                                         '-decrement
                                         'add
                                         'multiply
+                                        'subtract
                                         'divide]])
 
 (defmacro and
@@ -126,8 +126,10 @@
   ([x y] (add x y))
   ([x y & more] (clojure.core/reduce + (+ x y) more)))
 
-(defn - [x y]
-  (-subtract x y))
+(defn -
+  ([x] (subtract x))
+  ([x y] (subtract x y))
+  ([x y & more] (clojure.core/reduce - (- x y) more)))
 
 (defn *
   ([] 1)

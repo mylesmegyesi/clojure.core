@@ -29,9 +29,11 @@ public final class Addition {
 
   public static Number longAdd(long x, long y) {
     long ret = x + y;
-    if ((ret ^ x) < 0 && (ret ^ y) < 0)
+    if ((ret ^ x) < 0 && (ret ^ y) < 0) {
       throw new ArithmeticException("integer overflow");
-    return (Number) ret;
+    } else {
+      return (Number) ret;
+    }
   }
 
   public static Number bigIntAdd(BigInt x, BigInt y) {
