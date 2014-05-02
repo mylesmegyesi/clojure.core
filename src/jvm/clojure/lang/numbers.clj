@@ -185,7 +185,6 @@
   (->double [this] (.doubleValue this)))
 
 (defprotocol Ops
-  (ops-add                      [ops x y])
   (ops-bit-and                  [ops x y])
   (ops-bit-count                [ops i])
   (ops-bit-or                   [ops x y])
@@ -195,7 +194,6 @@
   (ops-decrement                [ops i])
   (ops-equals                   [ops x y])
   (ops-increment                [ops i])
-  (ops-multiply                 [ops x y])
   (ops-subtract                 [ops x y])
   (ops-zero?                    [ops x]))
 
@@ -214,7 +212,6 @@
 
 (deftype IntegerOps []
   Ops
-  (ops-add                       [_ x y] (NumberOps/intAdd (->int x) (->int y)))
   (ops-bit-and                   [_ x y] (NumberOps/intBitAnd (->int x) (->int y)))
   (ops-bit-count                 [_ i]   (Integer/bitCount i))
   (ops-bit-or                    [_ x y] (NumberOps/intBitOr (->int x) (->int y)))
@@ -224,7 +221,6 @@
   (ops-decrement                 [_ i]   (NumberOps/intDecrement (->int i)))
   (ops-equals                    [_ x y] (-equals ->int x y))
   (ops-increment                 [_ i]   (NumberOps/intIncrement (->int i)))
-  (ops-multiply                  [_ x y] (NumberOps/intMultiply (->int x) (->int y)))
   (ops-subtract                  [_ x y] (NumberOps/intSubtract (->int x) (->int y))))
 
 (deftype LongOps []
@@ -495,9 +491,7 @@
     (ops-equals this other)))
 
 (defprotocol MathOperations
-  (-add       [x y])
   (-subtract  [x y])
-  (-multiply  [x y])
   (-increment [x])
   (-decrement [x]))
 
@@ -557,17 +551,9 @@
   (->bigdec [this] (. BigDecimal (valueOf (.longValue this))))
 
   MathOperations
-  (-add [x y]
-    (-> (no-overflow-ops (type x) (type y))
-      (ops-add x y)))
-
   (-subtract [x y]
     (-> (no-overflow-ops (type x) (type y))
       (ops-subtract x y)))
-
-  (-multiply [x y]
-    (-> (no-overflow-ops (type x) (type y))
-      (ops-multiply x y)))
 
   (-increment [i]
     (ops-increment (make-ops i) i))

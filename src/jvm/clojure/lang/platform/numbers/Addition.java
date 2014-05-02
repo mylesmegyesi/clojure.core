@@ -22,6 +22,11 @@ public final class Addition {
     }
   }
 
+  // Special case for hash map
+  public static int hashMapIntegerAdd(int x, int y) {
+    return x + y;
+  }
+
   public static Number longAdd(long x, long y) {
     long ret = x + y;
     if ((ret ^ x) < 0 && (ret ^ y) < 0)

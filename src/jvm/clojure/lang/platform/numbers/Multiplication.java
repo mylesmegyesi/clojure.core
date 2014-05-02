@@ -22,6 +22,11 @@ public final class Multiplication {
     }
   }
 
+  // Special case for hash map
+  public static int hashMapIntegerMultiply(int x, int y) {
+    return x * y;
+  }
+
   public static Number longMultiply(long x, long y) {
     if (x == Long.MIN_VALUE && y < 0)
       throw new ArithmeticException("integer overflow");
