@@ -352,6 +352,46 @@
       (is (= Long (type (add t1 t2))))
       (is (= 3 (add t1 t2))))))
 
+(deftest integer-increment-test
+  (testing "increment an int"
+    (is (= -1 (increment (int -2))))
+    (is (= Long (type (increment (int -2))))))
+
+  (testing "increment a long"
+    (is (= 3 (increment (long 2))))
+    (is (= Long (type (increment (long 2)))))))
+
+(deftest big-int-increment-test
+  (testing "incrementing a big int"
+    (is (= (bigint -1) (increment (bigint -2))))
+    (is (= clojure.lang.BigInt (type (increment (bigint -2))))))
+
+  (testing "incrementing a big integer"
+    (is (= (bigint 3) (increment (biginteger 2))))
+    (is (= clojure.lang.BigInt (type (increment (biginteger 2)))))))
+
+(deftest ratio-increment-test
+  (testing "incrementing a ratio"
+    (is (= (make-ratio 3 2) (increment (make-ratio 1 2))))
+    (is (= clojure.lang.platform.Ratio (type (increment (make-ratio 1 2)))))))
+
+(deftest big-decimal-increment-test
+  (testing "incrementing a big decimal"
+    (is (< 2.1 (increment (bigdecimal 1.2))))
+    (is (> 2.3 (increment (bigdecimal 1.2))))
+    (is (= BigDecimal (type (increment (bigdecimal 1.2)))))))
+
+(deftest double-increment-test
+  (testing "incrementing a float"
+    (is (< -1.2 (increment (float -2.1))))
+    (is (> -1.0 (increment (float -2.1))))
+    (is (= Double (type (increment (float -2.1))))))
+
+  (testing "incrementing a double"
+    (is (< 2.1 (increment (double 1.2))))
+    (is (> 2.3 (increment (double 1.2))))
+    (is (= Double (type (increment (double 1.2)))))))
+
 (deftest integer-multiplication-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}

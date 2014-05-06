@@ -23,9 +23,9 @@
                                         '-bit-count
                                         '-bit-or
                                         '-bit-xor
-                                        '-increment
                                         '-decrement
                                         'add
+                                        'increment
                                         'multiply
                                         'subtract
                                         'divide]])
@@ -143,7 +143,7 @@
   ([x y & more] (clojure.core/reduce / (/ x y) more)))
 
 (defn inc [i]
-  (-increment i))
+  (increment i))
 
 (defn dec [i]
   (-decrement i))

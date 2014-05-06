@@ -118,6 +118,15 @@
 
   )
 
+(deftest inc-test
+  (testing "increment an argument"
+    (is (= 2 (inc 1))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (inc "Foo")))
+
+  )
+
 (deftest *-test
   (testing "returns 1 without arguments"
     (is (= 1 (*))))
@@ -136,6 +145,7 @@
     (class-cast-exception-thrown? (* 1 "Foo")))
 
   )
+
 (deftest --test
   (testing "negation of a single element"
     (is (= -1 (- 1))))

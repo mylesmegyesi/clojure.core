@@ -1,5 +1,5 @@
 (ns clojure.lang.platform.hash-map
-  (:refer-clojure :only [defmacro defn])
+  (:refer-clojure :only [defmacro defn int])
   (:require [clojure.lang.numbers :refer [unsafe-cast-int]])
   (:import [clojure.lang.platform.numbers Addition]
            [clojure.lang.platform.numbers Multiplication]
@@ -13,6 +13,9 @@
 
 (defmacro + [x y]
   `(. Addition (hashMapIntegerAdd ~x ~y)))
+
+(defmacro inc [x]
+  `(. Addition (hashMapIntegerAdd ~x (int 1))))
 
 (defmacro * [x y]
   `(. Multiplication (hashMapIntegerMultiply ~x ~y)))
