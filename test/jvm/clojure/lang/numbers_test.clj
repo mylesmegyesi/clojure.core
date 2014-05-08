@@ -392,6 +392,11 @@
     (is (> 2.3 (increment (double 1.2))))
     (is (= Double (type (increment (double 1.2)))))))
 
+(deftest number-fallback-increment-test
+  (testing "incrementing a number"
+    (is (= 3 (increment (number 2))))
+    (is (= Long (type (increment (number 2)))))))
+
 (deftest integer-multiplication-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
@@ -722,6 +727,51 @@
           t2 (number 5)]
       (is (= Long (type (subtract t1 t2))))
       (is (= 5 (subtract t1 t2))))))
+
+(deftest integer-decrement-test
+  (testing "decrement an int"
+    (is (= -3 (decrement (int -2))))
+    (is (= Long (type (decrement (int -2))))))
+
+  (testing "decrement a long"
+    (is (= 1 (decrement (long 2))))
+    (is (= Long (type (decrement (long 2)))))))
+
+(deftest big-int-decrement-test
+  (testing "decrementing a big int"
+    (is (= (bigint -3) (decrement (bigint -2))))
+    (is (= clojure.lang.BigInt (type (decrement (bigint -2))))))
+
+  (testing "decrementing a big integer"
+    (is (= (bigint 1) (decrement (biginteger 2))))
+    (is (= clojure.lang.BigInt (type (decrement (biginteger 2)))))))
+
+(deftest ratio-decrement-test
+  (testing "decrementing a ratio"
+    (is (= (make-ratio 1 2) (decrement (make-ratio 3 2))))
+    (is (= clojure.lang.platform.Ratio (type (decrement (make-ratio 3 2)))))))
+
+(deftest big-decimal-decrementing-test
+  (testing "decrementing a big decimal"
+    (is (< 0.1 (decrement (bigdecimal 1.2))))
+    (is (> 0.3 (decrement (bigdecimal 1.2))))
+    (is (= BigDecimal (type (decrement (bigdecimal 1.2)))))))
+
+(deftest double-decrement-test
+  (testing "decrementing a float"
+    (is (< -3.2 (decrement (float -2.1))))
+    (is (> -3.0 (decrement (float -2.1))))
+    (is (= Double (type (decrement (float -2.1))))))
+
+  (testing "decrementing a double"
+    (is (< 0.1 (decrement (double 1.2))))
+    (is (> 0.3 (decrement (double 1.2))))
+    (is (= Double (type (decrement (double 1.2)))))))
+
+(deftest number-fallback-decrement-test
+  (testing "decrement a number"
+    (is (= 1 (decrement (number 2))))
+    (is (= Long (type (decrement (number 2)))))))
 
 (deftest integer-division-test
   (op-test {Long [[int long] [number int long]]

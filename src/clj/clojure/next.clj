@@ -23,11 +23,11 @@
                                         '-bit-count
                                         '-bit-or
                                         '-bit-xor
-                                        '-decrement
                                         'add
                                         'increment
                                         'multiply
                                         'subtract
+                                        'decrement
                                         'divide]])
 
 (defmacro and
@@ -146,7 +146,7 @@
   (increment i))
 
 (defn dec [i]
-  (-decrement i))
+  (decrement i))
 
 (defn count [obj]
   (-count obj))

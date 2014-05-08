@@ -11,15 +11,20 @@
 (defn empty-object []
   (Object.))
 
+(def integer-one (int 1))
+
 (defmacro + [x y]
   `(. Addition (hashMapIntegerAdd ~x ~y)))
 
 (defmacro inc [x]
-  `(. Addition (hashMapIntegerAdd ~x (int 1))))
+  `(. Addition (hashMapIntegerAdd ~x integer-one)))
 
 (defmacro * [x y]
   `(. Multiplication (hashMapIntegerMultiply ~x ~y)))
 
 (defmacro - [x y]
   `(. Subtraction (hashMapIntegerSubtract ~x ~y)))
+
+(defmacro dec [x]
+  `(. Subtraction (hashMapIntegerSubtract ~x integer-one)))
 

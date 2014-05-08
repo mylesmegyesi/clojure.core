@@ -162,6 +162,15 @@
 
   )
 
+(deftest dec-test
+  (testing "decrement an argument"
+    (is (= 1 (dec 2))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (dec "Foo")))
+
+  )
+
 (deftest divide-test ; / is not a valid character
   (testing "ratio creation with a single argument"
     (let [ratio (/ 2)]

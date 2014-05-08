@@ -12,6 +12,7 @@
            [clojure.lang.platform.numbers Increment]
            [clojure.lang.platform.numbers Multiplication]
            [clojure.lang.platform.numbers Subtraction]
+           [clojure.lang.platform.numbers Decrement]
            [clojure.lang.platform.numbers Division]
            [clojure.lang.platform.numbers Negation]))
 
@@ -194,7 +195,6 @@
   (ops-bit-xor                  [ops x y])
   (ops-bit-shift-left           [ops x y])
   (ops-bit-unsigned-shift-right [ops x y])
-  (ops-decrement                [ops i])
   (ops-equals                   [ops x y])
   (ops-zero?                    [ops x]))
 
@@ -219,7 +219,6 @@
   (ops-bit-xor                   [_ x y] (NumberOps/intBitXor (->int x) (->int y)))
   (ops-bit-shift-left            [_ x y] (NumberOps/intBitShiftLeft (->int x) (->int y)))
   (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/intBitUnsignedShiftRight (->int x) (->int y)))
-  (ops-decrement                 [_ i]   (NumberOps/intDecrement (->int i)))
   (ops-equals                    [_ x y] (-equals ->int x y)))
 
 (deftype LongOps []
@@ -489,9 +488,6 @@
   (-> (no-overflow-ops (type this) (type other))
     (ops-equals this other)))
 
-(defprotocol MathOperations
-  (-decrement [x]))
-
 (defmacro add [x y]
   `(. Addition (numberAdd ~x ~y)))
 
@@ -504,6 +500,9 @@
 (defmacro subtract
   ([x] `(. Negation (numberNegate ~x)))
   ([x y] `(. Subtraction (numberSubtract ~x ~y))))
+
+(defmacro decrement [x]
+  `(. Decrement (numberDecrement ~x)))
 
 (defmacro divide [x y]
   `(. Division (numberDivide ~x ~y)))
@@ -553,9 +552,5 @@
   (->bigint [this] (. BigInteger (valueOf (.longValue this))))
   (->ratio  [this] (make-ratio (->bigint this) BigInteger/ONE))
   (->bigdec [this] (. BigDecimal (valueOf (.longValue this))))
-
-  MathOperations
-  (-decrement [i]
-    (ops-decrement (make-ops i) i))
 
   )
