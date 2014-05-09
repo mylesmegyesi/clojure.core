@@ -11,7 +11,8 @@ public final class Subtraction {
     return Addition.numberAdd((Number) x, (Number) Negation.numberNegate(y));
   }
 
-  public static int hashMapIntegerSubtract(int x, int y) {
+  // Special Case, needs to be removed at some point
+  public static int integerPreserveSubtract(int x, int y) {
     return x - y;
   }
 

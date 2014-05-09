@@ -22,8 +22,8 @@ public final class Addition {
     }
   }
 
-  // Special case for hash map
-  public static int hashMapIntegerAdd(int x, int y) {
+  // Special Case, needs to be removed at some point
+  public static int integerPreserveAdd(int x, int y) {
     return x + y;
   }
 
