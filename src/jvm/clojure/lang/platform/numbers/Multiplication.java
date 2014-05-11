@@ -22,8 +22,8 @@ public final class Multiplication {
     }
   }
 
-  // Special case for hash map
-  public static int hashMapIntegerMultiply(int x, int y) {
+  // Special Case, needs to be removed at some point
+  public static int integerPreserveMultiply(int x, int y) {
     return x * y;
   }
 

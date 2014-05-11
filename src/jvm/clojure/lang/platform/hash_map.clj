@@ -14,17 +14,17 @@
 (def integer-one (int 1))
 
 (defmacro + [x y]
-  `(. Addition (hashMapIntegerAdd ~x ~y)))
+  `(. Addition (integerPreserveAdd ~x ~y)))
 
 (defmacro inc [x]
-  `(. Addition (hashMapIntegerAdd ~x integer-one)))
+  `(. Addition (integerPreserveAdd ~x integer-one)))
 
 (defmacro * [x y]
-  `(. Multiplication (hashMapIntegerMultiply ~x ~y)))
+  `(. Multiplication (integerPreserveMultiply ~x ~y)))
 
 (defmacro - [x y]
-  `(. Subtraction (hashMapIntegerSubtract ~x ~y)))
+  `(. Subtraction (integerPreserveSubtract ~x ~y)))
 
 (defmacro dec [x]
-  `(. Subtraction (hashMapIntegerSubtract ~x integer-one)))
+  `(. Subtraction (integerPreserveSubtract ~x integer-one)))
 
