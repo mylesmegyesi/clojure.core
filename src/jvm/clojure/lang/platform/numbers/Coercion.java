@@ -61,5 +61,16 @@ public final class Coercion {
     return x.doubleValue();
   }
 
+  public static long toBitOperand(Object x) {
+    if (x instanceof Byte ||
+        x instanceof Short ||
+        x instanceof Integer ||
+        x instanceof Long) {
+      return toLong((Number) x);
+    } else {
+      throw new IllegalArgumentException("bit operation not supported for: " + x.getClass());
+    }
+  }
+
 }
 

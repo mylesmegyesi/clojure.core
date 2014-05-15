@@ -208,6 +208,11 @@
 (defn- bigdecimal [n] (BigDecimal. n))
 (defn- number [n] (FallBackNumber. n))
 
+(deftest bit-and-test
+  (op-test {Long [[byte short int long] [byte short int long]]}
+           #(band %1 %2)
+             4 4 5))
+
 (deftest integer-addition-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}

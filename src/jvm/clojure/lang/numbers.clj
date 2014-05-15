@@ -8,6 +8,7 @@
            [clojure.lang BigInt]
            [clojure.lang.platform NumberOps]
            [clojure.lang.platform Ratio]
+           [clojure.lang.platform.numbers BitAnd]
            [clojure.lang.platform.numbers Addition]
            [clojure.lang.platform.numbers Increment]
            [clojure.lang.platform.numbers Multiplication]
@@ -189,7 +190,6 @@
   (->double [this] (.doubleValue this)))
 
 (defprotocol Ops
-  (ops-bit-and                  [ops x y])
   (ops-bit-count                [ops i])
   (ops-bit-or                   [ops x y])
   (ops-bit-xor                  [ops x y])
@@ -213,7 +213,6 @@
 
 (deftype IntegerOps []
   Ops
-  (ops-bit-and                   [_ x y] (NumberOps/intBitAnd (->int x) (->int y)))
   (ops-bit-count                 [_ i]   (Integer/bitCount i))
   (ops-bit-or                    [_ x y] (NumberOps/intBitOr (->int x) (->int y)))
   (ops-bit-xor                   [_ x y] (NumberOps/intBitXor (->int x) (->int y)))
@@ -224,7 +223,6 @@
 (deftype LongOps []
   Ops
   (ops-equals                    [_ x y] (-equals ->long x y))
-  ;(ops-bit-and                   [_ x y] (NumberOps/longBitAnd (->long x) (->long y)))
   ;(ops-bit-or                    [_ x y] (NumberOps/longBitOr (->long x) (->long y)))
   (ops-bit-xor                   [_ x y] (NumberOps/longBitXor (->long x) (->long y)))
   ;(ops-bit-shift-left            [_ x y] (NumberOps/longBitShiftLeft (->long x) (->long y)))
@@ -443,7 +441,6 @@
 (defmethod no-overflow-ops [BigDecimal BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
 
 (defprotocol BitOperations
-  (-bit-and                  [this other])
   (-bit-count                [this])
   (-bit-or                   [this other])
   (-bit-xor                  [this other])
@@ -488,6 +485,9 @@
   (-> (no-overflow-ops (type this) (type other))
     (ops-equals this other)))
 
+(defmacro band [x y]
+  `(. BitAnd (numberBitAnd ~x ~y)))
+
 (defmacro add [x y]
   `(. Addition (numberAdd ~x ~y)))
 
@@ -523,10 +523,6 @@
       false))
 
   BitOperations
-  (-bit-and [this other]
-    (-> (no-overflow-ops (type this) (type other))
-      (ops-bit-and this other)))
-
   (-bit-count [i]
     (ops-bit-count (make-ops i) i))
 
