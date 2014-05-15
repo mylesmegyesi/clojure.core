@@ -1,7 +1,8 @@
 (ns clojure.lang.platform.hash-map
   (:refer-clojure :only [defmacro defn int])
   (:require [clojure.lang.numbers :refer [unsafe-cast-int]])
-  (:import [clojure.lang.platform.numbers Addition]
+  (:import [clojure.lang.platform.numbers BitAnd]
+           [clojure.lang.platform.numbers Addition]
            [clojure.lang.platform.numbers Multiplication]
            [clojure.lang.platform.numbers Subtraction]))
 
@@ -12,6 +13,9 @@
   (Object.))
 
 (def integer-one (int 1))
+
+(defmacro bit-and [x y]
+  `(. BitAnd (integerPreserveBitAnd ~x ~y)))
 
 (defmacro + [x y]
   `(. Addition (integerPreserveAdd ~x ~y)))

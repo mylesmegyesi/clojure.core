@@ -1,12 +1,15 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [defmacro reify let list list* nil?])
+  (:refer-clojure :only [bigint double float bigdec defmacro reify let list list* nil?])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.platform.exceptions :refer [class-cast-exception]]
+            [clojure.lang.platform.exceptions :refer [class-cast-exception argument-error]]
             [clojure.lang.protocols           :refer [IEquivalence]]
             [clojure.next                     :refer :all]))
 
 (defmacro class-cast-exception-thrown? [& body]
   (list 'is (list* 'thrown? class-cast-exception body)))
+
+(defmacro argument-error-thrown? [& body]
+  (list 'is (list* 'thrown? argument-error body)))
 
 (deftest and-test
   (testing "returns true with zero arguments"
@@ -96,6 +99,24 @@
       (is (== item1 item2 item4))
       (is (not== item1 item4 item2))
       (is (not== item1 item4 item5))))
+
+  )
+
+(deftest bit-and-test
+  (testing "returns for two arguments"
+    (is (= 1 (bit-and 1 1))))
+
+  (testing "returns for many arguments"
+    (is (= 1 (bit-and 1 1 1))))
+
+  (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-and (bigint 1) 1))
+    (argument-error-thrown? (bit-and (double 0.1) 1))
+    (argument-error-thrown? (bit-and (float 0.1) 1))
+    (argument-error-thrown? (bit-and (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-and "foo" 1)))
 
   )
 
