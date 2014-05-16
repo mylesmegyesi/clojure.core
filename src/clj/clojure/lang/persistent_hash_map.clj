@@ -5,10 +5,13 @@
             [clojure.lang.atomic-ref             :refer [new-atomic-ref]]
             [clojure.lang.map-entry              :refer [new-map-entry]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
-            [clojure.lang.platform.hash-map      :refer [->bitnum empty-object bit-and bit-or bit-xor + inc * - dec]]
+            [clojure.lang.platform.hash-map      :refer [->bitnum empty-object
+                                                         bit-and bit-or bit-xor bit-shift-left
+                                                         + inc * - dec]]
             [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
                                                          IMeta IPersistentMap ISeqable ISeq]]
-            [clojure.next                        :refer :all :exclude [and bit-and bit-or bit-xor + inc * - dec]]))
+            [clojure.next                        :refer :all :exclude [and bit-and bit-or bit-xor bit-shift-left
+                                                                       + inc * - dec]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
 (def ^:private ZERO       (->bitnum 0))

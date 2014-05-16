@@ -18,8 +18,8 @@
   (platform-object/type x))
 
 (require ['clojure.lang.numbers :refer ['-bit-unsigned-shift-right
-                                        '-bit-shift-left
                                         '-bit-count
+                                        'bshift-left
                                         'band
                                         'bor
                                         'bxor
@@ -106,7 +106,7 @@
   (-bit-unsigned-shift-right n shift))
 
 (defn bit-shift-left [n shift]
-  (-bit-shift-left n shift))
+  (bshift-left n shift))
 
 (defn bit-and
   ([n other] (band n other))
