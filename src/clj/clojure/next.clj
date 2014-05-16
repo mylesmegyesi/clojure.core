@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [apply cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         list list* loop format into < butlast last])
+                         list list* loop format into < butlast last when])
   (:require [clojure.lang.platform.equivalence]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
             [clojure.lang.protocols :refer :all]))
@@ -195,6 +195,20 @@
 (defn sequential? [s]
   (satisfies? ISequential s))
 
+(defn empty [coll]
+  (-empty coll))
+
+(defn peek [coll]
+  (when coll
+    (-peek coll)))
+
+(defn pop [coll]
+  (when coll
+    (-pop coll)))
+
+(defn empty? [seqable]
+  (not (seq seqable)))
+
 (require ['clojure.lang.aseq])
 (require ['clojure.lang.platform.seqable])
 
@@ -233,9 +247,6 @@
     (-nth coll n))
   ([coll n not-found]
     (-nth coll n not-found)))
-
-(defn empty? [seqable]
-  (not (seq seqable)))
 
 (require 'clojure.lang.platform.seqable)
 
@@ -460,5 +471,3 @@
               next-acc (f acc (first next-s))]
           (recur (next next-s) next-acc))))))
 
-(defn empty [coll]
-  (-empty coll))

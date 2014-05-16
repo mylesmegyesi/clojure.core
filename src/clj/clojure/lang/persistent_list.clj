@@ -1,15 +1,14 @@
 (ns clojure.lang.persistent-list
-  (:refer-clojure :only [declare defn defn- deftype first loop rest])
-  (:require [clojure.next           :refer [cons empty? inc with-meta]]
+  (:refer-clojure :only [declare defn defn- deftype loop last butlast])
+  (:require [clojure.next           :refer [empty? inc with-meta =]]
             [clojure.lang.protocols :refer [ICounted IMeta IPersistentCollection -cons
-                                            IPersistentStack ISeqable]]))
-
+                                            IPersistentStack ISeq ISeqable]]))
 
 (declare make-list)
 
-(declare EMPTY)
+(declare EMPTY-LIST)
 
-(deftype PersistentVector [-meta -first -rest -count]
+(deftype PersistentList [-meta -first -rest -count]
   ICounted
   (-count [this] -count)
 
@@ -24,19 +23,32 @@
     (make-list -meta x this (inc -count)))
 
   (-empty [this]
-    (with-meta EMPTY -meta))
+    (with-meta EMPTY-LIST -meta))
+
+  IPersistentStack
+  (-peek [this] -first)
+
+  (-pop [this]
+    (if -rest -rest (with-meta EMPTY-LIST)))
+
+  ISeq
+  (-first [this] -first)
+
+  (-next [this]
+    (if (= -count 1) nil -rest))
 
   ISeqable
   (-seq [this] this)
 )
 
-(defn make-list [meta first rest count]
-  (PersistentVector. meta first rest count))
+(defn- make-list [meta first rest count]
+  (PersistentList. meta first rest count))
 
-(def ^:private EMPTY (make-list nil nil nil 0))
+(def EMPTY-LIST (make-list nil nil nil 0))
 
 (defn list [& args]
-  (loop [list EMPTY args args]
+  (loop [list EMPTY-LIST args args]
     (if (empty? args)
       list
-      (recur (-cons list (first args)) (rest args)))))
+      (recur (-cons list (last args)) (butlast args)))))
+
