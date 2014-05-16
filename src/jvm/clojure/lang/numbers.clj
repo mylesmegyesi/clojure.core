@@ -191,7 +191,6 @@
 
 (defprotocol Ops
   (ops-bit-count                [ops i])
-  (ops-bit-or                   [ops x y])
   (ops-bit-xor                  [ops x y])
   (ops-bit-shift-left           [ops x y])
   (ops-bit-unsigned-shift-right [ops x y])
@@ -214,7 +213,6 @@
 (deftype IntegerOps []
   Ops
   (ops-bit-count                 [_ i]   (Integer/bitCount i))
-  (ops-bit-or                    [_ x y] (NumberOps/intBitOr (->int x) (->int y)))
   (ops-bit-xor                   [_ x y] (NumberOps/intBitXor (->int x) (->int y)))
   (ops-bit-shift-left            [_ x y] (NumberOps/intBitShiftLeft (->int x) (->int y)))
   (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/intBitUnsignedShiftRight (->int x) (->int y)))
@@ -223,7 +221,6 @@
 (deftype LongOps []
   Ops
   (ops-equals                    [_ x y] (-equals ->long x y))
-  ;(ops-bit-or                    [_ x y] (NumberOps/longBitOr (->long x) (->long y)))
   (ops-bit-xor                   [_ x y] (NumberOps/longBitXor (->long x) (->long y)))
   ;(ops-bit-shift-left            [_ x y] (NumberOps/longBitShiftLeft (->long x) (->long y)))
   (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/longBitUnsignedShiftRight (->long x) (->long y)))
@@ -442,7 +439,6 @@
 
 (defprotocol BitOperations
   (-bit-count                [this])
-  (-bit-or                   [this other])
   (-bit-xor                  [this other])
   (-bit-shift-left           [this shift])
   (-bit-unsigned-shift-right [this shift]))
@@ -491,6 +487,9 @@
 (defmacro bor [x y]
   `(. BitOps (numberBitOr ~x ~y)))
 
+(defmacro bxor [x y]
+  `(. BitOps (numberBitXor ~x ~y)))
+
 (defmacro add [x y]
   `(. Addition (numberAdd ~x ~y)))
 
@@ -528,10 +527,6 @@
   BitOperations
   (-bit-count [i]
     (ops-bit-count (make-ops i) i))
-
-  (-bit-or [this other]
-    (-> (no-overflow-ops (type this) (type other))
-      (ops-bit-or this other)))
 
   (-bit-xor [this other]
     (-> (no-overflow-ops (type this) (type other))

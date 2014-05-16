@@ -22,4 +22,14 @@ public final class BitOps {
     return x | y;
   }
 
+  public static long numberBitXor(Object x, Object y) {
+    long lx = Coercion.toBitOperand(x);
+    long ly = Coercion.toBitOperand(y);
+    return lx ^ ly;
+  }
+
+  public static int integerPreserveBitXor(int x, int y) {
+    return x ^ y;
+  }
+
 }

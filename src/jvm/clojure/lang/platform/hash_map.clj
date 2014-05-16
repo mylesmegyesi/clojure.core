@@ -20,6 +20,9 @@
 (defmacro bit-or [x y]
   `(. BitOps (integerPreserveBitOr ~x ~y)))
 
+(defmacro bit-xor [x y]
+  `(. BitOps (integerPreserveBitXor ~x ~y)))
+
 (defmacro + [x y]
   `(. Addition (integerPreserveAdd ~x ~y)))
 

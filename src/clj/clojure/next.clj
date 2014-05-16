@@ -20,9 +20,9 @@
 (require ['clojure.lang.numbers :refer ['-bit-unsigned-shift-right
                                         '-bit-shift-left
                                         '-bit-count
-                                        '-bit-xor
                                         'band
                                         'bor
+                                        'bxor
                                         'add
                                         'increment
                                         'multiply
@@ -112,11 +112,13 @@
   ([n other] (band n other))
   ([n other & more] (clojure.core/reduce bit-and (bit-and n other) more)))
 
-(defn bit-or [n other]
-  (bor n other))
+(defn bit-or
+  ([n other] (bor n other))
+  ([n other & more] (clojure.core/reduce bit-or (bit-or n other) more)))
 
-(defn bit-xor [n other]
-  (-bit-xor n other))
+(defn bit-xor
+  ([n other] (bxor n other))
+  ([n other & more] (clojure.core/reduce bit-xor (bit-xor n other) more)))
 
 (defn bit-count [i]
   (-bit-count i))
