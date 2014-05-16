@@ -120,6 +120,12 @@
 
   )
 
+(deftest bit-or-test
+  (testing "returns for two arguments"
+    (is (= 1 (bit-or 1 1))))
+
+  )
+
 (deftest +-test
   (testing "returns 0 without arguments"
     (is (= 0 (+))))

@@ -8,7 +8,7 @@
            [clojure.lang BigInt]
            [clojure.lang.platform NumberOps]
            [clojure.lang.platform Ratio]
-           [clojure.lang.platform.numbers BitAnd]
+           [clojure.lang.platform.numbers BitOps]
            [clojure.lang.platform.numbers Addition]
            [clojure.lang.platform.numbers Increment]
            [clojure.lang.platform.numbers Multiplication]
@@ -486,7 +486,10 @@
     (ops-equals this other)))
 
 (defmacro band [x y]
-  `(. BitAnd (numberBitAnd ~x ~y)))
+  `(. BitOps (numberBitAnd ~x ~y)))
+
+(defmacro bor [x y]
+  `(. BitOps (numberBitOr ~x ~y)))
 
 (defmacro add [x y]
   `(. Addition (numberAdd ~x ~y)))
