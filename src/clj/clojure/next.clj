@@ -459,3 +459,6 @@
         (let [next-s (seq s)
               next-acc (f acc (first next-s))]
           (recur (next next-s) next-acc))))))
+
+(defn empty [coll]
+  (-empty coll))
