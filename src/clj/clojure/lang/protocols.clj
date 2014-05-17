@@ -65,6 +65,8 @@
   (-peek [this])
   (-pop [this]))
 
+(defprotocol IPersistentList)
+
 (defprotocol IPersistentMap
   (-dissoc [this k]))
 

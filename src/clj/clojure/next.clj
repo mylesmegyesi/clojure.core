@@ -195,6 +195,9 @@
 (defn sequential? [s]
   (satisfies? ISequential s))
 
+(defn empty? [seqable]
+  (not (seq seqable)))
+
 (defn empty [coll]
   (-empty coll))
 
@@ -205,9 +208,6 @@
 (defn pop [coll]
   (when coll
     (-pop coll)))
-
-(defn empty? [seqable]
-  (not (seq seqable)))
 
 (require ['clojure.lang.aseq])
 (require ['clojure.lang.platform.seqable])
@@ -231,7 +231,9 @@
   (-seq [this] nil))
 
 (defn first [s]
-  (-first (seq s)))
+  (if (satisfies? ISeq s)
+    (-first s)
+    (-first (seq s))))
 
 (defn next [s]
   (-next (seq s)))
