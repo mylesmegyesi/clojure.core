@@ -120,6 +120,57 @@
 
   )
 
+(deftest bit-or-test
+  (testing "returns for two arguments"
+    (is (= 1 (bit-or 1 1))))
+
+  (testing "returns for many arguments"
+    (is (= 1 (bit-or 1 1 1))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-or (bigint 1) 1))
+    (argument-error-thrown? (bit-or (double 0.1) 1))
+    (argument-error-thrown? (bit-or (float 0.1) 1))
+    (argument-error-thrown? (bit-or (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-or "foo" 1)))
+
+  )
+
+(deftest bit-xor-test
+  (testing "returns for two arguemnts"
+    (is (= 0 (bit-xor 1 1))))
+
+  (testing "returns for many arguments"
+    (is (= 1 (bit-xor 1 1 1))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-xor (bigint 1) 1))
+    (argument-error-thrown? (bit-xor (double 0.1) 1))
+    (argument-error-thrown? (bit-xor (float 0.1) 1))
+    (argument-error-thrown? (bit-xor (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-xor "foo" 1)))
+
+  )
+
+(deftest bit-shift-left-test
+  (testing "returns for two arguemnts"
+    (is (= 2 (bit-shift-left 1 1))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-shift-left (bigint 1) 1))
+    (argument-error-thrown? (bit-shift-left (double 0.1) 1))
+    (argument-error-thrown? (bit-shift-left (float 0.1) 1))
+    (argument-error-thrown? (bit-shift-left (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-shift-left "foo" 1)))
+
+  )
+
 (deftest +-test
   (testing "returns 0 without arguments"
     (is (= 0 (+))))

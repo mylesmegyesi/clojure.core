@@ -8,7 +8,7 @@
            [clojure.lang BigInt]
            [clojure.lang.platform NumberOps]
            [clojure.lang.platform Ratio]
-           [clojure.lang.platform.numbers BitAnd]
+           [clojure.lang.platform.numbers BitOps]
            [clojure.lang.platform.numbers Addition]
            [clojure.lang.platform.numbers Increment]
            [clojure.lang.platform.numbers Multiplication]
@@ -16,6 +16,37 @@
            [clojure.lang.platform.numbers Decrement]
            [clojure.lang.platform.numbers Division]
            [clojure.lang.platform.numbers Negation]))
+
+(defmacro band [x y]
+  `(. BitOps (numberBitAnd ~x ~y)))
+
+(defmacro bor [x y]
+  `(. BitOps (numberBitOr ~x ~y)))
+
+(defmacro bxor [x y]
+  `(. BitOps (numberBitXor ~x ~y)))
+
+(defmacro bshift-left [x y]
+  `(. BitOps (numberBitShiftLeft ~x ~y)))
+
+(defmacro add [x y]
+  `(. Addition (numberAdd ~x ~y)))
+
+(defmacro increment [x]
+  `(. Increment (numberIncrement ~x)))
+
+(defmacro multiply [x y]
+  `(. Multiplication (numberMultiply ~x ~y)))
+
+(defmacro subtract
+  ([x] `(. Negation (numberNegate ~x)))
+  ([x y] `(. Subtraction (numberSubtract ~x ~y))))
+
+(defmacro decrement [x]
+  `(. Decrement (numberDecrement ~x)))
+
+(defmacro divide [x y]
+  `(. Division (numberDivide ~x ~y)))
 
 (defprotocol NumberCoercions
   (->byte   [this])
@@ -191,9 +222,6 @@
 
 (defprotocol Ops
   (ops-bit-count                [ops i])
-  (ops-bit-or                   [ops x y])
-  (ops-bit-xor                  [ops x y])
-  (ops-bit-shift-left           [ops x y])
   (ops-bit-unsigned-shift-right [ops x y])
   (ops-equals                   [ops x y])
   (ops-zero?                    [ops x]))
@@ -214,18 +242,12 @@
 (deftype IntegerOps []
   Ops
   (ops-bit-count                 [_ i]   (Integer/bitCount i))
-  (ops-bit-or                    [_ x y] (NumberOps/intBitOr (->int x) (->int y)))
-  (ops-bit-xor                   [_ x y] (NumberOps/intBitXor (->int x) (->int y)))
-  (ops-bit-shift-left            [_ x y] (NumberOps/intBitShiftLeft (->int x) (->int y)))
   (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/intBitUnsignedShiftRight (->int x) (->int y)))
   (ops-equals                    [_ x y] (-equals ->int x y)))
 
 (deftype LongOps []
   Ops
   (ops-equals                    [_ x y] (-equals ->long x y))
-  ;(ops-bit-or                    [_ x y] (NumberOps/longBitOr (->long x) (->long y)))
-  (ops-bit-xor                   [_ x y] (NumberOps/longBitXor (->long x) (->long y)))
-  ;(ops-bit-shift-left            [_ x y] (NumberOps/longBitShiftLeft (->long x) (->long y)))
   (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/longBitUnsignedShiftRight (->long x) (->long y)))
   )
 
@@ -442,14 +464,11 @@
 
 (defprotocol BitOperations
   (-bit-count                [this])
-  (-bit-or                   [this other])
-  (-bit-xor                  [this other])
-  (-bit-shift-left           [this shift])
   (-bit-unsigned-shift-right [this shift]))
 
 (defn- long-hash-code [lpart]
   (unsafe-cast-int
-    (-bit-xor
+    (bxor
       lpart
       (-bit-unsigned-shift-right lpart 32))))
 
@@ -485,28 +504,6 @@
   (-> (no-overflow-ops (type this) (type other))
     (ops-equals this other)))
 
-(defmacro band [x y]
-  `(. BitAnd (numberBitAnd ~x ~y)))
-
-(defmacro add [x y]
-  `(. Addition (numberAdd ~x ~y)))
-
-(defmacro increment [x]
-  `(. Increment (numberIncrement ~x)))
-
-(defmacro multiply [x y]
-  `(. Multiplication (numberMultiply ~x ~y)))
-
-(defmacro subtract
-  ([x] `(. Negation (numberNegate ~x)))
-  ([x y] `(. Subtraction (numberSubtract ~x ~y))))
-
-(defmacro decrement [x]
-  `(. Decrement (numberDecrement ~x)))
-
-(defmacro divide [x y]
-  `(. Division (numberDivide ~x ~y)))
-
 (extend-type Number
   IEquivalence
   (-equivalent? [this other]
@@ -525,18 +522,6 @@
   BitOperations
   (-bit-count [i]
     (ops-bit-count (make-ops i) i))
-
-  (-bit-or [this other]
-    (-> (no-overflow-ops (type this) (type other))
-      (ops-bit-or this other)))
-
-  (-bit-xor [this other]
-    (-> (no-overflow-ops (type this) (type other))
-      (ops-bit-xor this other)))
-
-  (-bit-shift-left [this shift]
-    (-> (no-overflow-ops (type this) (type shift))
-      (ops-bit-shift-left this shift)))
 
   (-bit-unsigned-shift-right [this shift]
     (-> (no-overflow-ops (type this) (type shift))

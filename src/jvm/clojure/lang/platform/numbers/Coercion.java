@@ -62,10 +62,11 @@ public final class Coercion {
   }
 
   public static long toBitOperand(Object x) {
-    if (x instanceof Byte ||
-        x instanceof Short ||
-        x instanceof Integer ||
-        x instanceof Long) {
+    if (x instanceof Long) {
+      return (Long) x;
+    } else if (x instanceof Byte ||
+               x instanceof Short ||
+               x instanceof Integer) {
       return toLong((Number) x);
     } else {
       throw new IllegalArgumentException("bit operation not supported for: " + x.getClass());
