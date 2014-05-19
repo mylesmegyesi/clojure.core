@@ -228,6 +228,17 @@
            #(bshift-left %1 %2)
            16 2 3))
 
+(deftest bit-unsigned-shift-right-test
+  (testing "works with a 0 in the signed position"
+    (op-test {Long [[byte short int long] [byte short int long]]}
+             #(bunsigned-shift-right %1 %2)
+             2 5 1))
+
+  (testing "works with a 1 in the signed position"
+    (op-test {Long [[byte short int long] [byte short int long]]}
+             #(bunsigned-shift-right %1 %2)
+             9223372036854775805 -5 1)))
+
 (deftest integer-addition-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}

@@ -102,6 +102,21 @@
 
   )
 
+(deftest bit-unsigned-shift-right-test
+  (testing "returns for a numbers and a shift"
+    (is (= 1 (unsigned-bit-shift-right 3 1))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (unsigned-bit-shift-right (bigint 1) 1))
+    (argument-error-thrown? (unsigned-bit-shift-right (double 0.1) 1))
+    (argument-error-thrown? (unsigned-bit-shift-right (float 0.1) 1))
+    (argument-error-thrown? (unsigned-bit-shift-right (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (unsigned-bit-shift-right "foo" 1)))
+
+  )
+
 (deftest bit-and-test
   (testing "returns for two arguments"
     (is (= 1 (bit-and 1 1))))
@@ -157,7 +172,7 @@
   )
 
 (deftest bit-shift-left-test
-  (testing "returns for two arguemnts"
+  (testing "returns for a numbers and a shift"
     (is (= 2 (bit-shift-left 1 1))))
 
  (testing "raises an error with big numbers and decimals"

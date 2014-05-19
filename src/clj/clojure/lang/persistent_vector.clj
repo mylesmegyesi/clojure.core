@@ -1,9 +1,9 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [cond declare defn- defn defprotocol deftype dec inc integer? let loop when < > >= ->])
-  (:require [clojure.next                     :refer :all :exclude [dec inc]]
+  (:refer-clojure :only [cond declare defn- defn defprotocol deftype integer? let loop when < > >= ->])
+  (:require [clojure.next                     :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.platform.exceptions :refer [new-argument-error new-out-of-bounds-exception]]
             [clojure.lang.numbers             :refer [->int]]
-            [clojure.lang.platform.hash-map   :refer [->bitnum]]
+            [clojure.lang.platform.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.protocols           :refer [-as-transient -assoc-n -conj! -persistent
                                                       IAssociative ICounted IEditableCollection IMeta IPersistentVector
                                                       ISeq ISeqable ITransientCollection IIndexed]]))
@@ -54,7 +54,7 @@
   (if (< length 32)
     0
     (-> (->bitnum (dec length))
-        (bit-unsigned-shift-right (->bitnum 5))
+        (unsigned-bit-shift-right (->bitnum 5))
         (bit-shift-left (->bitnum 5)))))
 
 (defn- new-path [edit level node]
@@ -65,7 +65,7 @@
       new-node)))
 
 (defn- push-tail [level parent-node tail-node length root]
-  (let [subidx (bit-and (->int (bit-unsigned-shift-right (->bitnum (dec length)) (->bitnum level))) (->bitnum 0x01f))
+  (let [subidx (bit-and (->int (unsigned-bit-shift-right (->bitnum (dec length)) (->bitnum level))) (->bitnum 0x01f))
         new-node (make-node (get-edit parent-node) (aclone (get-array parent-node)))]
     (if (= level 5)
       (aset (get-array new-node) subidx tail-node)
@@ -88,7 +88,7 @@
       (let [tail-node (make-node (get-edit -root) -tail)
             new-tail (make-array 32)]
         (aset new-tail 0 x)
-        (if (> (bit-unsigned-shift-right (->bitnum -length) (->bitnum 5)) (bit-shift-left (->bitnum 1) (->bitnum -shift)))
+        (if (> (unsigned-bit-shift-right (->bitnum -length) (->bitnum 5)) (bit-shift-left (->bitnum 1) (->bitnum -shift)))
           (let [new-root (make-node (get-edit -root))]
             (aset (get-array new-root) 0 -root)
             (aset (get-array new-root) 1 (new-path (get-edit -root) -shift tail-node))
@@ -122,7 +122,7 @@
       (do
         (aset (get-array new-node) (bit-and (->bitnum n) (->bitnum 0x01f)) x)
         new-node)
-      (let [subidx (bit-and (bit-unsigned-shift-right (->bitnum n) (->bitnum level)) (->bitnum 0x01f))]
+      (let [subidx (bit-and (unsigned-bit-shift-right (->bitnum n) (->bitnum level)) (->bitnum 0x01f))]
         (aset (get-array new-node) subidx (do-assoc (- level 5) (aget (get-array node) subidx) n x))
         new-node))))
 
@@ -138,7 +138,7 @@
       (let [tail-node (make-node (get-edit -root) -tail)
             new-arr (make-array 1)]
         (aset new-arr 0 x)
-        (if (> (bit-unsigned-shift-right (->bitnum -length) (->bitnum 5)) (bit-shift-left (->bitnum 1) (->bitnum -shift)))
+        (if (> (unsigned-bit-shift-right (->bitnum -length) (->bitnum 5)) (bit-shift-left (->bitnum 1) (->bitnum -shift)))
           (let [new-root (make-node (get-edit -root))]
             (aset (get-array new-root) 0 -root)
             (aset (get-array new-root) 1 (new-path (get-edit -root) -shift tail-node))
