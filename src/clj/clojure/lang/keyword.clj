@@ -1,5 +1,5 @@
 (ns clojure.lang.keyword
-  (:refer-clojure :only [deftype defmacro declare defn + let list* list concat ->])
+  (:refer-clojure :only [deftype defmacro declare defn + let list list* concat ->])
   (:require [clojure.lang.deftype              :refer [expand-methods]]
             [clojure.lang.platform.comparison  :refer [platform-compare-to-method]]
             [clojure.lang.platform.equivalence :refer [platform-equals-method]]

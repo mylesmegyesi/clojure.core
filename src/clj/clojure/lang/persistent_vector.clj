@@ -5,7 +5,8 @@
             [clojure.lang.numbers             :refer [->int]]
             [clojure.lang.platform.hash-map   :refer [->bitnum]]
             [clojure.lang.protocols           :refer [-as-transient -assoc-n -conj! -persistent
-                                                      IAssociative ICounted IEditableCollection IMeta IPersistentVector
+                                                      IAssociative ICounted IEditableCollection IMeta
+                                                      IPersistentCollection IPersistentVector
                                                       ISeq ISeqable ITransientCollection IIndexed]]))
 
 (declare make-vector-seq)
@@ -127,7 +128,7 @@
         new-node))))
 
 (deftype PersistentVector [-meta -length -shift -root -tail -seq]
-  IPersistentVector
+  IPersistentCollection
   (-cons [this x]
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
       (let [tail-length (alength -tail)
@@ -146,6 +147,7 @@
           (let [new-root (push-tail -shift -root tail-node -length -root)]
             (make-vector -meta (inc -length) -shift new-root new-arr))))))
 
+  IPersistentVector
   (-assoc-n [this n x]
     (cond
       (n-in-range? n -length)

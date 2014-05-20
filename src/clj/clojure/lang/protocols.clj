@@ -57,6 +57,16 @@
   (-name [this])
   (-namespace [this]))
 
+(defprotocol IPersistentCollection
+  (-cons [this x])
+  (-empty [this]))
+
+(defprotocol IPersistentStack
+  (-peek [this])
+  (-pop [this]))
+
+(defprotocol IPersistentList)
+
 (defprotocol IPersistentMap
   (-dissoc [this k]))
 
@@ -68,7 +78,6 @@
   (-union        [this sets]))
 
 (defprotocol IPersistentVector
-  (-cons [this x])
   (-assoc-n [this n x]))
 
 (defprotocol IRatio
