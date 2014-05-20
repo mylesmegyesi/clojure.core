@@ -151,10 +151,6 @@
 (defn count [obj]
   (-count obj))
 
-(extend-type nil
-  ICounted
-  (-count [this] 0))
-
 (defn deref [obj]
   (-deref obj))
 
@@ -188,6 +184,14 @@
 
 (defn namespace [named]
   (-namespace named))
+
+(extend-type nil
+  ICounted
+  (-count [this] 0)
+  ISeqable
+  (-seq [this] nil)
+  ISeq
+  (-first [this] nil))
 
 (defn seq [s]
   (-seq s))
@@ -226,14 +230,8 @@
     (list elem)
     (make-cons elem (seq seqable))))
 
-(extend-type nil
-  ISeqable
-  (-seq [this] nil))
-
 (defn first [s]
-  (if (satisfies? ISeq s)
-    (-first s)
-    (-first (seq s))))
+  (-first (seq s)))
 
 (defn next [s]
   (-next (seq s)))
