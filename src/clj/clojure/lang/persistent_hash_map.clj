@@ -6,11 +6,11 @@
             [clojure.lang.map-entry              :refer [new-map-entry]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.hash-map      :refer [->bitnum empty-object
-                                                         bit-and bit-or bit-xor bit-shift-left
+                                                         bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right
                                                          + inc * - dec]]
             [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
                                                          IMeta IPersistentMap ISeqable ISeq]]
-            [clojure.next                        :refer :all :exclude [and bit-and bit-or bit-xor bit-shift-left
+            [clojure.next                        :refer :all :exclude [and bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right
                                                                        + inc * - dec]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
@@ -58,7 +58,7 @@
 
 (defn- mask [hash shift]
   (bit-and
-    (bit-unsigned-shift-right hash shift)
+    (unsigned-bit-shift-right hash shift)
     BITMASK))
 
 (defn- bit-pos [hash shift]
@@ -304,7 +304,7 @@
               (aset nodes jdx jdx-node)
               (loop [i ZERO j ZERO]
                 (when (< i THIRTY-TWO)
-                  (if (not= (bit-and (bit-unsigned-shift-right bitmap i) ONE) ZERO)
+                  (if (not= (bit-and (unsigned-bit-shift-right bitmap i) ONE) ZERO)
                     (do
                       (if (nil? (aget arr j))
                         (aset nodes i (aget arr (inc j)))
@@ -364,7 +364,7 @@
                     jdx-node (node-assoc-ref EMPTY-BitmapIndexedNode edit (+ FIVE shift) hash key val added-leaf)]
                 (loop [i ZERO j ZERO]
                   (when (< i THIRTY-TWO)
-                    (if (not= (bit-and (bit-unsigned-shift-right i) ONE) ZERO)
+                    (if (not= (bit-and (unsigned-bit-shift-right bitmap i) ONE) ZERO)
                       (do
                         (if (nil? (aget arr j))
                           (aset nodes i (aget (inc j)))

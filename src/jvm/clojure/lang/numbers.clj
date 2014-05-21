@@ -29,6 +29,9 @@
 (defmacro bshift-left [x y]
   `(. BitOps (numberBitShiftLeft ~x ~y)))
 
+(defmacro bunsigned-shift-right [x y]
+  `(. BitOps (numberUnsignedBitShiftRight ~x ~y)))
+
 (defmacro add [x y]
   `(. Addition (numberAdd ~x ~y)))
 
@@ -222,7 +225,6 @@
 
 (defprotocol Ops
   (ops-bit-count                [ops i])
-  (ops-bit-unsigned-shift-right [ops x y])
   (ops-equals                   [ops x y])
   (ops-zero?                    [ops x]))
 
@@ -242,13 +244,11 @@
 (deftype IntegerOps []
   Ops
   (ops-bit-count                 [_ i]   (Integer/bitCount i))
-  (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/intBitUnsignedShiftRight (->int x) (->int y)))
   (ops-equals                    [_ x y] (-equals ->int x y)))
 
 (deftype LongOps []
   Ops
   (ops-equals                    [_ x y] (-equals ->long x y))
-  (ops-bit-unsigned-shift-right  [_ x y] (NumberOps/longBitUnsignedShiftRight (->long x) (->long y)))
   )
 
 (deftype FloatOps []
@@ -463,14 +463,13 @@
 (defmethod no-overflow-ops [BigDecimal BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
 
 (defprotocol BitOperations
-  (-bit-count                [this])
-  (-bit-unsigned-shift-right [this shift]))
+  (-bit-count                [this]))
 
 (defn- long-hash-code [lpart]
   (unsafe-cast-int
     (bxor
       lpart
-      (-bit-unsigned-shift-right lpart 32))))
+      (bunsigned-shift-right lpart 32))))
 
 (extend-protocol IHash
   Byte
@@ -522,10 +521,6 @@
   BitOperations
   (-bit-count [i]
     (ops-bit-count (make-ops i) i))
-
-  (-bit-unsigned-shift-right [this shift]
-    (-> (no-overflow-ops (type this) (type shift))
-      (ops-bit-unsigned-shift-right this shift)))
 
   NumberCoercions
   (->long   [this] (.longValue this))

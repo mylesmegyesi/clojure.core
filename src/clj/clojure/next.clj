@@ -17,8 +17,8 @@
 (defn type [x]
   (platform-object/type x))
 
-(require ['clojure.lang.numbers :refer ['-bit-unsigned-shift-right
-                                        '-bit-count
+(require ['clojure.lang.numbers :refer ['-bit-count
+                                        'bunsigned-shift-right
                                         'bshift-left
                                         'band
                                         'bor
@@ -102,8 +102,8 @@
   [& args]
   (not (apply == args)))
 
-(defn bit-unsigned-shift-right [n shift]
-  (-bit-unsigned-shift-right n shift))
+(defn unsigned-bit-shift-right [n shift]
+  (bunsigned-shift-right n shift))
 
 (defn bit-shift-left [n shift]
   (bshift-left n shift))

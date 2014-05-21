@@ -14,6 +14,9 @@
 
 (def integer-one (int 1))
 
+(defmacro unsigned-bit-shift-right [x y]
+  `(. BitOps (integerPreserveUnsignedBitShiftRight ~x ~y)))
+
 (defmacro bit-and [x y]
   `(. BitOps (integerPreserveBitAnd ~x ~y)))
 
