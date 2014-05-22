@@ -18,6 +18,8 @@
   (platform-object/type x))
 
 (require ['clojure.lang.numbers :refer ['-bit-count
+                                        'numbers-equal?
+                                        'numbers-equivalent?
                                         'bunsigned-shift-right
                                         'bshift-left
                                         'band
@@ -60,18 +62,19 @@
        ~@body)))
 
 (defn- equal? [x y]
-  (when-not-nil
-    x y
-    (-equal? x y)))
+  (when-not-nil x y
+    (if (and (number? x) (number? y))
+      (numbers-equal? x y)
+      (-equal? x y))))
 
 (defn- equivalent? [x y]
-  (when-not-nil
-    x y
-    (do
-    (-equivalent? x y))))
+  (when-not-nil x y
+    (if (and (number? x) (number? y))
+      (numbers-equivalent? x y)
+      (-equivalent? x y))))
 
 (defn =
-  "Eqaulity. Calls the -equal? method on the first argument."
+  "Eqaulity. When provided with numbers performs numbers-equal?. Else, calls the -equal? method on the first argument."
   ([x] true)
   ([x y] (equal? x y))
   ([x y & more] (and (= x y) (apply = y more))))
