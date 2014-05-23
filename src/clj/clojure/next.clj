@@ -182,6 +182,9 @@
 (defn with-meta [this new-meta]
   (-with-meta this new-meta))
 
+(defn vary-meta [this f & args]
+  (with-meta this (apply f (meta this) args)))
+
 (defn name [named]
   (-name named))
 
