@@ -275,3 +275,12 @@
     (class-cast-exception-thrown? (/ 1 "Foo")))
 
   )
+
+(deftest zero-test
+  (testing "determines if a number is zero"
+    (is (zero? 0)))
+
+  (testing "raises an error without a number argument"
+    (class-cast-exception-thrown? (zero? "Foo")))
+
+  )

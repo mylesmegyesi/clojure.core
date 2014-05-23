@@ -1,7 +1,7 @@
 (ns clojure.lang.numbers
-  (:refer-clojure :only [and or case cond contains? defmacro defn defn- defprotocol deftype defmulti defmethod defn- mod not nil? zero? extend-protocol extend-type fn let -> / =])
+  (:refer-clojure :only [let fn defmacro defn defn- mod extend-protocol extend-type])
   (:require [clojure.lang.protocols :refer [IHash IRatio -denominator -numerator]]
-            [clojure.next           :refer [instance? type]])
+            [clojure.next           :refer :all])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
            [java.util.concurrent.atomic AtomicInteger AtomicLong]
@@ -16,7 +16,8 @@
            [clojure.lang.platform.numbers Subtraction]
            [clojure.lang.platform.numbers Decrement]
            [clojure.lang.platform.numbers Division]
-           [clojure.lang.platform.numbers Negation]))
+           [clojure.lang.platform.numbers Negation]
+           [clojure.lang.platform.numbers Zero]))
 
 (defmacro band [x y]
   `(. BitOps (numberBitAnd ~x ~y)))
@@ -58,6 +59,9 @@
 (defmacro numbers-equivalent? [x y]
   `(. Equivalence (numbersEquivalent ~x ~y)))
 
+(defmacro is-zero? [x]
+  `(. Zero (numberIsZero ~x)))
+
 (defn ->int [n]
   (.intValue n))
 
@@ -67,81 +71,17 @@
   (-denominator [this] (.getDenominator this)))
 
 (defn- gcd [a b]
-  (if (zero? b)
+  (if (is-zero? b)
     a
     (recur b (mod a b))))
 
 (defn make-ratio [numerator denominator]
  (let [gcd (gcd numerator denominator)]
-    (if (zero? gcd)
+    (if (is-zero? gcd)
       (Ratio. (BigInteger. "0") (BigInteger. "1"))
-      (let [n (BigInteger. (.toString (/ numerator gcd)))
-            d (BigInteger. (.toString (/ denominator gcd)))]
+      (let [n (BigInteger. (.toString (divide numerator gcd)))
+            d (BigInteger. (.toString (divide denominator gcd)))]
         (Ratio. n d)))))
-
-(defprotocol Ops
-  (ops-zero?                    [ops x]))
-
-(def INTEGER-ZERO (Integer. "0"))
-
-(deftype BigDecimalOps []
-  Ops
-  (ops-zero?  [this x]
-    (.equals (.signum x) INTEGER-ZERO)))
-
-(def BIGDECIMAL-OPS (BigDecimalOps.))
-
-(defprotocol MakeOps
-  (make-ops [this]))
-
-(extend-protocol MakeOps
-  BigDecimal
-  (make-ops [this] BIGDECIMAL-OPS))
-
-(defmulti no-overflow-ops (fn [t1 t2] [t1 t2]))
-
-(defmethod no-overflow-ops [Byte BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Short BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Integer BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [AtomicInteger BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Long BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [AtomicLong BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Float Ratio]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Float BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Float BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Float BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Double BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Double BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Double BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Ratio Float]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Ratio Double]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Ratio BigInt]        [ops2 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Ratio BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [Ratio BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInteger Float]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInteger Double]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInteger BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInteger BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInteger BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInteger Ratio]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInt Float]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInt Double]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInt BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInt BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInt BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigInt Ratio]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal Byte]          [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal Short]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal Integer]       [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal AtomicInteger] [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal Long]          [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal AtomicLong]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal Float]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal Double]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal Ratio]         [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal BigInteger]    [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal BigInt]        [ops1 ops2] BIGDECIMAL-OPS)
-(defmethod no-overflow-ops [BigDecimal BigDecimal]    [ops1 ops2] BIGDECIMAL-OPS)
 
 (defn unsafe-cast-int [i]
   (.intValue i))
@@ -171,7 +111,7 @@
 
   BigDecimal
   (-hash [this]
-    (if (ops-zero? (make-ops this) this)
+    (if (is-zero? this)
       (.hashCode BigInteger/ZERO)
       (.hashCode (.stripTrailingZeros this))))
 

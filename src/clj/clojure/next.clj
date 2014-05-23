@@ -20,7 +20,8 @@
 (require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
                                         'bunsigned-shift-right 'bshift-left 'band 'bor 'bxor
                                         'increment 'decrement
-                                        'add 'multiply 'subtract 'divide]])
+                                        'add 'multiply 'subtract 'divide
+                                        'is-zero?]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -140,6 +141,9 @@
 
 (defn dec [i]
   (decrement i))
+
+(defn zero? [i]
+  (is-zero? i))
 
 (defn count [obj]
   (-count obj))
