@@ -17,20 +17,10 @@
 (defn type [x]
   (platform-object/type x))
 
-(require ['clojure.lang.numbers :refer ['-bit-count
-                                        'numbers-equal?
-                                        'numbers-equivalent?
-                                        'bunsigned-shift-right
-                                        'bshift-left
-                                        'band
-                                        'bor
-                                        'bxor
-                                        'add
-                                        'increment
-                                        'multiply
-                                        'subtract
-                                        'decrement
-                                        'divide]])
+(require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
+                                        'bunsigned-shift-right 'bshift-left 'band 'bor 'bxor
+                                        'increment 'decrement
+                                        'add 'multiply 'subtract 'divide]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -122,9 +112,6 @@
 (defn bit-xor
   ([n other] (bxor n other))
   ([n other & more] (clojure.core/reduce bit-xor (bit-xor n other) more)))
-
-(defn bit-count [i]
-  (-bit-count i))
 
 (defn +
   ([] 0)
