@@ -17,18 +17,11 @@
 (defn type [x]
   (platform-object/type x))
 
-(require ['clojure.lang.numbers :refer ['-bit-count
-                                        'bunsigned-shift-right
-                                        'bshift-left
-                                        'band
-                                        'bor
-                                        'bxor
-                                        'add
-                                        'increment
-                                        'multiply
-                                        'subtract
-                                        'decrement
-                                        'divide]])
+(require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
+                                        'bunsigned-shift-right 'bshift-left 'band 'bor 'bxor
+                                        'increment 'decrement
+                                        'add 'multiply 'subtract 'divide
+                                        'is-zero?]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -60,18 +53,19 @@
        ~@body)))
 
 (defn- equal? [x y]
-  (when-not-nil
-    x y
-    (-equal? x y)))
+  (when-not-nil x y
+    (if (and (number? x) (number? y))
+      (numbers-equal? x y)
+      (-equal? x y))))
 
 (defn- equivalent? [x y]
-  (when-not-nil
-    x y
-    (do
-    (-equivalent? x y))))
+  (when-not-nil x y
+    (if (and (number? x) (number? y))
+      (numbers-equivalent? x y)
+      (-equivalent? x y))))
 
 (defn =
-  "Eqaulity. Calls the -equal? method on the first argument."
+  "Eqaulity. When provided with numbers performs numbers-equal?. Else, calls the -equal? method on the first argument."
   ([x] true)
   ([x y] (equal? x y))
   ([x y & more] (and (= x y) (apply = y more))))
@@ -120,9 +114,6 @@
   ([n other] (bxor n other))
   ([n other & more] (clojure.core/reduce bit-xor (bit-xor n other) more)))
 
-(defn bit-count [i]
-  (-bit-count i))
-
 (defn +
   ([] 0)
   ([x] (add x 0))
@@ -150,6 +141,9 @@
 
 (defn dec [i]
   (decrement i))
+
+(defn zero? [i]
+  (is-zero? i))
 
 (defn count [obj]
   (-count obj))

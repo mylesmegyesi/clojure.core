@@ -6,7 +6,7 @@
             [clojure.lang.map-entry              :refer [new-map-entry]]
             [clojure.lang.platform.exceptions    :refer [new-argument-error]]
             [clojure.lang.platform.hash-map      :refer [->bitnum empty-object
-                                                         bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right
+                                                         bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
                                                          + inc * - dec]]
             [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
                                                          IMeta IPersistentMap ISeqable ISeq]]

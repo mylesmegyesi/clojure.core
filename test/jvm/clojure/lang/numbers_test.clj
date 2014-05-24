@@ -981,6 +981,32 @@
       (is (= Long (type (divide t1 t2))))
       (is (= 2 (divide t1 t2))))))
 
+(deftest integer-zero-test
+  (is (is-zero? (int 0)))
+  (is (not (is-zero? (int 1))))
+  (is (is-zero? (long 0)))
+  (is (not (is-zero? (int 1)))))
+
+(deftest big-integer-zero-test
+  (is (is-zero? (bigint 0)))
+  (is (not (is-zero? (bigint 1))))
+  (is (is-zero? (biginteger 0)))
+  (is (not (is-zero? (biginteger 1)))))
+
+(deftest ratio-zero-test
+  (is (is-zero? (make-ratio 0 1)))
+  (is (not (is-zero? (make-ratio 1 1)))))
+
+(deftest big-decimal-zero-test
+  (is (is-zero? (bigdecimal 0.0)))
+  (is (not (is-zero? (bigdecimal 1.0)))))
+
+(deftest double-zero-test
+  (is (is-zero? (double 0.0)))
+  (is (not (is-zero? (double 1.0))))
+  (is (is-zero? (float 0.0)))
+  (is (not (is-zero? (float 1.0)))))
+
 (deftest ratio-test
   (testing "numerator of a ratio"
     (let [ratio (make-ratio 1 2)]

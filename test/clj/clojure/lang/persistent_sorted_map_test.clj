@@ -1,10 +1,10 @@
 (ns clojure.lang.persistent-sorted-map-test
-  (:refer-clojure :only [conj dec defn- distinct let loop nil? rand-nth remove rand-int reduce repeatedly sort zero? >])
+  (:refer-clojure :only [conj defn- distinct let loop nil? rand-nth remove rand-int reduce repeatedly sort >])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
-            [clojure.next                       :refer :all :exclude [dec reduce]]))
+            [clojure.next                       :refer :all :exclude [reduce]]))
 
 (deftest sorted-map-test
   (map-test "PersistentTreeMap" sorted-map))

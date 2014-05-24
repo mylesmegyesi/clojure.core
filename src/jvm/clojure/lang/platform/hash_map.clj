@@ -29,6 +29,9 @@
 (defmacro bit-shift-left [x y]
   `(. BitOps (integerPreserveBitShiftLeft ~x ~y)))
 
+(defmacro bit-count [x]
+  `(Integer/bitCount ~x))
+
 (defmacro + [x y]
   `(. Addition (integerPreserveAdd ~x ~y)))
 
