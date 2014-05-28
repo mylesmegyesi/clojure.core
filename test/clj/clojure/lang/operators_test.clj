@@ -150,6 +150,24 @@
 
   )
 
+(deftest bit-and-not-test
+  (testing "returns for two arguments"
+    (is (= 0 (bit-and-not 1 1))))
+
+  (testing "returns for many arguments"
+    (is (= 0 (bit-and-not 1 1 1))))
+
+  (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-and-not (bigint 1) 1))
+    (argument-error-thrown? (bit-and-not (double 0.1) 1))
+    (argument-error-thrown? (bit-and-not (float 0.1) 1))
+    (argument-error-thrown? (bit-and-not (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-and-not "foo" 1)))
+
+  )
+
 (deftest bit-or-test
   (testing "returns for two arguments"
     (is (= 1 (bit-or 1 1))))

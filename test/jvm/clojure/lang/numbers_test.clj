@@ -219,7 +219,12 @@
 (deftest bit-and-test
   (op-test {Long [[byte short int long] [byte short int long]]}
            #(band %1 %2)
-             4 4 5))
+           4 4 5))
+
+(deftest bit-and-not-test
+  (op-test {Long [[byte short int long] [byte short int long]]}
+           #(band-not %1 %2)
+           2 42 41))
 
 (deftest bit-or-test
   (op-test {Long [[byte short int long] [byte short int long]]}

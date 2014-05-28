@@ -25,6 +25,9 @@
 (defmacro band [x y]
   `(. BitOps (numberBitAnd ~x ~y)))
 
+(defmacro band-not [x y]
+  `(. BitOps (numberBitAndNot ~x ~y)))
+
 (defmacro bor [x y]
   `(. BitOps (numberBitOr ~x ~y)))
 
