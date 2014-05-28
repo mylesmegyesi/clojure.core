@@ -285,14 +285,7 @@
     (let [mta {:so :meta}
           m1 (constructor)
           m2 (with-meta m1 mta)]
-      (is (= mta (meta m2)))))
-
-  (testing "vary-meta will return the same object with a function applied to meta"
-    (let [vary-fn #(select-keys %1 %2)
-          m1 (constructor)
-          m2 (with-meta m1 {:a 1 :b 2 :c 3})
-          m3 (vary-meta m2 vary-fn '(:b))]
-      (is (= {:b 2} (meta m3))))))
+      (is (= mta (meta m2))))))
 
 (deftype Thing [t]
   IHash
