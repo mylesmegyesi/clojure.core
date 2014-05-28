@@ -19,6 +19,9 @@
            [clojure.lang.platform.numbers Negation]
            [clojure.lang.platform.numbers Zero]))
 
+(defmacro bnot [x]
+  `(. BitOps (numberBitNot ~x)))
+
 (defmacro band [x y]
   `(. BitOps (numberBitAnd ~x ~y)))
 
