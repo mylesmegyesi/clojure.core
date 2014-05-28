@@ -1,5 +1,5 @@
 (ns clojure.lang.numbers-test
-  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let if-not when
+  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let if-not when rest
                          byte short int long bigint biginteger float double
                          < >
                          ])
@@ -208,10 +208,23 @@
 (defn- bigdecimal [n] (BigDecimal. n))
 (defn- number [n] (FallBackNumber. n))
 
+(deftest bit-not-test
+  (loop [types [byte short int long]]
+    (if-not (clojure.core/empty? types)
+      (let [t (clojure.core/first types)]
+        (is (= -22 (bnot (t 21))))
+        (is (= Long (type (bnot (t 21)))))
+        (recur (clojure.core/rest types))))))
+
 (deftest bit-and-test
   (op-test {Long [[byte short int long] [byte short int long]]}
            #(band %1 %2)
-             4 4 5))
+           4 4 5))
+
+(deftest bit-and-not-test
+  (op-test {Long [[byte short int long] [byte short int long]]}
+           #(band-not %1 %2)
+           2 42 41))
 
 (deftest bit-or-test
   (op-test {Long [[byte short int long] [byte short int long]]}

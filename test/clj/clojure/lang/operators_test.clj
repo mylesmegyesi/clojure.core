@@ -117,6 +117,21 @@
 
   )
 
+(deftest bit-not-test
+  (testing "returns for a number"
+    (is (= 41 (bit-not -42))))
+
+  (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-not (bigint 1)))
+    (argument-error-thrown? (bit-not (double 0.1)))
+    (argument-error-thrown? (bit-not (float 0.1)))
+    (argument-error-thrown? (bit-not (bigdec 0.1))))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-not "foo")))
+
+  )
+
 (deftest bit-and-test
   (testing "returns for two arguments"
     (is (= 1 (bit-and 1 1))))
@@ -132,6 +147,24 @@
 
   (testing "raises an error without a number type"
     (argument-error-thrown? (bit-and "foo" 1)))
+
+  )
+
+(deftest bit-and-not-test
+  (testing "returns for two arguments"
+    (is (= 0 (bit-and-not 1 1))))
+
+  (testing "returns for many arguments"
+    (is (= 0 (bit-and-not 1 1 1))))
+
+  (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-and-not (bigint 1) 1))
+    (argument-error-thrown? (bit-and-not (double 0.1) 1))
+    (argument-error-thrown? (bit-and-not (float 0.1) 1))
+    (argument-error-thrown? (bit-and-not (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-and-not "foo" 1)))
 
   )
 

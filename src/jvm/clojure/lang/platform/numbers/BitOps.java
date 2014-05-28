@@ -2,10 +2,21 @@ package clojure.lang.platform.numbers;
 
 public final class BitOps {
 
+  public static long numberBitNot(Object x) {
+    long lx = Coercion.toBitOperand(x);
+    return ~lx;
+  }
+
   public static long numberBitAnd(Object x, Object y) {
     long lx = Coercion.toBitOperand(x);
     long ly = Coercion.toBitOperand(y);
     return lx & ly;
+  }
+
+  public static long numberBitAndNot(Object x, Object y) {
+    long lx = Coercion.toBitOperand(x);
+    long ly = Coercion.toBitOperand(y);
+    return lx & ~ly;
   }
 
   public static int integerPreserveBitAnd(int x, int y) {

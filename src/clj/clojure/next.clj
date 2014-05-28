@@ -18,7 +18,7 @@
   (platform-object/type x))
 
 (require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
-                                        'bunsigned-shift-right 'bshift-left 'band 'bor 'bxor
+                                        'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor
                                         'increment 'decrement
                                         'add 'multiply 'subtract 'divide
                                         'is-zero?]])
@@ -102,9 +102,15 @@
 (defn bit-shift-left [n shift]
   (bshift-left n shift))
 
+(defn bit-not [x] (bnot x))
+
 (defn bit-and
   ([n other] (band n other))
   ([n other & more] (clojure.core/reduce bit-and (bit-and n other) more)))
+
+(defn bit-and-not
+  ([n other] (band-not n other))
+  ([n other & more] (clojure.core/reduce bit-and-not (bit-and-not n other) more)))
 
 (defn bit-or
   ([n other] (bor n other))
