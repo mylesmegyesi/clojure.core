@@ -102,6 +102,21 @@
 
   )
 
+(deftest bit-shift-right-test
+  (testing "returns for a numbers and a shift"
+    (is (= 1 (bit-shift-right 3 1))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-shift-right (bigint 1) 1))
+    (argument-error-thrown? (bit-shift-right (double 0.1) 1))
+    (argument-error-thrown? (bit-shift-right (float 0.1) 1))
+    (argument-error-thrown? (bit-shift-right (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-shift-right "foo" 1)))
+
+  )
+
 (deftest bit-unsigned-shift-right-test
   (testing "returns for a numbers and a shift"
     (is (= 1 (unsigned-bit-shift-right 3 1))))
@@ -201,6 +216,66 @@
 
   (testing "raises an error without a number type"
     (argument-error-thrown? (bit-xor "foo" 1)))
+
+  )
+
+(deftest bit-clear-test
+  (testing "returns for a number and a position"
+    (is (= 0 (bit-clear 1 0))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-clear (bigint 1) 1))
+    (argument-error-thrown? (bit-clear (double 0.1) 1))
+    (argument-error-thrown? (bit-clear (float 0.1) 1))
+    (argument-error-thrown? (bit-clear (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-clear "foo" 1)))
+
+  )
+
+(deftest bit-set-test
+  (testing "returns for a number and a position"
+    (is (= 1 (bit-set 1 0))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-set (bigint 1) 1))
+    (argument-error-thrown? (bit-set (double 0.1) 1))
+    (argument-error-thrown? (bit-set (float 0.1) 1))
+    (argument-error-thrown? (bit-set (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-set "foo" 1)))
+
+  )
+
+(deftest bit-flip-test
+  (testing "returns for a number and a position"
+    (is (= 5 (bit-flip 1 2))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-flip (bigint 1) 1))
+    (argument-error-thrown? (bit-flip (double 0.1) 1))
+    (argument-error-thrown? (bit-flip (float 0.1) 1))
+    (argument-error-thrown? (bit-flip (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-flip "foo" 1)))
+
+  )
+
+(deftest bit-test-test
+  (testing "returns for a number and a position"
+    (is (= false (bit-test 1 2))))
+
+ (testing "raises an error with big numbers and decimals"
+    (argument-error-thrown? (bit-test (bigint 1) 1))
+    (argument-error-thrown? (bit-test (double 0.1) 1))
+    (argument-error-thrown? (bit-test (float 0.1) 1))
+    (argument-error-thrown? (bit-test (bigdec 0.1) 1)))
+
+  (testing "raises an error without a number type"
+    (argument-error-thrown? (bit-test "foo" 1)))
 
   )
 

@@ -236,10 +236,35 @@
            #(bxor %1 %2)
            1 4 5))
 
+(deftest bit-clear-test
+  (op-test {Long [[byte short int long] [byte short int long]]}
+           #(bclear %1 %2)
+           1 5 2))
+
+(deftest bit-set-test
+  (op-test {Long [[byte short int long] [byte short int long]]}
+           #(bset %1 %2)
+           3 1 1))
+
+(deftest bit-flip-test
+  (op-test {Long [[byte short int long] [byte short int long]]}
+           #(bflip %1 %2)
+           1 0 0))
+
+(deftest bit-test-test
+  (op-test {Boolean [[byte short int long] [byte short int long]]}
+           #(btest %1 %2)
+           true 1 0))
+
 (deftest bit-shift-left-test
   (op-test {Long [[byte short int long] [byte short int long]]}
            #(bshift-left %1 %2)
            16 2 3))
+
+(deftest bit-shift-right-test
+  (op-test {Long [[byte short int long] [byte short int long]]}
+           #(bshift-right %1 %2)
+           1 5 2))
 
 (deftest bit-unsigned-shift-right-test
   (testing "works with a 0 in the signed position"

@@ -18,7 +18,7 @@
   (platform-object/type x))
 
 (require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
-                                        'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor
+                                        'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'decrement
                                         'add 'multiply 'subtract 'divide
                                         'is-zero?]])
@@ -96,6 +96,9 @@
   [& args]
   (not (apply == args)))
 
+(defn bit-shift-right [n shift]
+  (bshift-right n shift))
+
 (defn unsigned-bit-shift-right [n shift]
   (bunsigned-shift-right n shift))
 
@@ -119,6 +122,18 @@
 (defn bit-xor
   ([n other] (bxor n other))
   ([n other & more] (clojure.core/reduce bit-xor (bit-xor n other) more)))
+
+(defn bit-clear [x location]
+  (bclear x location))
+
+(defn bit-set [x location]
+  (bset x location))
+
+(defn bit-flip [x location]
+  (bflip x location))
+
+(defn bit-test [x location]
+  (btest x location))
 
 (defn +
   ([] 0)

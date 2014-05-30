@@ -34,8 +34,23 @@
 (defmacro bxor [x y]
   `(. BitOps (numberBitXor ~x ~y)))
 
+(defmacro bclear [x y]
+  `(. BitOps (numberBitClear ~x ~y)))
+
+(defmacro bset [x y]
+  `(. BitOps (numberBitSet ~x ~y)))
+
+(defmacro bflip [x y]
+  `(. BitOps (numberBitFlip ~x ~y)))
+
+(defmacro btest [x y]
+  `(. BitOps (numberBitTest ~x ~y)))
+
 (defmacro bshift-left [x y]
   `(. BitOps (numberBitShiftLeft ~x ~y)))
+
+(defmacro bshift-right [x y]
+  `(. BitOps (numberBitShiftRight ~x ~y)))
 
 (defmacro bunsigned-shift-right [x y]
   `(. BitOps (numberUnsignedBitShiftRight ~x ~y)))
