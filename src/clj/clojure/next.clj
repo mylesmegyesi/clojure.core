@@ -212,7 +212,11 @@
   ISeqable
   (-seq [this] nil)
   ISeq
-  (-first [this] nil))
+  (-first [this] nil)
+  IIndexed
+  (-nth
+    ([this n] nil)
+    ([this n default] default)))
 
 (defn seq [s]
   (-seq s))
