@@ -2,6 +2,7 @@
   (:refer-clojure :only [conj defn- distinct let loop nil? rand-nth remove rand-int reduce repeatedly sort >])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map-test   :refer [map-test]]
+            [clojure.lang.persistent-list       :refer [EMPTY-LIST]]
             [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
             [clojure.next                       :refer :all :exclude [reduce]]))
@@ -92,7 +93,7 @@
     (is (nil? (next (seq (sorted-map :k1 1))))))
 
   (testing "rest returns an empty list when there is only one entry"
-    (is (= '() (rest (seq (sorted-map :k1 1))))))
+    (is (= EMPTY-LIST (rest (seq (sorted-map :k1 1))))))
 
   (testing "returns items in default order with the default comparator"
     (let [m1 (sorted-map 2 :v2 3 :v3 1 :v1)

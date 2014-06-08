@@ -1,6 +1,7 @@
 (ns clojure.lang.persistent-map
-  (:refer-clojure :only [deftype defn defn- declare let nil? when-let when loop])
+  (:refer-clojure :only [deftype defn defn- declare nil? if-let when-let when loop])
   (:require [clojure.lang.aseq            :refer [defseq]]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.protocols       :refer [ICounted ISeq -assoc -dissoc]]
             [clojure.next                 :refer :all]))
 
@@ -19,10 +20,7 @@
     (new-key-seq (next -seq)))
 
   (-more [this]
-    (let [m (next -seq)]
-      (if m
-        (new-key-seq m)
-        '()))))
+    (if-let [m (next -seq)] (new-key-seq m) EMPTY-LIST)))
 
 (defn- new-key-seq [-seq]
   (when -seq
@@ -46,10 +44,7 @@
     (new-val-seq (next -seq)))
 
   (-more [this]
-    (let [m (next -seq)]
-      (if m
-        (new-key-seq m)
-        '()))))
+    (if-let [m (next -seq)] (new-val-seq m) EMPTY-LIST)))
 
 (defn- new-val-seq [-seq]
   (when -seq

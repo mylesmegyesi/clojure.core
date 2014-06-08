@@ -3,6 +3,7 @@
   (:require [clojure.lang.apersistent-map      :refer [defmap]]
             [clojure.lang.aseq                 :refer [defseq]]
             [clojure.lang.map-entry            :refer [new-map-entry]]
+            [clojure.lang.persistent-list      :refer [EMPTY-LIST]]
             [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
             [clojure.lang.protocols            :refer [ICounted ILookup IMeta
                                                        IAssociative IPersistentMap ISeqable ISeq]]
@@ -380,7 +381,7 @@
       (make-sorted-map-seq next-stack (dec -count))))
 
   (-more [this]
-    (if-let [s (next this)] s '()))
+    (if-let [s (next this)] s EMPTY-LIST))
 
   )
 

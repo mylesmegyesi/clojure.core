@@ -3,6 +3,7 @@
   (:require [clojure.test                     :refer :all]
             [clojure.lang.persistent-map-test :refer [map-test]]
             [clojure.lang.persistent-hash-set :refer [hash-set]]
+            [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
             [clojure.lang.persistent-set      :refer [union]]
             [clojure.next                     :refer :all]))
 
@@ -24,7 +25,7 @@
     (is (nil? (next (seq (hash-map :k1 1))))))
 
   (testing "rest returns an empty list when there is only one entry"
-    (is (= '() (rest (seq (hash-map :k1 1))))))
+    (is (= EMPTY-LIST (rest (seq (hash-map :k1 1))))))
 
   (testing "next returns the next entry when there more than one entry"
     (let [m1 (hash-map :k1 1 :k2 2)

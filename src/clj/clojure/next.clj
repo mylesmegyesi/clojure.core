@@ -206,20 +206,6 @@
 (defn namespace [named]
   (-namespace named))
 
-(extend-type nil
-  ICounted
-  (-count [this] 0)
-  ISeqable
-  (-seq [this] nil)
-  ISeq
-  (-first [this] nil)
-  (-next [this] nil)
-  (-more [this] '())
-  IIndexed
-  (-nth
-    ([this n] nil)
-    ([this n default] default)))
-
 (defn seq [s]
   (-seq s))
 
@@ -500,4 +486,20 @@
         (let [next-s (seq s)
               next-acc (f acc (first next-s))]
           (recur (next next-s) next-acc))))))
+
+(require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
+
+(extend-type nil
+  ICounted
+  (-count [this] 0)
+  ISeqable
+  (-seq [this] nil)
+  ISeq
+  (-first [this] nil)
+  (-next [this] nil)
+  (-more [this] EMPTY-LIST)
+  IIndexed
+  (-nth
+    ([this n] nil)
+    ([this n default] default)))
 
