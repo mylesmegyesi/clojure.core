@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-hash-map
-  (:refer-clojure :only [defn defn- declare defprotocol deftype -> let when even? loop format cond nil? >= < and])
+  (:refer-clojure :only [defn defn- declare defprotocol deftype -> let if-let when even? loop format cond nil? >= <])
   (:require [clojure.lang.apersistent-map        :refer [defmap]]
             [clojure.lang.aseq                   :refer [defseq]]
             [clojure.lang.atomic-ref             :refer [new-atomic-ref]]
@@ -10,7 +10,7 @@
                                                          + inc * - dec]]
             [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
                                                          IMeta IPersistentMap ISeqable ISeq]]
-            [clojure.next                        :refer :all :exclude [and bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right
+            [clojure.next                        :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right
                                                                        + inc * - dec]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
@@ -151,7 +151,9 @@
     (if (nil? s)
       (new-node-seq arr (+ TWO i) nil)
       (new-node-seq arr i (next s))))
-  )
+
+  (-more [this]
+    (if-let [s (next this)] s '())))
 
 (defn- new-node-seq
   ([arr] (new-node-seq arr ZERO nil))

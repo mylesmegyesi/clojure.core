@@ -41,6 +41,8 @@
 
   (-next [this] nil)
 
+  (-more [this] this)
+
   IPersistentList
 )
 
@@ -72,6 +74,8 @@
 
   (-next [this]
     (if (= count 1) nil rest))
+
+  (-more [this] rest)
 
   IPersistentList
 )

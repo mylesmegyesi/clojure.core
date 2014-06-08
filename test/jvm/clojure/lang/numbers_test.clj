@@ -1,5 +1,5 @@
 (ns clojure.lang.numbers-test
-  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let if-not when rest
+  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let if-not when
                          byte short int long bigint biginteger float double
                          < >
                          ])

@@ -21,7 +21,10 @@
                    (aget arr (inc position))))
 
   (-next [this]
-    (new-array-map-seq arr (dec count) (+ position 2))))
+    (new-array-map-seq arr (dec count) (+ position 2)))
+
+  (-more [this]
+    (if-let [sq (next this)] sq '())))
 
 (defn- new-array-map-seq [arr count position]
   (when (not= 0 count)

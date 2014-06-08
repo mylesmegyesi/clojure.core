@@ -1,3 +1,5 @@
+; Temporary namespace to help us transition to the seq methods
+
 (ns clojure.lang.platform.seqable
   (:refer-clojure :only [extend-type fn defn deftype declare when-let])
   (:require [clojure.lang.protocols :refer [ICounted ISeqable ISeq]]))
@@ -11,8 +13,9 @@
   ISeq
   (-first [this] (clojure.core/first old))
 
-  (-next [this]
-    (old-seq->new-seq (clojure.core/next old))))
+  (-next [this] (clojure.core/next old))
+
+  (-more [this] (clojure.core/rest old)))
 
 (defn old-seq->new-seq [old]
   (when-let [old (clojure.core/seq old)]

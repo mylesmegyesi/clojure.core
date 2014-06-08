@@ -27,6 +27,9 @@
   (testing "next returns nil when there is only one entry"
     (is (nil? (next (seq (array-map :k1 1))))))
 
+  (testing "rest returns an empty list when there is only one entry"
+    (is (= '() (rest (seq (array-map :k1 1))))))
+
   (testing "returns items in the order that they are constructed"
     (let [m1 (array-map :k1 1 :k2 2)
           m1-seq (seq m1)

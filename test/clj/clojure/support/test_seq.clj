@@ -1,5 +1,5 @@
 (ns clojure.support.test-seq
-  (:refer-clojure :only [count defn deftype nth rest])
+  (:refer-clojure :only [conj count defn deftype nth loop])
   (:require [clojure.lang.protocols :refer [ICounted ISeq ISeqable]]
             [clojure.next           :refer :all :exclude [nth count]]))
 
@@ -18,7 +18,14 @@
   (-next [this]
     (if (= '() (rest -list))
       nil
-      (TestSeq. (rest -list)))))
+      (TestSeq. (rest -list))))
+
+  (-more [this]
+    (loop [s (next (seq -list))
+           r []]
+      (if s
+        (recur (next s) (conj r (first s)))
+        r))))
 
 (deftype TestSeqable [-list]
   ISeqable

@@ -13,20 +13,19 @@
 
 (deftype ^:private ChunkedSeq [-first -arr -length -position]
   ICounted
-  (-count [this]
-    -length)
+  (-count [this] -length)
 
   ISeq
-  (-first [this]
-    -first)
+  (-first [this] -first)
 
   (-next [this]
     (make-vector-seq -arr (dec -length) (inc -position)))
 
+  (-more [this]
+    (make-vector-seq -arr (dec -length) (inc -position)))
+
   ISeqable
-  (-seq [this]
-    this)
-)
+  (-seq [this] this))
 
 (defn- make-vector-seq [arr length position]
   (when (not= 0 length)
@@ -38,12 +37,9 @@
 
 (deftype ^:private Node [-edit -arr]
   INode
-  (get-array [this]
-    -arr)
+  (get-array [this] -arr)
 
-  (get-edit [this]
-    -edit)
-)
+  (get-edit [this] -edit))
 
 (defn- make-node
   ([edit arr]
@@ -175,23 +171,20 @@
       false))
 
   ICounted
-  (-count [this]
-    -length)
+  (-count [this] -length)
 
   IEditableCollection
   (-as-transient [this]
     (make-transient-vec -meta -length -shift -root -tail))
 
   IMeta
-  (-meta [this]
-    -meta)
+  (-meta [this] -meta)
 
   (-with-meta [this new-meta]
     (make-vector new-meta -length -shift -root -tail))
 
   ISeqable
-  (-seq [this]
-    -seq)
+  (-seq [this] -seq)
 
   IIndexed
   (-nth [this n]

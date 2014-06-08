@@ -13,6 +13,12 @@
   (testing "first of nil is nil"
     (is (nil? (first nil))))
 
+  (testing "next of nil is nil"
+    (is (nil? (next nil))))
+
+  (testing "rest of nil is an empty list"
+    (is (= '() (rest nil))))
+
   (testing "nth of nil without a default is nil"
     (is (nil? (nth nil 0)))
     (is (nil? (nth nil 42))))

@@ -86,7 +86,8 @@
 
 (defprotocol ISeq
   (-first [this])
-  (-next  [this]))
+  (-next  [this])
+  (-more [this]))
 
 (defprotocol ISeqable
   (-seq [this]))

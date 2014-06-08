@@ -91,6 +91,9 @@
   (testing "next returns nil when there is only one entry"
     (is (nil? (next (seq (sorted-map :k1 1))))))
 
+  (testing "rest returns an empty list when there is only one entry"
+    (is (= '() (rest (seq (sorted-map :k1 1))))))
+
   (testing "returns items in default order with the default comparator"
     (let [m1 (sorted-map 2 :v2 3 :v3 1 :v1)
           m1-seq (seq m1)

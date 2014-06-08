@@ -15,10 +15,15 @@
     (let [cns (cons 1 (test-seqable '(2)))]
       (is (= 1 (first cns)))))
 
-  (testing "next of cons is equivalent the seq of the collection"
+  (testing "next of cons is equivalent to the seq of the collection"
     (let [test-seq (test-seq '(2))
           cns (cons 1 test-seq)]
-      (is (== test-seq (next cns)))))
+      (is (= test-seq (next cns)))))
+
+  (testing "rest of cons is equivalence to the seq of the collection"
+    (let [test-seq (test-seq '(2))
+          cns (cons 1 test-seq)]
+      (is (= test-seq (next cns)))))
 
   (testing "count is the count of the seq plus 1"
     (is (= 2 (count (cons 1 (test-seqable '(2))))))

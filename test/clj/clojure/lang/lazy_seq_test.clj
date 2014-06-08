@@ -21,7 +21,13 @@
 
   (testing "counting a lazy seq"
     (is (= 0 (count (lazy-seq))))
-    (is (= 1 (count (lazy-seq (test-seqable '(1))))))))
+    (is (= 1 (count (lazy-seq (test-seqable '(1)))))))
+
+  (testing "rest of a lazy seq"
+    (is (= '(2 3) (rest (lazy-seq (test-seqable '(1 2 3)))))))
+
+  (testing "rest of an empty lazy seq"
+    (is (= '() (rest (lazy-seq))))))
 
 (defn repeatedly-true []
   (test-seqable '(true (lazy-seq (repeatedly-true)))))

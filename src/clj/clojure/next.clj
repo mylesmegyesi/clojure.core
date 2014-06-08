@@ -213,6 +213,8 @@
   (-seq [this] nil)
   ISeq
   (-first [this] nil)
+  (-next [this] nil)
+  (-more [this] '())
   IIndexed
   (-nth
     ([this n] nil)
@@ -260,6 +262,9 @@
 
 (defn next [s]
   (-next (seq s)))
+
+(defn rest [s]
+  (-more (seq s)))
 
 (defn every? [pred s]
   (cond
