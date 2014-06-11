@@ -1,8 +1,21 @@
 (ns clojure.lang.seq-test
-  (:refer-clojure :only [fn let nil? > +])
+  (:refer-clojure :only [fn let nil? >])
   (:require [clojure.test             :refer :all]
-            [clojure.next             :refer :all :exclude [+]]
+            [clojure.next             :refer :all]
             [clojure.support.test-seq :refer [test-seq test-seqable]]))
+
+(deftest second-test
+  (testing "second of nil is nil"
+    (is (nil? (second nil))))
+
+  (testing "second of a seq with one element is nil"
+    (is (nil? (second (test-seqable '(1))))))
+
+  (testing "second of a two element seq is the last element"
+    (is (= 2 (second (test-seqable '(1 2))))))
+
+  (testing "second of a many element seq is the second element"
+    (is (= 2 (second (test-seqable '(1 2 3 4)))))))
 
 (deftest every?-test
   (testing "returns true if the seq is nil"

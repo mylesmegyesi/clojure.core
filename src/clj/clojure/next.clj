@@ -252,6 +252,9 @@
 (defn rest [s]
   (-more (seq s)))
 
+(defn second [s]
+  (first (next s)))
+
 (defn every? [pred s]
   (cond
     (nil? s) true
