@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [cond declare defn- defn defprotocol deftype integer? let loop when < > >= ->])
+  (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop when < > >= ->])
   (:require [clojure.next                     :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.platform.exceptions :refer [new-argument-error new-out-of-bounds-exception]]
             [clojure.lang.numbers             :refer [->int]]
