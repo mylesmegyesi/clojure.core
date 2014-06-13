@@ -9,6 +9,7 @@
            [clojure.lang BigInt]
            [clojure.lang.platform NumberOps]
            [clojure.lang.platform Ratio]
+           [clojure.lang.platform.numbers Cast]
            [clojure.lang.platform.numbers Equivalence]
            [clojure.lang.platform.numbers BitOps]
            [clojure.lang.platform.numbers Addition]
@@ -84,8 +85,17 @@
 (defmacro is-zero? [x]
   `(. Zero (numberIsZero ~x)))
 
-(defn ->int [n]
-  (.intValue n))
+(defmacro ->byte [x]
+  `(. Cast (castToByte ~x)))
+
+(defmacro ->short [x]
+  `(. Cast (castToShort ~x)))
+
+(defmacro ->long [x]
+  `(. Cast (castToLong ~x)))
+
+(defmacro ->int [x]
+  `(. Cast (castToInt ~x)))
 
 (extend-type Ratio
   IRatio
@@ -147,7 +157,5 @@
       (.hashCode (.stripTrailingZeros this))))
 
   Ratio
-  (-hash [this] (.hashCode this))
-
-  )
+  (-hash [this] (.hashCode this)))
 
