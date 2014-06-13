@@ -1,7 +1,7 @@
 (ns clojure.lang.lazy-seq
-  (:refer-clojure :only [declare defn defn- deftype inc let locking loop])
-  (:require [clojure.lang.protocols :refer [ICounted IMeta ISeq ISeqable -seq -first -next]]
-            [clojure.next           :refer :all :exclude [inc]]))
+  (:refer-clojure :only [declare defn defn- deftype let locking loop])
+  (:require [clojure.lang.protocols :refer [ICounted IMeta ISeq ISeqable -seq -first -next -more]]
+            [clojure.next           :refer :all]))
 
 (declare make-lazy-seq)
 
@@ -35,16 +35,13 @@
 
   ISeq
   (-first [this]
-    (let [s (-seq this)]
-      (if s
-        (-first s)
-        nil)))
+    (-first (-seq this)))
 
   (-next [this]
-    (let [s (-seq this)]
-      (if s
-        (-next s)
-        nil))))
+    (-next (-seq this)))
+
+  (-more [this]
+    (-more (-seq this))))
 
 (defn make-lazy-seq
   ([-fn]

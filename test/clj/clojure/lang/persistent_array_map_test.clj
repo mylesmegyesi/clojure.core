@@ -1,9 +1,10 @@
 (ns clojure.lang.persistent-array-map-test
   (:refer-clojure :only [deftype nil? let])
-  (:require [clojure.test                      :refer :all]
-            [clojure.lang.persistent-map-test  :refer [map-test]]
-            [clojure.lang.protocols            :refer [ISeqable ISequential]]
-            [clojure.next                      :refer :all]))
+  (:require [clojure.test                     :refer :all]
+            [clojure.lang.persistent-map-test :refer [map-test]]
+            [clojure.lang.protocols           :refer [ISeqable ISequential]]
+            [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
+            [clojure.next                     :refer :all]))
 
 (deftype FixedSequential [seq]
   ISequential
@@ -26,6 +27,9 @@
 
   (testing "next returns nil when there is only one entry"
     (is (nil? (next (seq (array-map :k1 1))))))
+
+  (testing "rest returns an empty list when there is only one entry"
+    (is (= EMPTY-LIST (rest (seq (array-map :k1 1))))))
 
   (testing "returns items in the order that they are constructed"
     (let [m1 (array-map :k1 1 :k2 2)

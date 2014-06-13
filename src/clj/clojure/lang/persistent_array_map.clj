@@ -1,11 +1,12 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [declare defn defn- let + - dec loop < inc when if-let even? format nil?])
+  (:refer-clojure :only [declare defn defn- let loop < when if-let even? format nil?])
   (:require [clojure.lang.apersistent-map     :refer [defmap]]
             [clojure.lang.aseq                :refer [defseq]]
             [clojure.lang.map-entry           :refer [new-map-entry]]
             [clojure.lang.platform.exceptions :refer [new-argument-error]]
+            [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
             [clojure.lang.protocols           :refer [ICounted ILookup IMeta IAssociative IPersistentMap ISeq ISeqable]]
-            [clojure.next                     :refer :all :exclude [+ - dec inc]]))
+            [clojure.next                     :refer :all]))
 
 (declare new-array-map)
 
@@ -21,7 +22,10 @@
                    (aget arr (inc position))))
 
   (-next [this]
-    (new-array-map-seq arr (dec count) (+ position 2))))
+    (new-array-map-seq arr (dec count) (+ position 2)))
+
+  (-more [this]
+    (if-let [sq (next this)] sq EMPTY-LIST)))
 
 (defn- new-array-map-seq [arr count position]
   (when (not= 0 count)

@@ -2,6 +2,7 @@
   (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* nil? re-pattern select-keys loop when < inc cond >])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map        :refer [keys vals]]
+            [clojure.lang.persistent-list       :refer [EMPTY-LIST]]
             [clojure.lang.platform.comparison]
             [clojure.lang.platform.exceptions   :refer [argument-error]]
             [clojure.lang.protocols             :refer [IComparable IEquivalence IHash]]
@@ -345,6 +346,12 @@
   (testing "returns the next seq"
     (is (= :k2 (first (next (keys (array-map :k1 1 :k2 2)))))))
 
+  (testing "rest returns an empty list when there is one entry"
+    (is (= EMPTY-LIST (rest (keys (array-map :k1 1))))))
+
+  (testing "returns the rest seq"
+    (is (= :k2 (first (rest (keys (array-map :k1 1 :k2 2)))))))
+
   (testing "counts the keys"
     (is (= 1 (count (keys (array-map :k1 1)))))
     (is (= 2 (count (keys (array-map :k1 1 :k2 2)))))))
@@ -361,6 +368,12 @@
 
   (testing "returns the next seq"
     (is (= 2 (first (next (vals (array-map :k1 1 :k2 2)))))))
+
+  (testing "rest returns an empty list when there is one entry"
+    (is (= EMPTY-LIST (rest (vals (array-map :k1 1))))))
+
+  (testing "returns the rest seq"
+    (is (= 2 (first (rest (vals (array-map :k1 1 :k2 2)))))))
 
   (testing "counts the vals"
     (is (= 1 (count (vals (array-map :k1 1)))))

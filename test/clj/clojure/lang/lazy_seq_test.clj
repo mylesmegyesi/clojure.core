@@ -1,8 +1,9 @@
 (ns clojure.lang.lazy-seq-test
   (:refer-clojure :only [defn let nil?])
-  (:require [clojure.test             :refer :all]
-            [clojure.next             :refer :all]
-            [clojure.support.test-seq :refer [test-seq test-seqable]]))
+  (:require [clojure.test                 :refer :all]
+            [clojure.next                 :refer :all]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
+            [clojure.support.test-seq     :refer [test-seq test-seqable]]))
 
 (deftest lazy-seq-test
   (testing "retrieving the first element"
@@ -21,7 +22,13 @@
 
   (testing "counting a lazy seq"
     (is (= 0 (count (lazy-seq))))
-    (is (= 1 (count (lazy-seq (test-seqable '(1))))))))
+    (is (= 1 (count (lazy-seq (test-seqable '(1)))))))
+
+  (testing "rest of a lazy seq"
+    (is (= '(2 3) (rest (lazy-seq (test-seqable '(1 2 3)))))))
+
+  (testing "rest of an empty lazy seq"
+    (is (= EMPTY-LIST (rest (lazy-seq))))))
 
 (defn repeatedly-true []
   (test-seqable '(true (lazy-seq (repeatedly-true)))))

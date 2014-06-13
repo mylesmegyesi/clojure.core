@@ -1,7 +1,8 @@
 (ns clojure.lang.nil-test
   (:refer-clojure :only [nil?])
-  (:require [clojure.test :refer :all]
-            [clojure.next :refer :all]))
+  (:require [clojure.test                 :refer :all]
+            [clojure.next                 :refer :all]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST]]))
 
 (deftest nil-test
   (testing "count of nil is zero"
@@ -12,6 +13,12 @@
 
   (testing "first of nil is nil"
     (is (nil? (first nil))))
+
+  (testing "next of nil is nil"
+    (is (nil? (next nil))))
+
+  (testing "rest of nil is an empty list"
+    (is (= EMPTY-LIST (rest nil))))
 
   (testing "nth of nil without a default is nil"
     (is (nil? (nth nil 0)))

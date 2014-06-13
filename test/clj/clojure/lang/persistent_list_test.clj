@@ -1,7 +1,7 @@
 (ns clojure.lang.persistent-list-test
   (:refer-clojure :only [defmacro let list* apply range])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.persistent-list     :refer [list]]
+            [clojure.lang.persistent-list     :refer [EMPTY-LIST list]]
             [clojure.lang.platform.exceptions :refer [illegal-state-error]]
             [clojure.next                     :refer :all]))
 
@@ -32,6 +32,14 @@
 
   (testing "returns next"
     (is (= (list 2 3) (next (list 1 2 3)))))
+)
+
+(deftest rest-test
+  (testing "returns an empty list for one element"
+    (is (= EMPTY-LIST (rest (list 1)))))
+
+  (testing "returns rest"
+    (is (= (list 2 3) (rest (list 1 2 3)))))
 )
 
 (deftest meta-test

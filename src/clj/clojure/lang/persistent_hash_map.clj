@@ -1,17 +1,17 @@
 (ns clojure.lang.persistent-hash-map
-  (:refer-clojure :only [defn defn- declare defprotocol deftype -> let when even? loop format cond nil? >= < and])
-  (:require [clojure.lang.apersistent-map        :refer [defmap]]
-            [clojure.lang.aseq                   :refer [defseq]]
-            [clojure.lang.atomic-ref             :refer [new-atomic-ref]]
-            [clojure.lang.map-entry              :refer [new-map-entry]]
-            [clojure.lang.platform.exceptions    :refer [new-argument-error]]
-            [clojure.lang.platform.hash-map      :refer [->bitnum empty-object
-                                                         bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
-                                                         + inc * - dec]]
-            [clojure.lang.protocols              :refer [IAssociative ICounted ILookup
-                                                         IMeta IPersistentMap ISeqable ISeq]]
-            [clojure.next                        :refer :all :exclude [and bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right
-                                                                       + inc * - dec]]))
+  (:refer-clojure :only [defn defn- declare defprotocol deftype -> let if-let when even? loop format cond nil? >= <])
+  (:require [clojure.lang.apersistent-map     :refer [defmap]]
+            [clojure.lang.aseq                :refer [defseq]]
+            [clojure.lang.atomic-ref          :refer [new-atomic-ref]]
+            [clojure.lang.map-entry           :refer [new-map-entry]]
+            [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
+            [clojure.lang.platform.exceptions :refer [new-argument-error]]
+            [clojure.lang.platform.hash-map   :refer [->bitnum empty-object
+                                                      bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
+                                                      + inc * - dec]]
+            [clojure.lang.protocols           :refer [IAssociative ICounted ILookup
+                                                      IMeta IPersistentMap ISeqable ISeq]]
+            [clojure.next                     :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right + inc * - dec]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
 (def ^:private ZERO       (->bitnum 0))
@@ -151,7 +151,9 @@
     (if (nil? s)
       (new-node-seq arr (+ TWO i) nil)
       (new-node-seq arr i (next s))))
-  )
+
+  (-more [this]
+    (if-let [s (next this)] s EMPTY-LIST)))
 
 (defn- new-node-seq
   ([arr] (new-node-seq arr ZERO nil))

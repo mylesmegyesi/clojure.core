@@ -5,7 +5,7 @@
             [clojure.lang.platform.exceptions    :refer [new-illegal-state-error]]
             [clojure.lang.protocols              :refer [IAtom IDeref IMeta IValidatable IWatchable
                                                          -reset-meta!]]
-            [clojure.next                        :refer :all :exclude [cons first empty? assoc dissoc]]))
+            [clojure.next                        :refer :all :exclude [cons first second rest empty? assoc dissoc]]))
 
 (defn- validate-with-exception [validator-fn input]
   (if validator-fn

@@ -1,6 +1,6 @@
 (ns clojure.lang.persistent-list
   (:refer-clojure :only [declare defn defn- deftype last butlast loop])
-  (:require [clojure.next                     :refer [empty empty? inc with-meta =]]
+  (:require [clojure.next                     :refer :all]
             [clojure.lang.aseq                :refer [defseq]]
             [clojure.lang.platform.exceptions :refer [new-illegal-state-error]]
             [clojure.lang.protocols           :refer [ICounted IMeta IPersistentCollection -cons
@@ -41,6 +41,8 @@
 
   (-next [this] nil)
 
+  (-more [this] this)
+
   IPersistentList
 )
 
@@ -72,6 +74,8 @@
 
   (-next [this]
     (if (= count 1) nil rest))
+
+  (-more [this] rest)
 
   IPersistentList
 )

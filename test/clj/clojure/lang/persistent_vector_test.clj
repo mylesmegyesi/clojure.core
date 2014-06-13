@@ -81,6 +81,15 @@
       (is (= 1 (first v3-seq)))
       (is (nil? v4-seq))))
 
+  (testing "returns rest until emtpy"
+    (let [v1-seq (seq (vector 3 2 1))
+          v2-seq (rest v1-seq)
+          v3-seq (rest v2-seq)
+          v4-seq (rest v3-seq)]
+      (is (= 2 (first v2-seq)))
+      (is (= 1 (first v3-seq)))
+      (is (nil? v4-seq))))
+
   (testing "returns the count"
     (let [v1-seq (seq (vector 3 2 1))
           v2-seq (next v1-seq)

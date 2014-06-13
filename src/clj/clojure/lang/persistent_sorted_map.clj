@@ -1,12 +1,13 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [cond comparator cons count declare defn defn- defprotocol deftype empty? even? first format let loop next nil? rest second > < ->])
+  (:refer-clojure :only [cond comparator count declare defn defn- defprotocol deftype empty? even? format if-let let loop nil? > < ->])
   (:require [clojure.lang.apersistent-map      :refer [defmap]]
             [clojure.lang.aseq                 :refer [defseq]]
             [clojure.lang.map-entry            :refer [new-map-entry]]
+            [clojure.lang.persistent-list      :refer [EMPTY-LIST]]
             [clojure.lang.platform.exceptions  :refer [new-argument-error new-unsupported-error]]
             [clojure.lang.protocols            :refer [ICounted ILookup IMeta
                                                        IAssociative IPersistentMap ISeqable ISeq]]
-            [clojure.next                      :refer :all :exclude [cons empty? next count first comparator]]))
+            [clojure.next                      :refer :all :exclude [empty? count comparator]]))
 
 (declare red-node?)
 (declare black-node?)
@@ -378,6 +379,9 @@
     (let [node (first -stack)
           next-stack (make-seq-stack (-right node) (next -stack))]
       (make-sorted-map-seq next-stack (dec -count))))
+
+  (-more [this]
+    (if-let [s (next this)] s EMPTY-LIST))
 
   )
 
