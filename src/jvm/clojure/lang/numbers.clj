@@ -1,6 +1,7 @@
 (ns clojure.lang.numbers
   (:refer-clojure :only [let fn defmacro defn defn- mod extend-protocol extend-type])
-  (:require [clojure.lang.protocols :refer [IHash IRatio -denominator -numerator]]
+  (:require [clojure.lang.protocols :refer [IDecimal IFloat IHash IInteger IRatio
+                                            -denominator -numerator]]
             [clojure.next           :refer :all])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
@@ -112,6 +113,15 @@
     (bxor
       lpart
       (bunsigned-shift-right lpart 32))))
+
+(extend-protocol IInteger
+  Short Byte Integer Long BigInteger BigInt)
+
+(extend-protocol IFloat
+  Float Double)
+
+(extend-protocol IDecimal
+  BigDecimal)
 
 (extend-protocol IHash
   Byte

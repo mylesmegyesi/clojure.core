@@ -19,6 +19,8 @@
 (defprotocol ICounted
   (-count [this]))
 
+(defprotocol IDecimal)
+
 (defprotocol IDeref
   (-deref [this]))
 
@@ -31,6 +33,8 @@
   (-equal?      [this other])
   (-equivalent? [this other]))
 
+(defprotocol IFloat)
+
 (defprotocol IHash
   "This protocol should not be directly used in a deftype. It should only
   be used to override an existing platform hash method."
@@ -38,6 +42,8 @@
 
 (defprotocol IIndexed
   (-nth [this n] [this n not-found]))
+
+(defprotocol IInteger)
 
 (defprotocol ILookup
   (-includes? [this k])

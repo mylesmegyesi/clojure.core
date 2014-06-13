@@ -96,6 +96,21 @@
   [& args]
   (not (apply == args)))
 
+(defn ratio? [x]
+  (satisfies? IRatio x))
+
+(defn integer? [x]
+  (satisfies? IInteger x))
+
+(defn float? [x]
+  (satisfies? IFloat x))
+
+(defn decimal? [x]
+  (satisfies? IDecimal x))
+
+(defn rational? [x]
+  (or (integer? x) (ratio? x) (decimal? x)))
+
 (defn bit-shift-right [n shift]
   (bshift-right n shift))
 
