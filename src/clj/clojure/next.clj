@@ -21,7 +21,8 @@
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'decrement
                                         'add 'multiply 'subtract 'divide
-                                        'is-zero?]])
+                                        'is-zero?
+                                        '->short '->byte '->int '->long]])
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
@@ -110,6 +111,18 @@
 
 (defn rational? [x]
   (or (integer? x) (ratio? x) (decimal? x)))
+
+(defn byte [x]
+  (->byte x))
+
+(defn short [x]
+  (->short x))
+
+(defn int [x]
+  (->int x))
+
+(defn long [x]
+  (->long x))
 
 (defn bit-shift-right [n shift]
   (bshift-right n shift))

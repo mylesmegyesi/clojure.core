@@ -102,6 +102,50 @@
 
   )
 
+(deftest byte-test
+  (testing "raises an error when cast from less than min byte"
+    (is (= -128 (byte -128)))
+    (argument-error-thrown? (byte -129)))
+
+  (testing "raises an error when cast from greater than max byte"
+    (is (= 127 (byte 127)))
+    (argument-error-thrown? (byte 128)))
+
+  )
+
+(deftest short-test
+  (testing "raises an error when cast from less than min short"
+    (is (= -32768 (short -32768)))
+    (argument-error-thrown? (short -32769)))
+
+  (testing "raises an error when cast from greater than max short"
+    (is (= 32767 (short 32767)))
+    (argument-error-thrown? (short 32768)))
+
+  )
+
+(deftest int-test
+  (testing "raises an error when cast from less than min int"
+    (is (= -2147483648 (int -2147483648)))
+    (argument-error-thrown? (int -2147483649)))
+
+  (testing "raises an error when cast from greater than max int"
+    (is (= 2147483647 (int 2147483647)))
+    (argument-error-thrown? (int 2147483648)))
+
+  )
+
+(deftest long-test
+  (testing "raises an error when cast from less than min long"
+    (is (= -9223372036854775808 (long -9223372036854775808)))
+    (argument-error-thrown? (long -9223372036854775809)))
+
+  (testing "raises an error when cast from greater than max long"
+    (is (= 9223372036854775807 (long 9223372036854775807)))
+    (argument-error-thrown? (long 9223372036854775808)))
+
+  )
+
 (deftest bit-shift-right-test
   (testing "returns for a numbers and a shift"
     (is (= 1 (bit-shift-right 3 1))))
