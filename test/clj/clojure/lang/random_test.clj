@@ -1,0 +1,20 @@
+(ns clojure.lang.random-test
+  (:refer-clojure :only [let distinct repeatedly some take vals >= <=])
+  (:require [clojure.test :refer :all]
+            [clojure.next :refer :all]))
+
+(deftest rand-test
+  (testing "returns a floating point number"
+    (is (float? (rand))))
+
+  (testing "is between 0 and 1"
+    (let [rands (take 20 (repeatedly #(rand)))]
+      (is (every? #(and (>= % 0) (<= % 1)) rands))))
+
+  (testing "is pseudo-random"
+    (let [rands (take 20 (repeatedly #(rand)))]
+      (is (= rands (distinct rands)))))
+
+  (testing "accepting an upper bound"
+    (let [rands (take 20 (repeatedly #(rand 42)))]
+      (is (some #(>= % 1) rands)))))

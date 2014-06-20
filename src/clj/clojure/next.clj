@@ -194,6 +194,12 @@
 (defn zero? [i]
   (is-zero? i))
 
+(require ['clojure.lang.platform.random :refer ['rand-float]])
+
+(defn rand
+  ([] (rand-float))
+  ([n] (* n (rand))))
+
 (defn count [obj]
   (-count obj))
 
@@ -284,10 +290,11 @@
   (first (next s)))
 
 (defn every? [pred s]
-  (cond
-    (nil? s) true
-    (pred (first s)) (recur pred (next s))
-    :else false))
+  (let [sq (seq s)]
+    (cond
+      (nil? s) true
+      (pred (first sq)) (recur pred (next sq))
+      :else false)))
 
 (defn nth
   ([coll n]
