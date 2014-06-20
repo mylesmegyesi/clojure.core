@@ -194,12 +194,6 @@
 (defn zero? [i]
   (is-zero? i))
 
-(require ['clojure.lang.platform.random :refer ['rand-float]])
-
-(defn rand
-  ([] (rand-float))
-  ([n] (* n (rand))))
-
 (defn count [obj]
   (-count obj))
 
@@ -259,6 +253,15 @@
 (defn pop [coll]
   (when coll
     (-pop coll)))
+
+(require ['clojure.lang.platform.random :refer ['rand-float]])
+
+(defn rand
+  ([] (rand-float))
+  ([n] (* n (rand))))
+
+(defn rand-int [n]
+  (int (rand n)))
 
 (require ['clojure.lang.aseq])
 (require ['clojure.lang.platform.seqable])
