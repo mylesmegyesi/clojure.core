@@ -100,8 +100,7 @@
     (is (not= (keyword "kwd") nil)))
 
   (testing "not equal unless other is also a keyword"
-    (is (not= (keyword "kwd") (symbol "kwd")))
-    (is (not== (keyword "kwd") (symbol "kwd"))))
+    (is (not= (keyword "kwd") (symbol "kwd"))))
 
   (testing "returns 0 if the keywords are equal"
     (let [lhs (keyword "kwd")

@@ -72,33 +72,21 @@
   )
 
 (deftest ==-test
-  (testing "calls the -equivalent? method on the lhs"
-    (is (== (reify IEquivalence (-equivalent? [this other] true))
-            :anything))
-    (is (not (== (reify IEquivalence (-equivalent? [this other] false))
-                 :anything))))
-
-  (testing "not equal if either is nil"
-    (is (not== nil :something))
-    (is (not== :something nil)))
-
-  (testing "equal if both are nil"
-    (is (== nil nil)))
+  (testing  "raises an error when arguments are not numbers"
+    (class-cast-exception-thrown? (== :a :a)))
 
   (testing "true if only one item is given"
     (is (== :something)))
 
-  (testing "more than two items -  true if every item is equivalent to each other"
-    (let [item1 (reify IEquivalence (-equivalent? [this other] true))
-          item2 (reify IEquivalence (-equivalent? [this other] true))
-          item3 (reify IEquivalence (-equivalent? [this other] true))
-          item4 (reify IEquivalence (-equivalent? [this other] false))
-          item5 (reify IEquivalence (-equivalent? [this other] false))
-          ]
-      (is (== item1 item2 item3))
-      (is (== item1 item2 item4))
-      (is (not== item1 item4 item2))
-      (is (not== item1 item4 item5))))
+  (testing "true if both are equal"
+    (is (== 1000 1000))
+    (is (not== 1000 1001)))
+
+  (testing "more than two items - true if every item is equivalent to each other"
+    (is (== 5 5 5))
+    (is (== 10 10 10))
+    (is (not== 20 21 20))
+    (is (not== 30 30 31)))
 
   )
 

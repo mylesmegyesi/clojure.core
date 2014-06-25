@@ -59,22 +59,16 @@
       (numbers-equal? x y)
       (-equal? x y))))
 
-(defn- equivalent? [x y]
-  (when-not-nil x y
-    (if (and (number? x) (number? y))
-      (numbers-equivalent? x y)
-      (-equivalent? x y))))
-
 (defn =
-  "Eqaulity. When provided with numbers performs numbers-equal?. Else, calls the -equal? method on the first argument."
+  "Equality. When provided with numbers performs numbers-equal?. Else, calls the -equal? method on the first argument."
   ([x] true)
   ([x y] (equal? x y))
   ([x y & more] (and (= x y) (apply = y more))))
 
 (defn ==
-  "Equivalence. Calls the -equivalent? method on the first argument."
+  "Equivalence. Calls the platform numbers-equivalent? function with the arguments"
   ([x] true)
-  ([x y] (equivalent? x y))
+  ([x y] (numbers-equivalent? x y))
   ([x y & more] (and (== x y) (apply == y more))))
 
 (defn not

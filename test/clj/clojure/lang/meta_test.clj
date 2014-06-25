@@ -29,7 +29,7 @@
   (testing "with-meta returns a new instance with the specified meta"
     (let [obj1 (TestMeta. {})
           obj2 (with-meta obj1 {:so :meta})]
-      (is (not== obj1 obj2))
+      (is (not= obj1 obj2))
       (is (= {:so :meta} (meta obj2)))))
 
   (testing "reset-meta! will reset the meta on the object"
