@@ -1,5 +1,5 @@
 (ns clojure.lang.random-test
-  (:refer-clojure :only [let distinct repeatedly some take vals >= <=])
+  (:refer-clojure :only [let distinct nil? repeatedly some take vals >= <=])
   (:require [clojure.test :refer :all]
             [clojure.next :refer :all]))
 
@@ -17,4 +17,12 @@
 
   (testing "accepting an upper bound"
     (let [rands (take 20 (repeatedly #(rand 42)))]
+      (is (some #(>= % 1) rands)))))
+
+(deftest rand-int-test
+  (testing "returns an integer"
+    (is (integer? (rand-int 1))))
+
+  (testing "accepting an upper bound"
+    (let [rands (take 20 (repeatedly #(rand-int 42)))]
       (is (some #(>= % 1) rands)))))
