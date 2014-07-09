@@ -1,22 +1,20 @@
 (ns clojure.lang.persistent-set-test
-  (:refer-clojure :only [deftype let seq type])
+  (:refer-clojure :only [even? let type map])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-set        :refer :all]
-            [clojure.lang.persistent-hash-set   :refer [hash-set]]
-            [clojure.lang.persistent-sorted-set :refer [sorted-set]]
-            [clojure.lang.protocols             :refer [ISeqable]]
-            [clojure.next                       :refer [contains?]]))
-
-(deftype FakeSeqColl [coll]
-  ISeqable
-  (-seq [this] (seq coll)))
+            [clojure.next                       :refer [= contains?]]))
 
 (deftest persistent-set-test
   (testing "set produces a new hash-set from a seq"
-    (let [s1 (set (FakeSeqColl. '(1 2 3)))]
+    (let [s1 (set '(1 2 3))]
       (is 'PersistentHashSet (type s1))
       (is (contains? s1 1))
       (is (contains? s1 2))
       (is (contains? s1 3))))
 
+  (testing "select all elements for which the predicate is true"
+    (let [s (set '(1 2 3 4 5))]
+      (is (= (set '(2 4)) (select even? s)))))
+
   )
+
