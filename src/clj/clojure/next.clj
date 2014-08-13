@@ -267,6 +267,9 @@
 (defmacro lazy-seq [& s-body]
   (list 'clojure.lang.lazy-seq/make-lazy-seq (list* 'clojure.core/fn [] s-body)))
 
+(defn constantly [rval]
+  (fn [& args] rval))
+
 (require ['clojure.lang.cons :refer ['make-cons]])
 
 (defn cons [elem seqable]
