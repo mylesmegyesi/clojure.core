@@ -20,7 +20,9 @@
   ISeq
   (-first [this] -first)
 
-  (-next [this] (seq -more)))
+  (-next [this] (seq -more))
+
+  (-more [this] (seq -more)))
 
 (defn make-cons
   ([elem s] (Cons. {} elem s))

@@ -11,6 +11,10 @@
       (is (= :elem (first cons-nil)))
       (is (nil? (next cons-nil)))))
 
+  (testing "seq of cons is identity"
+    (let [cns (cons 1 (test-seqable '(2)))]
+      (is (= (seq cns) cns))))
+
   (testing "first of cons is the element"
     (let [cns (cons 1 (test-seqable '(2)))]
       (is (= 1 (first cns)))))
@@ -23,7 +27,7 @@
   (testing "rest of cons is equivalence to the seq of the collection"
     (let [test-seq (test-seq '(2))
           cns (cons 1 test-seq)]
-      (is (= test-seq (next cns)))))
+      (is (= test-seq (rest cns)))))
 
   (testing "count is the count of the seq plus 1"
     (is (= 2 (count (cons 1 (test-seqable '(2))))))
