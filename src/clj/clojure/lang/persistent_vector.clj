@@ -203,14 +203,5 @@
 
 (def ^:private EMPTY-ARRAY (make-array 0))
 
-(def ^:private EMPTY (make-vector nil 0 5 EMPTY-NODE EMPTY-ARRAY))
+(def EMPTY-VECTOR (make-vector nil 0 5 EMPTY-NODE EMPTY-ARRAY))
 
-(defn vector [& args]
-  (let [arg-seq (seq args)
-        empty-transient (-as-transient EMPTY)]
-    (if arg-seq
-      (loop [xs arg-seq v empty-transient]
-        (if xs
-          (recur (next xs) (-conj! v (first xs)))
-          (-persistent v)))
-      (-persistent empty-transient))))
