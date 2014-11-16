@@ -401,6 +401,21 @@
                            size)))))
       EMPTY-HASH-MAP)))
 
+(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR]])
+
+(defn vector [& args]
+  (let [arg-seq (seq args)
+        empty-transient (-as-transient EMPTY-VECTOR)]
+    (if arg-seq
+      (loop [xs arg-seq v empty-transient]
+        (if xs
+          (recur (next xs) (-conj! v (first xs)))
+          (-persistent v)))
+      (-persistent empty-transient))))
+
+(defn vector? [v]
+  (satisfies? IPersistentVector v))
+
 (defn get-validator [this]
   (-get-validator this))
 

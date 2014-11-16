@@ -1,7 +1,6 @@
 (ns clojure.lang.persistent-vector-test
   (:refer-clojure :only [defn defmacro apply list list* let nil? re-pattern range])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.persistent-vector   :refer [vector]]
             [clojure.lang.platform.exceptions :refer [argument-error out-of-bounds-exception]]
             [clojure.next                     :refer :all]))
 
