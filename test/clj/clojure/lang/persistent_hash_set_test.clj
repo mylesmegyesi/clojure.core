@@ -4,7 +4,7 @@
             [clojure.lang.persistent-set      :refer [conj difference disj intersection subset? superset? union]]
             [clojure.lang.persistent-hash-set :refer :all]
             [clojure.lang.protocols           :refer [IHash]]
-            [clojure.next                     :refer :all :exclude [first next]]))
+            [clojure.next                     :refer :all :exclude [first next conj]]))
 
 (deftest persistent-hash-set-test
   (testing "an empty hash set does not contains? an item"

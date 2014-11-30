@@ -277,6 +277,9 @@
     (list elem)
     (make-cons elem (seq seqable))))
 
+(defn conj [coll x]
+  (-cons coll x))
+
 (defn first [s]
   (-first (seq s)))
 

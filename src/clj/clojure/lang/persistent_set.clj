@@ -2,7 +2,7 @@
   (:refer-clojure :only [apply cons defn every? fn <= >=])
   (:require [clojure.lang.persistent-hash-set :refer [hash-set]]
             [clojure.lang.protocols           :refer [-conj -difference -disj -intersection -union]]
-            [clojure.next                     :refer :all :exclude [cons every?]]))
+            [clojure.next                     :refer :all :exclude [cons every? conj]]))
 
 (defn conj
   ([this x] (-conj this (cons x nil)))
