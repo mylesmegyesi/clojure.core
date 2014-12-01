@@ -1,7 +1,7 @@
 (ns clojure.support.test-seq
   (:refer-clojure :only [conj count defn deftype nth loop])
   (:require [clojure.lang.protocols :refer [ICounted ISeq ISeqable]]
-            [clojure.next           :refer :all :exclude [nth count]]))
+            [clojure.next           :refer :all :exclude [nth count conj]]))
 
 (deftype TestSeq [-list]
   ICounted
