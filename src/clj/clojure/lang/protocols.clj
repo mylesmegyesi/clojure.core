@@ -1,6 +1,14 @@
 (ns clojure.lang.protocols
   (:refer-clojure :only [defprotocol]))
 
+(defprotocol IAgent
+  (-action-queue [this])
+  (-dispatch [this f args executor])
+  (-error-handler [this])
+  (-error-mode [this])
+  (-enqueue [this action])
+  (-set-state [this new-state]))
+
 (defprotocol IAssociative
   (-contains-key? [this k])
   (-entry-at      [this k])
@@ -113,5 +121,8 @@
   (-set-validator! [this validator-fn]))
 
 (defprotocol IWatchable
-  (-add-watch    [this watch-key callback-fn])
-  (-remove-watch [this watch-key]))
+  (-get-watches    [this])
+  (-add-watch      [this watch-key callback-fn])
+  (-remove-watch   [this watch-key])
+  (-notify-watches [this old-val new-val]))
+

@@ -1,6 +1,6 @@
 (ns clojure.lang.atomic-ref
   (:refer-clojure :only [defmacro])
-  (:import [java.util.concurrent.atomic AtomicReference]))
+  (:import [java.util.concurrent.atomic AtomicReference AtomicLong]))
 
 (defmacro ref-get [ref]
   `(.get ~ref))
@@ -16,3 +16,7 @@
    `(AtomicReference.))
   ([value]
    `(AtomicReference. ~value)))
+
+(defmacro new-atomic-long [l]
+  `(AtomicLong. ~l))
+

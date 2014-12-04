@@ -1,9 +1,9 @@
 (ns clojure.next ; eventually, this will be clojure.core
-  (:refer-clojure :only [apply cond declare defmacro defn defn-
+  (:refer-clojure :only [apply binding cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         list list* loop format into < butlast last when])
+                         doseq list list* loop format into < butlast last when])
   (:require [clojure.lang.platform.equivalence]
-            [clojure.lang.platform.exceptions :refer [new-argument-error]]
+            [clojure.lang.platform.exceptions :refer [new-argument-error new-exception]]
             [clojure.lang.protocols :refer :all]))
 
 (require ['clojure.lang.platform.object :as 'platform-object])
@@ -442,6 +442,84 @@
   ([atm f x] (-swap! atm f [x]))
   ([atm f x y] (-swap! atm f [x y]))
   ([atm f x y & args] (-swap! atm f (into [x y] args))))
+
+(require ['clojure.lang.agent :refer ['new-agent 'agent-get-error
+                                      'action-release-pending-sends
+                                      'pooled-executor 'solo-executor]])
+(require ['clojure.lang.thread :as 'threading])
+
+(def ^:dynamic *agent* nil)
+
+(defn- binding-conveyor-fn [f]
+  (let [frame (clojure.lang.Var/cloneThreadBindingFrame)]
+    (fn
+      ([]
+         (clojure.lang.Var/resetThreadBindingFrame frame)
+         (f))
+      ([x]
+         (clojure.lang.Var/resetThreadBindingFrame frame)
+         (f x))
+      ([x y]
+         (clojure.lang.Var/resetThreadBindingFrame frame)
+         (f x y))
+      ([x y z]
+         (clojure.lang.Var/resetThreadBindingFrame frame)
+         (f x y z))
+      ([x y z & args]
+         (clojure.lang.Var/resetThreadBindingFrame frame)
+         (apply f x y z args)))))
+
+(defn send-via [executor agnt f & args]
+  (-dispatch agnt (binding [*agent* agnt] (binding-conveyor-fn f)) args executor))
+
+(defn send [agnt f & args]
+  (apply send-via pooled-executor agnt f args))
+
+(defn send-off [agnt f & args]
+  (apply send-via solo-executor agnt f args))
+
+(defn release-pending-sends [] action-release-pending-sends)
+
+(defn agent [state & args]
+  (let [options (apply hash-map args)
+        err-handler (get options :error-handler)]
+    (new-agent state err-handler
+               (get options :meta)
+               (get options :validator)
+               (get options :watches)
+               (get options :error-mode
+                 (if err-handler :continue :fail)))))
+
+(defn agent-error [agnt]
+  (agent-get-error agnt))
+
+(defmacro io! [& body]
+  (let [message (when (clojure.core/string? (first body)) (first body))
+        body (if message (next body) body)]
+    ; TODO stop relying on LockingTransaction
+    `(if (clojure.lang.LockingTransaction/isRunning)
+       (throw (new-argument-error ~(or message "I/O in transaction")))
+       (do ~@body))))
+
+(defn await [& agnts]
+  (io! "await in transaction"
+    (when *agent*
+      (throw (new-exception "Can't wait in agent action")))
+    (let [latch (threading/new-countdown-latch (clojure.core/count agnts))
+          count-down (fn [agnt] (threading/latch-countdown latch) agnt)]
+      (doseq [agnt agnts]
+        (send agnt count-down))
+      (threading/latch-await latch))))
+
+(defn await-for [timeout-ms & agnts]
+  (io! "await-for in transaction"
+    (when *agent*
+      (throw (new-exception "Can't wait in agent action")))
+    (let [latch (threading/new-countdown-latch (clojure.core/count agnts))
+          count-down (fn [agnt] (threading/latch-countdown latch) agnt)]
+      (doseq [agnt agnts]
+        (send agnt count-down))
+      (threading/latch-await latch timeout-ms))))
 
 (require ['clojure.lang.atomic-ref :refer ['new-atomic-ref]])
 (require ['clojure.lang.atom :refer ['new-atom]])

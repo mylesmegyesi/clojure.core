@@ -120,14 +120,14 @@
   (testing "reset-meta! will reset the metadata map"
     (let [atm (atom "atm" :meta {:first :meta})
           reset-meta-value (reset-meta! atm {:second :meta})]
-      (is (and (= {:second :meta} reset-meta-value)
-               (= {:second :meta} (meta atm))))))
+      (is (= {:second :meta} reset-meta-value))
+      (is (= {:second :meta} (meta atm)))))
 
   (testing "alter-meta! will reset the metadata map by applying a function"
     (let [atm (atom "atm" :meta {:first :meta})
           alter-meta-value (alter-meta! atm (fn [_ k v] {k v}) :second :meta)]
-      (is (and (= {:second :meta} alter-meta-value)
-               (= {:second :meta} (meta atm))))))
+      (is (= {:second :meta} alter-meta-value))
+      (is (= {:second :meta} (meta atm)))))
 
   (testing "get-validator will return the current validator function"
     (let [validator-fn #(not= 3 %)
