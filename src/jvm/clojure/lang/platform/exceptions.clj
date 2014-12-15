@@ -24,3 +24,36 @@
 
 (defmacro new-class-cast-exception [& args]
   (list* 'new class-cast-exception args))
+
+(def runtime-exception RuntimeException)
+
+(defmacro new-runtime-exception [& args]
+  (list* 'new runtime-exception args))
+
+(def exception Exception)
+
+(defmacro new-exception [& args]
+  (list* 'new exception args))
+
+(def throwable Throwable)
+
+; Try is a special form which won't resolve the classname
+; so we can't simply say
+; (try ... (catch clojure.lang.platform.exceptions/throwable error ...))
+(defmacro platform-try [& body]
+  (let [c (reduce (fn [acc item]
+                    (if (and (seq? item)
+                             (= 'platform-catch (first item)))
+                      (rest item)
+                      acc))
+                  nil body)
+        exception-class (eval (first c))
+        exception-var (first (rest c))
+        catch-block (rest (rest c))
+        try-block (take-while (fn [item]
+                                (if (seq? item)
+                                  (not= (first item) 'platform-catch)
+                                  true)) body)]
+    `(try ~@try-block
+       (catch ~exception-class ~exception-var ~@catch-block))))
+

@@ -5,7 +5,6 @@
             [clojure.next           :refer :all])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
-           [java.util.concurrent.atomic AtomicInteger AtomicLong]
            [clojure.lang BigInt]
            [clojure.lang.platform NumberOps]
            [clojure.lang.platform Ratio]
