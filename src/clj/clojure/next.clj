@@ -191,8 +191,19 @@
 (defn count [obj]
   (-count obj))
 
+(require ['clojure.lang.delay :refer ['new-delay '-force]])
+
+(defmacro delay [& body]
+  (list 'clojure.lang.delay/new-delay (list* 'clojure.core/fn [] body)))
+
 (defn deref [obj]
   (-deref obj))
+
+(defn realized? [obj]
+  (-is-realized? obj))
+
+(defn force [obj]
+  (-force obj))
 
 (defn contains? [coll k]
   (-includes? coll k))
