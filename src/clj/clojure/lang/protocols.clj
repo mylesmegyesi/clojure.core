@@ -71,6 +71,9 @@
   (-name [this])
   (-namespace [this]))
 
+(defprotocol IPending
+  (-is-realized? [this]))
+
 (defprotocol IPersistentCollection
   (-cons [this x])
   (-empty [this]))
