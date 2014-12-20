@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [apply binding cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         doseq list list* loop format into < butlast last when])
+                         doseq list list* loop format into < butlast last when when-let])
   (:require [clojure.lang.platform.equivalence]
             [clojure.lang.platform.exceptions :refer [new-argument-error new-exception]]
             [clojure.lang.protocols :refer :all]))
@@ -454,7 +454,7 @@
   ([atm f x y] (-swap! atm f [x y]))
   ([atm f x y & args] (-swap! atm f (into [x y] args))))
 
-(require ['clojure.lang.agent :refer ['new-agent 'agent-get-error
+(require ['clojure.lang.agent :refer ['new-agent 'agent-get-error 'agent-restart
                                       'action-release-pending-sends
                                       'pooled-executor 'solo-executor]])
 (require ['clojure.lang.thread :as 'threading])
@@ -503,6 +503,14 @@
 
 (defn agent-error [agnt]
   (agent-get-error agnt))
+
+(defn agent-errors [agnt]
+  (when-let [error (agent-error agnt)]
+    (list error)))
+
+(defn restart-agent [agnt new-state & options]
+  (let [opts (apply hash-map options)]
+    (agent-restart agnt new-state opts)))
 
 (defmacro io! [& body]
   (let [message (when (clojure.core/string? (first body)) (first body))

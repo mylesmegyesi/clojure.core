@@ -1,11 +1,11 @@
 (ns clojure.lang.agent
-  (:refer-clojure :only [apply declare defmacro defn defn- defprotocol deftype let loop nil? pos? vec])
+  (:refer-clojure :only [apply declare defmacro defn defn- defprotocol deftype let loop nil? pos? vec >])
   (:require [clojure.next                     :refer :all]
             [clojure.lang.atomic-ref          :refer :all]
             [clojure.lang.persistent-queue    :as    queue]
             [clojure.lang.persistent-vector   :refer [EMPTY-VECTOR]]
             [clojure.lang.protocols           :refer [IAgent IDeref IMeta IValidatable IWatchable
-                                                      -action-queue -cons -error-handler -error-mode -enqueue -notify-watches -reset-meta! -set-state]]
+                                                      -action-queue -cons -error-handler -error-mode -enqueue -notify-watches -peek -reset-meta! -set-state -restart]]
             [clojure.lang.runnable            :refer :all]
             [clojure.lang.thread              :refer [create-fixed-thread-pool-executor
                                                       create-cached-thread-pool-executor
@@ -71,7 +71,7 @@
                       next-popped (ref-compare-and-set! (-action-queue agnt) prior next-nxt)]
                   (recur next-popped next-nxt))))]
     (if (and (nil? error) (pos? (count (-stack nxt))))
-      (-execute (peek (-stack nxt))))))
+      (-execute (-peek (-stack nxt))))))
 
 (defn- do-action-run [action error]
   (let [agnt (-agent action)]
@@ -127,6 +127,9 @@
 (defn agent-get-error [agnt]
   (-error (ref-get (-action-queue agnt))))
 
+(defn agent-restart [agnt new-state options]
+  (-restart agnt new-state options))
+
 (declare new-action)
 
 (deftype Agent [^:volatile-mutable -state
@@ -158,7 +161,7 @@
   (-dispatch [this f args executor]
     (let [error (agent-get-error this)]
       (if error
-        (new-runtime-exception "Agent is failed, needs restart" error)
+        (throw (new-runtime-exception "Agent is failed, needs restart" error))
         (let [action (new-action this args f executor)]
           (if locking-transaction
             (.enqueue locking-transaction action)
@@ -169,6 +172,25 @@
 
   (-set-state [this new-state]
     (set! -state new-state))
+
+  (-restart [this new-state options]
+    (if (agent-get-error this)
+      (let [clear-actions (get options :clear-actions)]
+        (-set-state this new-state)
+        (if clear-actions
+          (ref-set! -action-queue EMPTY-ACTION-QUEUE)
+          (let [q (loop [restarted false
+                         prior nil]
+                    (if restarted
+                      (-stack prior)
+                      (let [p (ref-get -action-queue)]
+                        (recur
+                          (ref-compare-and-set! -action-queue p (new-action-queue (-stack p) nil))
+                          p))))]
+            (if (> (count q) 0)
+              (-execute (-peek q)))))
+        new-state)
+      (throw (new-runtime-exception "Agent does not need a restart"))))
 
   IDeref
   (-deref [this] -state)

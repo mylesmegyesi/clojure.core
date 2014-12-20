@@ -5,6 +5,9 @@
            [java.util.concurrent        CountDownLatch]
            [java.util.concurrent.atomic AtomicLong]))
 
+(defmacro sleep [millis]
+  `(Thread/sleep ~millis))
+
 (defmacro local-state []
   `(ThreadLocal.))
 

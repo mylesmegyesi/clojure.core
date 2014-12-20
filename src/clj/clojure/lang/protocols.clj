@@ -7,7 +7,8 @@
   (-error-handler [this])
   (-error-mode [this])
   (-enqueue [this action])
-  (-set-state [this new-state]))
+  (-set-state [this new-state])
+  (-restart [this new-state options]))
 
 (defprotocol IAssociative
   (-contains-key? [this k])
