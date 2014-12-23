@@ -5,9 +5,11 @@
   (-action-queue [this])
   (-dispatch [this f args executor])
   (-error-handler [this])
+  (-set-error-handler [this f])
   (-error-mode [this])
   (-enqueue [this action])
-  (-set-state [this new-state]))
+  (-set-state [this new-state])
+  (-restart [this new-state options]))
 
 (defprotocol IAssociative
   (-contains-key? [this k])
