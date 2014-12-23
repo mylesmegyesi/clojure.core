@@ -43,12 +43,21 @@
   (testing "an agent's errors is nil by default"
     (is (nil? (agent-errors (agent 0)))))
 
+  (testing "an agent's error handler is nil by default"
+    (is (nil? (error-handler (agent 0)))))
+
   (testing "handling errors with an error handler"
     (let [sentinel (atom false)
           agt (agent 0 :error-handler (fn [_ _] (reset! sentinel true)))]
       (send agt seq)
       (await agt)
       (is (true? (deref sentinel)))))
+
+  (testing "allows an error handler to be set after an agent is created"
+    (let [agt (agent 0)
+          handler-fn (fn [_ _])]
+      (set-error-handler! agt handler-fn)
+      (is (= handler-fn (error-handler agt)))))
 
   (testing "await-for a period of time"
     (let [agt (agent 0)]

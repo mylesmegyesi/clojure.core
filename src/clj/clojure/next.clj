@@ -454,7 +454,7 @@
   ([atm f x y] (-swap! atm f [x y]))
   ([atm f x y & args] (-swap! atm f (into [x y] args))))
 
-(require ['clojure.lang.agent :refer ['new-agent 'agent-get-error 'agent-restart
+(require ['clojure.lang.agent :refer ['new-agent 'agent-get-error 'agent-restart 'agent-set-error-handler 'agent-get-error-handler
                                       'action-release-pending-sends
                                       'pooled-executor 'solo-executor]])
 (require ['clojure.lang.thread :as 'threading])
@@ -507,6 +507,12 @@
 (defn agent-errors [agnt]
   (when-let [error (agent-error agnt)]
     (list error)))
+
+(defn set-error-handler! [agnt error-fn]
+  (agent-set-error-handler agnt error-fn))
+
+(defn error-handler [agnt]
+  (agent-get-error-handler agnt))
 
 (defn restart-agent [agnt new-state & options]
   (let [opts (apply hash-map options)]

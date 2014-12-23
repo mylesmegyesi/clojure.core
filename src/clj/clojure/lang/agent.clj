@@ -5,7 +5,7 @@
             [clojure.lang.persistent-queue    :as    queue]
             [clojure.lang.persistent-vector   :refer [EMPTY-VECTOR]]
             [clojure.lang.protocols           :refer [IAgent IDeref IMeta IValidatable IWatchable
-                                                      -action-queue -cons -error-handler -error-mode -enqueue -notify-watches -peek -reset-meta! -set-state -restart]]
+                                                      -action-queue -cons -error-handler -set-error-handler -error-mode -enqueue -notify-watches -peek -reset-meta! -set-state -restart]]
             [clojure.lang.runnable            :refer :all]
             [clojure.lang.thread              :refer [create-fixed-thread-pool-executor
                                                       create-cached-thread-pool-executor
@@ -60,6 +60,12 @@
             (count sends))
           (let [act (first s)]
             (-enqueue (-agent act) act)))))))
+
+(defn agent-set-error-handler [agnt error-fn]
+  (-set-error-handler agnt error-fn))
+
+(defn agent-get-error-handler [agnt]
+  (-error-handler agnt))
 
 (defn- do-action-run2 [action agnt error]
   (let [nxt (loop [popped false
@@ -144,6 +150,9 @@
   (-action-queue [this] -action-queue)
 
   (-error-handler [this] -error-handler)
+
+  (-set-error-handler [this f]
+    (set! -error-handler f))
 
   (-error-mode [this] -error-mode)
 
