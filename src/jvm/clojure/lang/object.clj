@@ -1,6 +1,8 @@
-(ns clojure.lang.platform.object
+(ns clojure.lang.object
   (:refer-clojure :only [defmacro])
   (:import [clojure.lang.platform Identity]))
+
+(def base-object Object)
 
 (defmacro instance? [x y]
   `(.isInstance ~x ~y))

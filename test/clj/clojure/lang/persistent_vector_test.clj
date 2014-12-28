@@ -1,8 +1,8 @@
 (ns clojure.lang.persistent-vector-test
   (:refer-clojure :only [defn defmacro apply list list* let nil? re-pattern range])
-  (:require [clojure.test                     :refer :all]
-            [clojure.lang.platform.exceptions :refer [argument-error out-of-bounds-exception]]
-            [clojure.next                     :refer :all]))
+  (:require [clojure.test            :refer :all]
+            [clojure.lang.exceptions :refer [argument-error out-of-bounds-exception]]
+            [clojure.next            :refer :all]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))

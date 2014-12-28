@@ -1,9 +1,9 @@
 (ns clojure.lang.persistent-list-test
   (:refer-clojure :only [defmacro let list* apply range])
-  (:require [clojure.test                     :refer :all]
-            [clojure.lang.persistent-list     :refer [EMPTY-LIST list]]
-            [clojure.lang.platform.exceptions :refer [illegal-state-error]]
-            [clojure.next                     :refer :all]))
+  (:require [clojure.test                 :refer :all]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST list]]
+            [clojure.lang.exceptions      :refer [illegal-state-error]]
+            [clojure.next                 :refer :all]))
 
 (defmacro illegal-state-error-is-thrown? [& body]
   (clojure.core/list 'is (list* 'thrown? illegal-state-error body)))

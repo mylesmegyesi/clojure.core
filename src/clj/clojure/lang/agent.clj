@@ -1,16 +1,16 @@
 (ns clojure.lang.agent
   (:refer-clojure :only [apply declare defmacro defn defn- defprotocol deftype let loop nil? pos? vec >])
-  (:require [clojure.next                     :refer :all]
-            [clojure.lang.atomic-ref          :refer :all]
-            [clojure.lang.persistent-queue    :as    queue]
-            [clojure.lang.persistent-vector   :refer [EMPTY-VECTOR]]
-            [clojure.lang.protocols           :refer [IAgent IDeref IMeta IValidatable IWatchable
-                                                      -action-queue -cons -error-handler -set-error-handler -error-mode -enqueue -notify-watches -peek -reset-meta! -set-state -restart]]
-            [clojure.lang.runnable            :refer :all]
-            [clojure.lang.thread              :refer [create-fixed-thread-pool-executor
-                                                      create-cached-thread-pool-executor
-                                                      local-state get-local-state set-local-state]]
-            [clojure.lang.platform.exceptions :refer [new-runtime-exception platform-try]]))
+  (:require [clojure.next                   :refer :all]
+            [clojure.lang.atomic-ref        :refer :all]
+            [clojure.lang.persistent-queue  :as    queue]
+            [clojure.lang.persistent-vector :refer [EMPTY-VECTOR]]
+            [clojure.lang.protocols         :refer [IAgent IDeref IMeta IValidatable IWatchable
+                                                    -action-queue -cons -error-handler -set-error-handler -error-mode -enqueue -notify-watches -peek -reset-meta! -set-state -restart]]
+            [clojure.lang.runnable          :refer :all]
+            [clojure.lang.thread            :refer [create-fixed-thread-pool-executor
+                                                    create-cached-thread-pool-executor
+                                                    local-state get-local-state set-local-state]]
+            [clojure.lang.exceptions        :refer [new-runtime-exception platform-try]]))
 
 ; This allows us to avoid implementing LockingTransaction right
 ; now. We'll need to revisit at some point.
@@ -91,7 +91,7 @@
           (if err-handler
             (platform-try
               (err-handler agnt error)
-              (platform-catch clojure.lang.platform.exceptions/throwable e)))
+              (platform-catch clojure.lang.exceptions/throwable e)))
           (if (= :continue (-error-mode agnt))
             (do-action-run2 action agnt nil)
             (do-action-run2 action agnt error)))))))
@@ -108,11 +108,11 @@
   (-execute [this]
     (platform-try
       (invoke-execute -ex this)
-      (platform-catch clojure.lang.platform.exceptions/throwable error
+      (platform-catch clojure.lang.exceptions/throwable error
         (if (-error-handler -agnt)
           (platform-try
             ((-error-handler -agnt) error)
-            (platform-catch clojure.lang.platform.exceptions/throwable _ nil))))))
+            (platform-catch clojure.lang.exceptions/throwable _ nil))))))
   (-run [this]
     (try
       (set-local-state nested EMPTY-VECTOR)
@@ -122,7 +122,7 @@
           (-set-state -agnt new-val)
           (-notify-watches -agnt old-val new-val)
           (do-action-run this nil))
-        (platform-catch clojure.lang.platform.exceptions/throwable e
+        (platform-catch clojure.lang.exceptions/throwable e
           (do-action-run this e)))
       (finally
         (set-local-state nested nil)))))

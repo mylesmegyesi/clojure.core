@@ -1,13 +1,13 @@
 (ns clojure.lang.persistent-vector
   (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop when < > >= ->])
-  (:require [clojure.next                     :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.platform.exceptions :refer [new-argument-error new-out-of-bounds-exception]]
-            [clojure.lang.numbers             :refer [->int]]
-            [clojure.lang.platform.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.protocols           :refer [-as-transient -assoc-n -conj! -persistent
-                                                      IAssociative ICounted IEditableCollection IMeta
-                                                      IPersistentCollection IPersistentVector
-                                                      ISeq ISeqable ITransientCollection IIndexed]]))
+  (:require [clojure.next            :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
+            [clojure.lang.exceptions :refer [new-argument-error new-out-of-bounds-exception]]
+            [clojure.lang.numbers    :refer [->int]]
+            [clojure.lang.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
+            [clojure.lang.protocols  :refer [-as-transient -assoc-n -conj! -persistent
+                                             IAssociative ICounted IEditableCollection IMeta
+                                             IPersistentCollection IPersistentVector
+                                             ISeq ISeqable ITransientCollection IIndexed]]))
 
 (declare make-vector-seq)
 

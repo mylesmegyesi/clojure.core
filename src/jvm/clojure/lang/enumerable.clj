@@ -1,4 +1,4 @@
-(ns clojure.lang.platform.enumerable
+(ns clojure.lang.enumerable
   (:refer-clojure :only [deftype let reset! defn update-in fn cons list])
   (:require [clojure.next :refer [first next] :exclude [cons]]))
 
@@ -13,10 +13,10 @@
       (let [first-item (first -current-seq)]
         (set! -current-seq (next -current-seq))
         first-item)
-      (throw (java.util.NoSuchElementException. "What has gone wrong in your life that has led you down this path?"))))
+      (throw (java.util.NoSuchElementException. ""))))
 
   (remove [this]
-    (throw (UnsupportedOperationException. "What're you gonna do?"))))
+    (throw (UnsupportedOperationException. ""))))
 
 (defn new-seq-iterator [-seq]
   (SeqIterator. -seq))
@@ -27,6 +27,6 @@
              (fn [old]
                (cons
                  (list 'iterator ['this]
-                       (list 'clojure.lang.platform.enumerable/new-seq-iterator
+                       (list 'clojure.lang.enumerable/new-seq-iterator
                              (list 'clojure.next/seq 'this)))
                  old))))

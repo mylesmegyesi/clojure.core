@@ -1,4 +1,4 @@
-(ns clojure.lang.platform.show
+(ns clojure.lang.show
   (:refer-clojure :only [defmacro extend-protocol fn defn list empty? loop first rest update-in cons])
   (:require [clojure.lang.protocols :refer [IShow -show]])
   (:import [java.lang StringBuilder]))

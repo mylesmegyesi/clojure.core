@@ -28,14 +28,14 @@
     (. Threading createThreadFactory
       "clojure-agent-send-off-pool-%d" ~atomic-long)))
 
-(defn new-countdown-latch [c]
-  (new CountDownLatch c))
+(defmacro new-countdown-latch [c]
+  `(new CountDownLatch ~c))
 
-(defn latch-countdown [latch]
-  (. latch countDown))
+(defmacro latch-countdown [latch]
+  `(. ~latch countDown))
 
-(defn latch-await
-  ([latch] (. latch await))
+(defmacro latch-await
+  ([latch] `(. ~latch await))
   ([latch timeout-ms]
-    (. latch await timeout-ms (. java.util.concurrent.TimeUnit MILLISECONDS))))
+    `(. ~latch await ~timeout-ms (. java.util.concurrent.TimeUnit MILLISECONDS))))
 

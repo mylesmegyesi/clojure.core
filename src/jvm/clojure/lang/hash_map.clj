@@ -1,4 +1,4 @@
-(ns clojure.lang.platform.hash-map
+(ns clojure.lang.hash-map
   (:refer-clojure :only [defmacro defn int])
   (:require [clojure.lang.numbers :refer [unsafe-cast-int]])
   (:import [clojure.lang.platform.numbers BitOps]

@@ -1,11 +1,11 @@
 (ns clojure.lang.atom
   (:refer-clojure :only [apply assoc cons defn defn- deftype dissoc empty? first fn let loop if-not into rest second])
-  (:require [clojure.lang.atomic-ref             :refer [new-atomic-ref ref-set!
-                                                         ref-get ref-compare-and-set!]]
-            [clojure.lang.platform.exceptions    :refer [new-illegal-state-error]]
-            [clojure.lang.protocols              :refer [IAtom IDeref IMeta IValidatable IWatchable
-                                                         -reset-meta!]]
-            [clojure.next                        :refer :all :exclude [cons first second rest empty? assoc dissoc]]))
+  (:require [clojure.lang.atomic-ref :refer [new-atomic-ref ref-set!
+                                             ref-get ref-compare-and-set!]]
+            [clojure.lang.exceptions :refer [new-illegal-state-error]]
+            [clojure.lang.protocols  :refer [IAtom IDeref IMeta IValidatable IWatchable
+                                             -reset-meta!]]
+            [clojure.next            :refer :all :exclude [cons first second rest empty? assoc dissoc]]))
 
 (defn- validate-with-exception [validator-fn input]
   (if validator-fn

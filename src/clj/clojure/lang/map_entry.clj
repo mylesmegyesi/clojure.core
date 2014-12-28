@@ -1,9 +1,9 @@
 (ns clojure.lang.map-entry
   (:refer-clojure :refer [deftype defmacro defn defn- let list list* -> satisfies?])
-  (:require [clojure.lang.deftype              :refer [expand-methods]]
-            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.protocols            :refer [IMapEntry]]
-            [clojure.next                      :refer :all]))
+  (:require [clojure.lang.deftype     :refer [expand-methods]]
+            [clojure.lang.equivalence :refer [platform-equals-method]]
+            [clojure.lang.protocols   :refer [IMapEntry]]
+            [clojure.next             :refer :all]))
 
 (defmacro map-entry-equals?
   {:private true}

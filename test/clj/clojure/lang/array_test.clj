@@ -1,8 +1,8 @@
 (ns clojure.lang.array-test
   (:refer-clojure :only [defmacro let list list*])
-  (:require [clojure.test                     :refer :all]
-            [clojure.lang.platform.exceptions :refer [out-of-bounds-exception]]
-            [clojure.next                     :refer :all]))
+  (:require [clojure.test            :refer :all]
+            [clojure.lang.exceptions :refer [out-of-bounds-exception]]
+            [clojure.next            :refer :all]))
 
 (defmacro out-of-bounds-exeption-is-thrown? [& body]
   (list 'is (list* 'thrown? out-of-bounds-exception body)))
