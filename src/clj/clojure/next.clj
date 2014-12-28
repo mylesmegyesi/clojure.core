@@ -2,11 +2,11 @@
   (:refer-clojure :only [apply binding cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
                          doseq list list* loop format into < butlast last when when-let])
-  (:require [clojure.lang.platform.equivalence]
-            [clojure.lang.platform.exceptions :refer [new-argument-error new-exception]]
-            [clojure.lang.protocols :refer :all]))
-
-(require ['clojure.lang.platform.object :as 'platform-object])
+  (:require [clojure.lang.equivalence]
+            [clojure.lang.object     :as    platform-object]
+            [clojure.lang.exceptions :refer [new-argument-error new-exception]]
+            [clojure.lang.random     :refer [rand-float]]
+            [clojure.lang.protocols  :refer :all]))
 
 (defn instance? [c x]
   (platform-object/instance? c x))
@@ -259,8 +259,6 @@
   (when coll
     (-pop coll)))
 
-(require ['clojure.lang.platform.random :refer ['rand-float]])
-
 (defn rand
   ([] (rand-float))
   ([n] (* n (rand))))
@@ -269,7 +267,7 @@
   (int (rand n)))
 
 (require ['clojure.lang.aseq])
-(require ['clojure.lang.platform.seqable])
+(require ['clojure.lang.seqable])
 
 (declare atom)
 (declare reset!)
@@ -316,8 +314,6 @@
   ([coll n not-found]
     (-nth coll n not-found)))
 
-(require 'clojure.lang.platform.seqable)
-
 (defn hash [obj]
   (-hash obj))
 
@@ -356,7 +352,7 @@
 (require ['clojure.lang.array :as 'arr])
 
 (defn make-array
-  ([size] (make-array Object size))
+  ([size] (make-array platform-object/base-object size))
   ([type size]
    (arr/make-array type size)))
 
@@ -376,7 +372,7 @@
   (arr/array-copy src src-pos dest dest-pos length))
 
 (defn into-array
-  ([seqable] (into-array Object seqable))
+  ([seqable] (into-array platform-object/base-object seqable))
   ([type seqable]
    (let [s (seq seqable)
          size (count s)
@@ -591,7 +587,7 @@
       -1)))
 
 (require ['clojure.lang.hash :refer ['hash-combine]])
-(require ['clojure.lang.platform.show :refer ['build-string]])
+(require ['clojure.lang.show :refer ['build-string]])
 (require ['clojure.lang.symbol :as 'sym])
 
 (defn str

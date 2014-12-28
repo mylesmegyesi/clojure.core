@@ -1,10 +1,10 @@
 (ns clojure.lang.apersistent-map
   (:refer-clojure :only [bit-and defmacro defn let loop + list list* concat ->])
-  (:require [clojure.lang.deftype              :refer [expand-methods]]
-            [clojure.lang.platform.enumerable  :refer [platform-enumerable-method]]
-            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.platform.hash        :refer [platform-hash-method]]
-            [clojure.next                      :refer :all :exclude [+ bit-and]]))
+  (:require [clojure.lang.deftype     :refer [expand-methods]]
+            [clojure.lang.enumerable  :refer [platform-enumerable-method]]
+            [clojure.lang.equivalence :refer [platform-equals-method]]
+            [clojure.lang.hash        :refer [platform-hash-method]]
+            [clojure.next             :refer :all :exclude [+ bit-and]]))
 
 (defn map-hash [m]
   (loop [entries (seq m)

@@ -1,9 +1,9 @@
 (ns clojure.lang.operators-test
   (:refer-clojure :only [bigint double float bigdec defmacro reify let list list* nil?])
-  (:require [clojure.test                     :refer :all]
-            [clojure.lang.platform.exceptions :refer [class-cast-exception argument-error]]
-            [clojure.lang.protocols           :refer [IEquivalence]]
-            [clojure.next                     :refer :all]))
+  (:require [clojure.test            :refer :all]
+            [clojure.lang.exceptions :refer [class-cast-exception argument-error]]
+            [clojure.lang.protocols  :refer [IEquivalence]]
+            [clojure.next            :refer :all]))
 
 (defmacro class-cast-exception-thrown? [& body]
   (list 'is (list* 'thrown? class-cast-exception body)))

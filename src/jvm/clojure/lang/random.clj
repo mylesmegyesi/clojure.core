@@ -1,4 +1,4 @@
-(ns clojure.lang.platform.random
+(ns clojure.lang.random
   (:refer-clojure :only [defn])
   (:import [Math]))
 

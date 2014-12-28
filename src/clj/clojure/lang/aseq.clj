@@ -1,9 +1,9 @@
 (ns clojure.lang.aseq
   (:refer-clojure :only [defn defmacro -> when loop cond nil? concat list list* let])
-  (:require [clojure.lang.deftype              :refer [expand-methods]]
-            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.protocols            :refer [-seq -first -next]]
-            [clojure.next                      :refer :all]))
+  (:require [clojure.lang.deftype     :refer [expand-methods]]
+            [clojure.lang.equivalence :refer [platform-equals-method]]
+            [clojure.lang.protocols   :refer [-seq -first -next]]
+            [clojure.next             :refer :all]))
 
 (defmacro seq-equal? [x y]
   `(boolean

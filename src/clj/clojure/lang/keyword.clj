@@ -1,12 +1,12 @@
 (ns clojure.lang.keyword
   (:refer-clojure :only [deftype defmacro declare defn + let list list* concat ->])
-  (:require [clojure.lang.deftype              :refer [expand-methods]]
-            [clojure.lang.platform.comparison  :refer [platform-compare-to-method]]
-            [clojure.lang.platform.equivalence :refer [platform-equals-method]]
-            [clojure.lang.platform.hash        :refer [platform-hash-method]]
-            [clojure.lang.platform.show        :refer [platform-show-method]]
-            [clojure.lang.protocols            :refer [IMeta INamed]]
-            [clojure.next                      :refer :all :exclude [+]]))
+  (:require [clojure.lang.deftype     :refer [expand-methods]]
+            [clojure.lang.comparison  :refer [platform-compare-to-method]]
+            [clojure.lang.equivalence :refer [platform-equals-method]]
+            [clojure.lang.hash        :refer [platform-hash-method]]
+            [clojure.lang.show        :refer [platform-show-method]]
+            [clojure.lang.protocols   :refer [IMeta INamed]]
+            [clojure.next             :refer :all :exclude [+]]))
 
 (defmacro keyword-compare-init
   {:private true}

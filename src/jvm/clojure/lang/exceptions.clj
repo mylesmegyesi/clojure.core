@@ -1,4 +1,4 @@
-(ns clojure.lang.platform.exceptions)
+(ns clojure.lang.exceptions)
 
 (def argument-error IllegalArgumentException)
 

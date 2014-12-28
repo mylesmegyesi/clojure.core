@@ -1,4 +1,4 @@
-(ns clojure.lang.platform.comparison
+(ns clojure.lang.comparison
   (:refer-clojure :only [defmacro defprotocol extend-protocol fn defn list update-in cons])
   (:require [clojure.lang.protocols :refer [IComparable]]))
 
