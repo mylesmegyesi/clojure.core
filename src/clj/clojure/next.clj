@@ -292,8 +292,20 @@
 (defn first [s]
   (-first (seq s)))
 
+(defn ffirst [s]
+  (first (first s)))
+
 (defn next [s]
   (-next (seq s)))
+
+(defn nfirst [s]
+  (next (first s)))
+
+(defn nnext [s]
+  (next (next s)))
+
+(defn fnext [s]
+  (first (next s)))
 
 (defn rest [s]
   (-more (seq s)))
