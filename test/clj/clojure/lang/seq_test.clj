@@ -1,5 +1,5 @@
 (ns clojure.lang.seq-test
-  (:refer-clojure :only [fn let nil? >])
+  (:refer-clojure :only [fn let list nil? >])
   (:require [clojure.test             :refer :all]
             [clojure.next             :refer :all]
             [clojure.support.test-seq :refer [test-seq test-seqable]]))
@@ -16,6 +16,44 @@
 
   (testing "second of a many element seq is the second element"
     (is (= 2 (second (test-seqable '(1 2 3 4)))))))
+
+(deftest ffirst-test
+  (testing "ffirst of nil is nil"
+    (is (nil? (ffirst nil))))
+
+  (testing "ffirst of an empty list or list with an empty list is nil"
+    (is (nil? (ffirst (test-seqable (list)))))
+    (is (nil? (ffirst (test-seqable (list (list)))))))
+
+  (testing "ffirst return the first of the first"
+    (is (= :first (ffirst (test-seqable (list (list :first))))))))
+
+(deftest nfirst-test
+  (testing "nfirst of nil is nil"
+    (is (nil? (nfirst nil))))
+
+  (testing "next first of a list in a list"
+    (is (= 2 (first (nfirst (test-seqable (list (list 1 2)))))))))
+
+(deftest nnext-test
+  (testing "nnext of nil is nil"
+    (is (nil? (nnext nil))))
+
+  (testing "nnext of a seq with zero, one or two elements is nil"
+    (is (nil? (nnext (test-seqable '()))))
+    (is (nil? (nnext (test-seqable '(1)))))
+    (is (nil? (nnext (test-seqable '(1 2))))))
+
+  (testing "nnext of a seq with three or more elements is a seq remainder"
+    (is (= 3 (first (nnext (test-seqable '(1 2 3))))))
+    (is (= 4 (second (nnext (test-seqable '(1 2 3 4))))))))
+
+(deftest fnext-test
+  (testing "fnext of nil is nil"
+    (is (nil? (fnext nil))))
+
+  (testing "first of the next"
+    (is (= 2 (fnext (test-seqable '(1 2)))))))
 
 (deftest every?-test
   (testing "returns true if the seq is nil"
