@@ -1,10 +1,11 @@
 (ns clojure.next ; eventually, this will be clojure.core
-  (:refer-clojure :only [apply binding cond declare defmacro defn defn-
+  (:refer-clojure :only [*assert*
+                         apply binding cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         doseq list list* loop format into < butlast last when when-let])
+                         doseq list list* loop format pr-str into < butlast last when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
-            [clojure.lang.exceptions :refer [new-argument-error new-exception]]
+            [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception]]
             [clojure.lang.random     :refer [rand-float]]
             [clojure.lang.protocols  :refer :all]))
 
@@ -656,6 +657,16 @@
 
 (defmacro when-not [test & body]
   (list 'if test nil (clojure.core/cons 'do body)))
+
+(defmacro assert
+  ([assertion]
+    (when *assert*
+      `(when-not ~assertion
+         (throw (new-assertion-error (str "Assert failed: " (pr-str '~assertion)))))))
+  ([assertion message]
+    (when *assert*
+      `(when-not ~assertion
+         (throw (new-assertion-error (str "Assert failed: " ~message "\n" (pr-str '~assertion))))))))
 
 (require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
 
