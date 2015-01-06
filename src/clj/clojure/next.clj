@@ -654,6 +654,9 @@
               next-acc (f acc (first next-s))]
           (recur (next next-s) next-acc))))))
 
+(defmacro when-not [test & body]
+  (list 'if test nil (clojure.core/cons 'do body)))
+
 (require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
 
 (extend-type nil

@@ -1,5 +1,5 @@
 (ns clojure.lang.namespace
-  (:refer-clojure :only [defn defn- assoc get-in if-let let assoc-in atom reduce fn val key -> select-keys doseq when-not contains? format apply dissoc get set concat keys update-in])
+  (:refer-clojure :only [defn defn- assoc get-in if-let let assoc-in atom reduce fn val key -> select-keys doseq contains? format apply dissoc get set concat keys update-in])
   (:require [clojure.lang.var        :refer [-alter-var-root make-var make-unbound]]
             [clojure.next            :refer :all :exclude [get contains? key val assoc dissoc atom reduce]]))
 
