@@ -197,8 +197,10 @@
 (defmacro delay [& body]
   (list 'clojure.lang.delay/new-delay (list* 'clojure.core/fn [] body)))
 
-(defn deref [obj]
-  (-deref obj))
+(defn deref
+  ([obj] (-deref obj))
+  ([obj timeout-ms timeout-val]
+    (-blocking-deref obj timeout-ms timeout-val)))
 
 (defn realized? [obj]
   (-is-realized? obj))
@@ -577,6 +579,15 @@
           (let [return-value (apply f args)]
             (swap! cache-atom assoc args return-value)
             return-value))))))
+
+(require ['clojure.lang.future :refer ['new-future]])
+
+(defn future-call [f]
+  (let [fun (binding-conveyor-fn f)]
+    (new-future fun)))
+
+(defmacro future [& body]
+  `(future-call (^{:once true} fn* [] ~@body)))
 
 (defn comparator [predicate]
   (fn [x y]
