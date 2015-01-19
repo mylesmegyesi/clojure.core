@@ -34,6 +34,9 @@
 (defprotocol IDeref
   (-deref [this]))
 
+(defprotocol IBlockingDeref
+  (-blocking-deref [this timeout-ms timeout-val]))
+
 (defprotocol IEditableCollection
   (-as-transient [this]))
 
