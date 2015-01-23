@@ -1,9 +1,8 @@
 (ns clojure.lang.future-submission
-  (:refer-clojure :only [assoc concat defmacro first list let symbol vary-meta])
-  (:require [clojure.next :refer :all :exclude [first vary-meta assoc]]
+  (:refer-clojure :only [concat defmacro first list let symbol reify])
+  (:require [clojure.next :refer :all :exclude [first]]
             [clojure.lang.agent])
-  (:import [java.util.concurrent TimeoutException TimeUnit Future]
-           [clojure.lang.platform FutureSubmission]))
+  (:import [java.util.concurrent TimeoutException TimeUnit Future]))
 
 (defmacro get-result
   ([future-submission] `(.get ~future-submission))
@@ -15,7 +14,9 @@
   `(.isDone ~future-submission))
 
 (defmacro submit-future [f]
-  `(FutureSubmission/submitFutureForceCallable clojure.lang.agent/solo-executor ~f))
+  `(let [callable# (reify Callable
+                     (call [_] (~f)))]
+    (.submit clojure.lang.agent/solo-executor callable#)))
 
 (defmacro cancel [future-submission interrupt]
   `(.cancel ~future-submission ~interrupt))
