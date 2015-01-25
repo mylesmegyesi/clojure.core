@@ -9,6 +9,18 @@
             [clojure.lang.random     :refer [rand-float]]
             [clojure.lang.protocols  :refer :all]))
 
+(def ^:dynamic *clojure-version*
+  {:major       1
+   :minor       6
+   :incremental 0})
+
+(declare str)
+
+(defn clojure-version []
+  (str (:major *clojure-version*) "."
+       (:minor *clojure-version*) "."
+       (:incremental *clojure-version*)))
+
 (defn instance? [c x]
   (platform-object/instance? c x))
 
