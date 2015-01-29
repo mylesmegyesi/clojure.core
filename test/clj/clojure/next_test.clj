@@ -8,6 +8,10 @@
 (defmacro assertion-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
 
+(deftest clojure-version-test
+  (testing "current clojure version as a string"
+    (is (= "1.6.0" (clojure-version)))))
+
 (deftest constantly-test
   (testing "returns the return value"
     (is (= :val ((constantly :val)))))
@@ -55,3 +59,4 @@
   (testing "assert does not run if *assert* is bound to false"
     (is
       (nil? (binding [*assert* false] (eval '(assert false)))))))
+
