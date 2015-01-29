@@ -421,6 +421,15 @@
       (is (= Long (type (add t1 t2))))
       (is (= 3 (add t1 t2))))))
 
+(deftest integer-precision-addition-test
+  (op-test {Long [[int long] [number int long]]
+            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+           #(addp %1 %2)
+           3 1 2))
+
+(deftest integer-precision-upper-overflow-test
+  (is (= 9223372036854775808N (addp Long/MAX_VALUE 1))))
+
 (deftest integer-increment-test
   (testing "increment an int"
     (is (= -1 (increment (int -2))))

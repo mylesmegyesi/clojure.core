@@ -59,6 +59,9 @@
 (defmacro add [x y]
   `(. Addition (numberAdd ~x ~y)))
 
+(defmacro addp [x y]
+  `(. Addition (numberPrecisionAdd ~x ~y)))
+
 (defmacro increment [x]
   `(. Increment (numberIncrement ~x)))
 
