@@ -9,6 +9,10 @@ public final class Addition {
 
   public static Number numberAdd(Number x, Number y) {
     Ops type = OpType.findOpType(x, y);
+    return Addition.numberAddWithOpType(type, x, y);
+  }
+
+  public static Number numberAddWithOpType(Ops type, Number x, Number y) {
     if (type == Ops.DOUBLE) {
       return Addition.doubleAdd(Coercion.toDouble(x), Coercion.toDouble(y));
     } else if (type == Ops.BIGDECIMAL) {
@@ -53,6 +57,23 @@ public final class Addition {
 
   public static Number doubleAdd(double x, double y) {
     return (Number) Double.valueOf(x + y);
+  }
+
+  public static Number numberPrecisionAdd(Number x, Number y) {
+    Ops type = OpType.findOpType(x, y);
+    if (type == Ops.LONG) {
+      return Addition.longPrecisionAdd(Coercion.toLong(x), Coercion.toLong(y));
+    } else {
+      return Addition.numberAddWithOpType(type, x, y);
+    }
+  }
+
+  public static Number longPrecisionAdd(long x, long y) {
+    long ret = x + y;
+    if ((ret ^ x) < 0 && (ret ^ y) < 0) {
+      return Addition.bigIntAdd(Coercion.toBigInt(x), Coercion.toBigInt(y));
+    }
+    return (Number) ret;
   }
 
 }

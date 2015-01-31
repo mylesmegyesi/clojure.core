@@ -345,6 +345,25 @@
 
   )
 
+(deftest +'-test
+  (testing "returns 0 without arguments"
+    (is (= 0 (+'))))
+
+  (testing "acts as an identity function with 1 argument"
+    (is (= 42 (+' 42))))
+
+  (testing "adds two numbers together"
+    (is (= 42 (+' 22 20))))
+
+  (testing "adds many numbers together"
+    (is (= 42 (+' 1 1 40))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (+' "Foo"))
+    (class-cast-exception-thrown? (+' 1 "Foo")))
+
+  )
+
 (deftest inc-test
   (testing "increment an argument"
     (is (= 2 (inc 1))))
