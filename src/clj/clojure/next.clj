@@ -32,7 +32,7 @@
 
 (require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
-                                        'increment 'decrement
+                                        'increment 'decrement 'decrementp
                                         'add 'addp 'multiply 'subtract 'divide
                                         'is-zero?
                                         '->short '->byte '->int '->long]])
@@ -203,6 +203,9 @@
 
 (defn dec [i]
   (decrement i))
+
+(defn dec' [i]
+  (decrementp i))
 
 (defn zero? [i]
   (is-zero? i))

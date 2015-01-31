@@ -75,6 +75,9 @@
 (defmacro decrement [x]
   `(. Decrement (numberDecrement ~x)))
 
+(defmacro decrementp [x]
+  `(. Decrement (numberPrecisionDecrement ~x)))
+
 (defmacro divide [x y]
   `(. Division (numberDivide ~x ~y)))
 
