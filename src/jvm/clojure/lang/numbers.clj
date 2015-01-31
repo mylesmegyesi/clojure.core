@@ -72,6 +72,10 @@
   ([x] `(. Negation (numberNegate ~x)))
   ([x y] `(. Subtraction (numberSubtract ~x ~y))))
 
+(defmacro subtractp
+  ([x] `(. Negation (numberPrecisionNegate ~x)))
+  ([x y] `(. Subtraction (numberPrecisionSubtract ~x ~y))))
+
 (defmacro decrement [x]
   `(. Decrement (numberDecrement ~x)))
 

@@ -806,9 +806,13 @@
       (is (= Long (type (subtract t1 t2))))
       (is (= 5 (subtract t1 t2))))))
 
-;(deftest integer-precision-subtraction-test
-;  (testing "overflow an integer via min value"
-;    (is (= -9223372036854775809N (subtractp Long/MIN_VALUE 1)))))
+(deftest integer-precision-negation-subtraction-test
+  (testing "overflow an integer into a BigInt by negating Long/MIN_VALUE"
+    (is (= 9223372036854775808N (subtractp Long/MIN_VALUE)))))
+
+(deftest integer-precision-subtraction-test
+  (testing "overflow an integer via min value"
+    (is (= -9223372036854775809N (subtractp Long/MIN_VALUE 1)))))
 
 (deftest integer-decrement-test
   (testing "decrement an int"

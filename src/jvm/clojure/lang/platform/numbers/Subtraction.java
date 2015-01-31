@@ -16,5 +16,9 @@ public final class Subtraction {
     return x - y;
   }
 
+  public static Number numberPrecisionSubtract(Number x, Number y) {
+    return Addition.numberPrecisionAdd((Number) x, (Number) Negation.numberPrecisionNegate(y));
+  }
+
 }
 
