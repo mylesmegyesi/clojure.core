@@ -8,7 +8,9 @@ import clojure.lang.platform.Ratio;
 public final class Negation {
 
   public static final Number numberNegate(Number x) {
-    if ((x instanceof Double) || (x instanceof Float)) {
+    if (x instanceof Long) {
+      return Negation.longNegate(Coercion.toLong(x));
+    } else if ((x instanceof Double) || (x instanceof Float)) {
       return Negation.doubleNegate(Coercion.toDouble(x));
     } else if (x instanceof BigDecimal) {
       return Negation.bigDecimalNegate((BigDecimal) x);
@@ -44,6 +46,20 @@ public final class Negation {
 
   public static final Number doubleNegate(double x) {
     return (Number) Double.valueOf(-x);
+  }
+
+  public static final Number numberPrecisionNegate(Number x) {
+    Categories category = CategoryType.findCategoryType(x);
+    if (category == Categories.INT) {
+      long lx = x.longValue();
+      if (lx > Long.MIN_VALUE) {
+        return (Number) Long.valueOf(-lx);
+      } else {
+        return (Number) BigInt.fromBigInteger(BigInteger.valueOf(lx).negate());
+      }
+    } else {
+      return (Number) numberNegate(x);
+    }
   }
 
 }

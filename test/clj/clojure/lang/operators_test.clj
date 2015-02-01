@@ -399,7 +399,7 @@
   (testing "subtracting two numbers"
     (is (= 1 (- 3 2))))
 
-  (testing "subtracts many numbers"
+  (testing "subtracting many numbers"
     (is (= 1 (- 5 3 1))))
 
   (testing "raises an error without numbers"
@@ -408,7 +408,32 @@
 
   )
 
+(deftest -'-test
+  (testing "negation of a single element"
+    (is (= -1 (-' 1))))
+
+  (testing "subtracting two numbers"
+    (is (= 1 (-' 3 2))))
+
+  (testing "subtracting many numbers"
+    (is (= 1 (-' 5 3 1))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (-' "Foo"))
+    (class-cast-exception-thrown? (-' 1 "Foo")))
+
+  )
+
 (deftest dec-test
+  (testing "decrement an argument"
+    (is (= 1 (dec 2))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (dec "Foo")))
+
+  )
+
+(deftest dec'-test
   (testing "decrement an argument"
     (is (= 1 (dec 2))))
 

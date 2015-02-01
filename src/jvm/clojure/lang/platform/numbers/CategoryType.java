@@ -8,7 +8,9 @@ import clojure.lang.platform.Ratio;
 public final class CategoryType {
 
   public static final Categories findCategoryType(Number x) {
-    if ((x instanceof Double) || (x instanceof Float)) {
+    if (x instanceof Long) {
+      return Categories.INT;
+    } else if ((x instanceof Double) || (x instanceof Float)) {
       return Categories.FLOAT;
     } else if (x instanceof BigDecimal) {
       return Categories.DECIMAL;

@@ -806,6 +806,14 @@
       (is (= Long (type (subtract t1 t2))))
       (is (= 5 (subtract t1 t2))))))
 
+(deftest integer-precision-negation-subtraction-test
+  (testing "overflow an integer into a BigInt by negating Long/MIN_VALUE"
+    (is (= 9223372036854775808N (subtractp Long/MIN_VALUE)))))
+
+(deftest integer-precision-subtraction-test
+  (testing "overflow an integer via min value"
+    (is (= -9223372036854775809N (subtractp Long/MIN_VALUE 1)))))
+
 (deftest integer-decrement-test
   (testing "decrement an int"
     (is (= -3 (decrement (int -2))))
@@ -850,6 +858,10 @@
   (testing "decrement a number"
     (is (= 1 (decrement (number 2))))
     (is (= Long (type (decrement (number 2)))))))
+
+(deftest integer-precision-decrement-overflow-test
+  (testing "overflows into BigInt when decrementing Long/MIN_VALUE"
+    (is (= -9223372036854775809N (decrementp Long/MIN_VALUE)))))
 
 (deftest integer-division-test
   (op-test {Long [[int long] [number int long]]
