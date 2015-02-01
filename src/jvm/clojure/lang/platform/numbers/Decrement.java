@@ -8,7 +8,9 @@ import clojure.lang.platform.Ratio;
 public final class Decrement {
 
   public static Number numberDecrement(Number x) {
-    if ((x instanceof Float) || (x instanceof Double)) {
+    if (x instanceof Long) {
+      return Decrement.longDecrement(x.longValue());
+    } else if ((x instanceof Float) || (x instanceof Double)) {
       return Decrement.doubleDecrement(Coercion.toDouble(x));
     } else if (x instanceof BigDecimal) {
       return Decrement.bigDecimalDecrement((BigDecimal) x);
@@ -48,12 +50,12 @@ public final class Decrement {
     if (category == Categories.INT) {
       long lx = x.longValue();
       if (lx == Long.MIN_VALUE) {
-        return (Number) numberDecrement(Coercion.toBigInt(x));
+        return (Number) Decrement.numberDecrement(Coercion.toBigInt(x));
       } else {
         return (Number) (lx - 1);
       }
     } else {
-      return (Number) numberDecrement(x);
+      return (Number) Decrement.numberDecrement(x);
     }
   }
 
