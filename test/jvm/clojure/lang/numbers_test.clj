@@ -427,7 +427,7 @@
            #(addp %1 %2)
            3 1 2))
 
-(deftest integer-precision-upper-overflow-test
+(deftest integer-precision-upper-overflow-addition-test
   (is (= 9223372036854775808N (addp Long/MAX_VALUE 1))))
 
 (deftest integer-increment-test
@@ -618,6 +618,17 @@
           t2 (number 3)]
       (is (= Long (type (multiply t1 t2))))
       (is (= 6 (multiply t1 t2))))))
+
+(deftest integer-precision-multiplication-test
+  (op-test {Long [[int long] [number int long]]}
+            #(multiplyp %1 %2)
+            8 4 2))
+
+(deftest integer-precision-upper-overflow-multiplicaton-test
+  (is (= 9223372036854775808N (multiplyp 4611686018427387904 2))))
+
+(deftest integer-precision-lower-overflow-multiplication-test
+  (is (= -9223372036854775810N (multiplyp -4611686018427387905 2))))
 
 (deftest integer-subtraction-test
   (op-test {Long [[int long] [number int long]]

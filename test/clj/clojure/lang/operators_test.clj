@@ -392,6 +392,25 @@
 
   )
 
+(deftest *'-test
+  (testing "returns 1 without arguments"
+    (is (= 1 (*'))))
+
+  (testing "acts as an identity function with 1 argument"
+    (is (= 42 (*' 42))))
+
+  (testing "multiplies two numbers together"
+    (is (= 42 (*' 21 2))))
+
+  (testing "multiplies many numbers together"
+    (is (= 42 (*' 1 2 21))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-thrown? (*' "Foo"))
+    (class-cast-exception-thrown? (*' 1 "Foo")))
+
+  )
+
 (deftest --test
   (testing "negation of a single element"
     (is (= -1 (- 1))))

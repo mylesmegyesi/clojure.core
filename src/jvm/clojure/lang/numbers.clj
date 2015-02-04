@@ -68,6 +68,9 @@
 (defmacro multiply [x y]
   `(. Multiplication (numberMultiply ~x ~y)))
 
+(defmacro multiplyp [x y]
+  `(. Multiplication (numberPrecisionMultiply ~x ~y)))
+
 (defmacro subtract
   ([x] `(. Negation (numberNegate ~x)))
   ([x y] `(. Subtraction (numberSubtract ~x ~y))))
