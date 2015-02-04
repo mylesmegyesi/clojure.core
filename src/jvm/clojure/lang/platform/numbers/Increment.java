@@ -8,7 +8,9 @@ import clojure.lang.platform.Ratio;
 public final class Increment {
 
   public static Number numberIncrement(Number x) {
-    if ((x instanceof Float) || (x instanceof Double)) {
+    if (x instanceof Long) {
+      return Increment.longIncrement(Coercion.toLong(x));
+    } else if ((x instanceof Float) || (x instanceof Double)) {
       return Increment.doubleIncrement(Coercion.toDouble(x));
     } else if (x instanceof BigDecimal) {
       return Increment.bigDecimalIncrement((BigDecimal) x);
@@ -41,6 +43,20 @@ public final class Increment {
 
   public static Number doubleIncrement(double x) {
     return (Number) Double.valueOf(x + 1);
+  }
+
+  public static Number numberPrecisionIncrement(Number x) {
+    Categories category = CategoryType.findCategoryType(x);
+    if (category == Categories.INT) {
+      long lx = x.longValue();
+      if (lx == Long.MAX_VALUE) {
+        return (Number) Increment.numberIncrement(Coercion.toBigInt(x));
+      } else {
+        return (Number) (lx - 1);
+      }
+    } else {
+      return (Number) Increment.numberIncrement(x);
+    }
   }
 
 }

@@ -475,6 +475,10 @@
     (is (= 3 (increment (number 2))))
     (is (= Long (type (increment (number 2)))))))
 
+(deftest integer-precision-intecrement-overflow-test
+  (testing "overflow into BigInt when increment Long/MAX_VALUE"
+    (is (= 9223372036854775808N (incrementp Long/MAX_VALUE)))))
+
 (deftest integer-multiplication-test
   (op-test {Long [[int long] [number int long]]
             clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}

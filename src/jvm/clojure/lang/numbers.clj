@@ -65,6 +65,9 @@
 (defmacro increment [x]
   `(. Increment (numberIncrement ~x)))
 
+(defmacro incrementp [x]
+  `(. Increment (numberPrecisionIncrement ~x)))
+
 (defmacro multiply [x y]
   `(. Multiplication (numberMultiply ~x ~y)))
 
