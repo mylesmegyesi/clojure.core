@@ -33,7 +33,7 @@
 (require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'decrement 'decrementp
-                                        'add 'addp 'multiply 'subtract 'subtractp 'divide
+                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
                                         'is-zero?
                                         '->short '->byte '->int '->long]])
 
@@ -197,6 +197,12 @@
   ([x] (multiply x 1))
   ([x y] (multiply x y))
   ([x y & more] (clojure.core/reduce * (* x y) more)))
+
+(defn *'
+  ([] 1)
+  ([x] (multiplyp x 1))
+  ([x y] (multiplyp x y))
+  ([x y & more] (clojure.core/reduce *' (*' x y) more)))
 
 (defn /
   ([x] (/ 1 x))
