@@ -373,6 +373,14 @@
 (defn val [entry]
   (-val entry))
 
+(require ['clojure.lang.persistent-map :refer ['new-key-seq 'new-val-seq]])
+
+(defn keys [m]
+  (new-key-seq (seq m)))
+
+(defn vals [m]
+  (new-val-seq (seq m)))
+
 (defn assoc-seq [m kvs]
   (if kvs
     (let [n (next kvs)]
