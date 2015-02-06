@@ -70,10 +70,6 @@
       (list 'clojure.core/contains? '-map 'x))
 
     'clojure.lang.protocols/IPersistentSet
-    (list '-conj ['this 'xs]
-      (list 'clojure.core/let ['next-map (list 'clojure.core/apply 'clojure.core/assoc '-map (list 'make-pairs 'xs))]
-        (list gen-next 'next-map)))
-
     (list '-difference ['this 'sets]
       (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-difference '-map 'sets)]
         (list gen-next 'next-map)))
@@ -88,6 +84,11 @@
 
     (list '-union ['this 'sets]
       (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-union '-map 'sets)]
+        (list gen-next 'next-map)))
+
+    'clojure.lang.protocols/IPersistentCollection
+    (list '-cons ['this 'x]
+      (list 'clojure.core/let ['next-map (list 'clojure.core/assoc '-map 'x 'x)]
         (list gen-next 'next-map)))
 
     'clojure.lang.protocols/ISeqable

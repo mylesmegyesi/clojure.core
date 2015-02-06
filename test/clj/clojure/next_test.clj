@@ -1,9 +1,9 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map nil? true? var-set])
+  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map nil? true? reify var-set])
   (:require [clojure.test            :refer :all]
             [clojure.next            :refer :all]
             [clojure.lang.exceptions :refer [assertion-error]]
-            [clojure.lang.protocols  :refer [IPersistentVector]]))
+            [clojure.lang.protocols  :refer [IPersistentVector IPersistentCollection]]))
 
 (defmacro assertion-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
@@ -59,4 +59,35 @@
   (testing "assert does not run if *assert* is bound to false"
     (is
       (nil? (binding [*assert* false] (eval '(assert false)))))))
+
+(deftest conj-test
+  (testing "conj with no arguments returns an empty vector"
+    (is (= [] (conj))))
+
+  (testing "conj with one argument returns the argument"
+    (is (= '(1 2 3) (conj '(1 2 3)))))
+
+  (testing "conj two arguments together"
+    (let [conj-arg (atom nil)
+          conjable (reify
+                     IPersistentCollection
+                     (-cons [this x]
+                       (reset! conj-arg x)
+                       this))]
+      (conj conjable :val)
+      (is (= :val (deref conj-arg)))))
+
+  (testing "conj many arguments together"
+    (let [conj-args (atom nil)
+          conjable (reify
+                     IPersistentCollection
+                     (-cons [this x]
+                       (reset! conj-args (cons x (deref conj-args)))
+                       this))]
+      (conj conjable :val1 :val2 :val3)
+      (is (= :val3 (first (deref conj-args))))
+      (is (= :val2 (first (next (deref conj-args)))))
+      (is (= :val1 (first (next (next (deref conj-args))))))))
+
+  )
 
