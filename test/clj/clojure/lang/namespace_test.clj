@@ -2,7 +2,7 @@
   (:refer-clojure :only [defn -> let get-in identity nil? set keys get assoc-in])
   (:require [clojure.test           :refer :all]
             [clojure.lang.namespace :refer :all]
-            [clojure.next           :refer :all :exclude [get]]))
+            [clojure.next           :refer :all :exclude [get keys]]))
 
 (defn empty-ns-map []
   {})

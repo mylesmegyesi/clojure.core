@@ -22,12 +22,9 @@
   (-more [this]
     (if-let [m (next -seq)] (new-key-seq m) EMPTY-LIST)))
 
-(defn- new-key-seq [-seq]
+(defn new-key-seq [-seq]
   (when -seq
     (KeySeq. -seq)))
-
-(defn keys [m]
-  (new-key-seq (seq m)))
 
 (declare new-val-seq)
 
@@ -46,9 +43,6 @@
   (-more [this]
     (if-let [m (next -seq)] (new-val-seq m) EMPTY-LIST)))
 
-(defn- new-val-seq [-seq]
+(defn new-val-seq [-seq]
   (when -seq
     (ValSeq. -seq)))
-
-(defn vals [m]
-  (new-val-seq (seq m)))

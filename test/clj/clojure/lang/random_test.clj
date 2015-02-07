@@ -1,5 +1,5 @@
 (ns clojure.lang.random-test
-  (:refer-clojure :only [let distinct nil? repeatedly some take vals >= <=])
+  (:refer-clojure :only [let distinct nil? repeatedly some take >= <=])
   (:require [clojure.test :refer :all]
             [clojure.next :refer :all]))
 
