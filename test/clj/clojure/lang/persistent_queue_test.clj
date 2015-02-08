@@ -19,8 +19,11 @@
     (is (= 0 (count (pop EMPTY-QUEUE)))))
 
   (testing "empty"
-    (is (empty? EMPTY-QUEUE))
-    (is (not (empty? (conj EMPTY-QUEUE :something)))))
+    (is (empty? (empty (conj EMPTY-QUEUE 1)))))
+
+  (testing "empty preserves the meta"
+    (is (= {:so "meta"}
+           (meta (empty (with-meta EMPTY-QUEUE {:so "meta"}))))))
 
   (testing "includes an item"
     (let [single-item-queue    (conj EMPTY-QUEUE :anything)

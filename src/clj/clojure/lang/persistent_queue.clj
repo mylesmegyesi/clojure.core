@@ -64,7 +64,7 @@
                        (conj -vec x))]
         (make-queue -meta (inc -length) -seq -new-vec))))
 
-  (-empty [this] (not (zero? -length)))
+  (-empty [this] (make-queue -meta 0 nil nil))
 
   IPersistentStack
   (-peek [this] (first -seq))
