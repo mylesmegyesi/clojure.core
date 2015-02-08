@@ -1,8 +1,9 @@
 (ns clojure.lang.map-entry
-  (:refer-clojure :refer [deftype defmacro defn defn- let list list* -> satisfies?])
+  (:refer-clojure :refer [concat deftype defmacro defn defn- let list list* -> satisfies?])
   (:require [clojure.lang.deftype     :refer [expand-methods]]
             [clojure.lang.equivalence :refer [platform-equals-method]]
-            [clojure.lang.protocols   :refer [IMapEntry]]
+            [clojure.lang.key-value   :refer [platform-map-entry]]
+            [clojure.lang.protocols   :refer [IMapEntry -key -val]]
             [clojure.next             :refer :all]))
 
 (defmacro map-entry-equals?
@@ -19,16 +20,18 @@
   (list 'map-entry-equals? 'k 'v other-arg))
 
 (defmacro defmapentry [type]
-  (list*
-    'deftype type ['k 'v]
+  (concat
+    (list*
+      'deftype type ['k 'v]
 
-    'IMapEntry
-    (list '-key ['this] 'k)
-    (list '-val ['this] 'v)
+      'IMapEntry
+      (list '-key ['this] 'k)
+      (list '-val ['this] 'v)
 
-    (-> {}
-      (platform-equals-method 'map-entry-equals?-init)
-      expand-methods)))
+      (-> {}
+        (platform-equals-method 'map-entry-equals?-init)
+        expand-methods))
+     platform-map-entry))
 
 (defmapentry MapEntry)
 
