@@ -1,5 +1,5 @@
 (ns clojure.lang.object
-  (:refer-clojure :only [defmacro])
+  (:refer-clojure :only [defmacro if-let nil?])
   (:import [clojure.lang.platform Identity]))
 
 (def base-object Object)
@@ -11,4 +11,4 @@
   `(Identity/areIdentical ~x ~y))
 
 (defmacro type [x]
-  `(.getClass ~x))
+  `(if-let [x# ~x] (.getClass x#)))
