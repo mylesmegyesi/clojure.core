@@ -4,10 +4,6 @@
             [clojure.lang.protocols           :refer [-conj -difference -disj -intersection -union]]
             [clojure.next                     :refer :all :exclude [cons every? conj]]))
 
-(defn conj
-  ([this x] (-conj this (cons x nil)))
-  ([this x & xs] (-conj this (cons x xs))))
-
 (defn difference
   ([this] this)
   ([this s] (-difference this [s]))

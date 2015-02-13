@@ -324,9 +324,6 @@
     (list elem)
     (make-cons elem (seq seqable))))
 
-(defn conj [coll x]
-  (-cons coll x))
-
 (defn first [s]
   (-first (seq s)))
 
@@ -350,6 +347,15 @@
 
 (defn second [s]
   (first (next s)))
+
+(defn conj
+  ([] [])
+  ([coll] coll)
+  ([coll x] (-cons coll x))
+  ([coll x & xs]
+   (if xs
+     (recur (conj coll x) (first xs) (next xs))
+     (conj coll x))))
 
 (defn every? [pred s]
   (let [sq (seq s)]

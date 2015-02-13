@@ -1,10 +1,10 @@
 (ns clojure.lang.persistent-hash-set-test
   (:refer-clojure :only [deftype first let next nil?])
   (:require [clojure.test                     :refer :all]
-            [clojure.lang.persistent-set      :refer [conj difference disj intersection subset? superset? union]]
+            [clojure.lang.persistent-set      :refer [difference disj intersection subset? superset? union]]
             [clojure.lang.persistent-hash-set :refer :all]
             [clojure.lang.protocols           :refer [IHash]]
-            [clojure.next                     :refer :all :exclude [first next conj]]))
+            [clojure.next                     :refer :all :exclude [first next]]))
 
 (deftest persistent-hash-set-test
   (testing "an empty hash set does not contains? an item"
