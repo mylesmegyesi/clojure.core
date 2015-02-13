@@ -26,4 +26,7 @@
 
   (testing "nth of nil with a default is the default"
     (is (= "foo" (nth nil 0 "foo")))
-    (is (= "foo" (nth nil 42 "foo")))))
+    (is (= "foo" (nth nil 42 "foo"))))
+
+  (testing "the type of nil is nil"
+    (is (nil? (type nil)))))
