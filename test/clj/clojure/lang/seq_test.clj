@@ -17,6 +17,19 @@
   (testing "second of a many element seq is the second element"
     (is (= 2 (second (test-seqable '(1 2 3 4)))))))
 
+(deftest last-test
+  (testing "last of nil is nil"
+    (is (nil? (last nil))))
+
+  (testing "last of an empty seq is nil"
+    (is (nil? (last (test-seqable (list))))))
+
+  (testing "last of a one element seq is the element"
+    (is (= 1 (last (test-seqable (list 1))))))
+
+  (testing "last of a many element seq is the last element"
+    (is (= 3 (last (test-seqable (list 1 2 3)))))))
+
 (deftest ffirst-test
   (testing "ffirst of nil is nil"
     (is (nil? (ffirst nil))))
