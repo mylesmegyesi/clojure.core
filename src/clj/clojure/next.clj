@@ -2,7 +2,7 @@
   (:refer-clojure :only [*assert*
                          apply binding cond declare defmacro defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         doseq list list* loop format pr-str into < butlast last when when-let])
+                         doseq list list* loop format pr-str into < butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
             [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception]]
@@ -344,6 +344,11 @@
 
 (defn rest [s]
   (-more (seq s)))
+
+(defn last [s]
+  (if (next s)
+    (recur (next s))
+    (first s)))
 
 (defn second [s]
   (first (next s)))
@@ -693,7 +698,7 @@
      (let [parts (clojure.string/split name #"/")]
        (if (= 1 (clojure.core/count parts))
          (symbol nil (clojure.core/first parts))
-         (symbol (clojure.string/join "/" (butlast parts)) (last parts))))))
+         (symbol (clojure.string/join "/" (butlast parts)) (clojure.core/last parts))))))
   ([ns name]
    (if (nil? name)
      (throw (Exception. "Can't create symbol with nil name")))

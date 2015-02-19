@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-list
-  (:refer-clojure :only [declare defn defn- deftype last butlast loop])
+  (:refer-clojure :only [declare defn defn- deftype butlast loop])
   (:require [clojure.next            :refer :all]
             [clojure.lang.aseq       :refer [defseq]]
             [clojure.lang.exceptions :refer [new-illegal-state-error]]
