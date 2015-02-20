@@ -21,6 +21,15 @@
       (is (= 2 (count two)))
       (is (= 100 (count more)))))
 
+  (testing "generate an empty vector"
+    (let [v (vector 1 2 3)]
+      (is (empty? (empty v)))))
+
+  (testing "empty vector retains the meta"
+    (let [mta {:so :meta}
+          v (with-meta (vector 1 2 3) mta)]
+      (is (= mta (meta (empty v))))))
+
   (testing "returns the nth object"
     (let [new-vec (vector :a :b :c :d :e :f)]
       (is (= :a (nth new-vec 0)))

@@ -91,6 +91,9 @@
       (list 'clojure.core/let ['next-map (list 'clojure.core/assoc '-map 'x 'x)]
         (list gen-next 'next-map)))
 
+    (list '-empty ['this]
+      (list gen-next (list 'clojure.core/empty '-map)))
+
     'clojure.lang.protocols/ISeqable
     (list '-seq ['this]
       (list 'clojure.core/seq (list 'clojure.core/keys '-map)))

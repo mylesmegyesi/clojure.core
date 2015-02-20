@@ -55,6 +55,10 @@
           s2 (sorted-set 2 4)]
       (is (= s2 (disj s1 1 3 5)))))
 
+  (testing "empty a sorted set"
+    (let [s (sorted-set 1 2 3)]
+      (is (empty? (empty s)))))
+
   (testing "difference of a single set is identity"
     (let [s1 (sorted-set 1 2 3)]
       (is (= s1 (difference s1)))))
