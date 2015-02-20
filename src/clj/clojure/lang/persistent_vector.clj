@@ -123,6 +123,8 @@
         (aset (get-array new-node) subidx (do-assoc (- level 5) (aget (get-array node) subidx) n x))
         new-node))))
 
+(declare EMPTY-VECTOR)
+
 (deftype PersistentVector [-meta -length -shift -root -tail -seq]
   IPersistentCollection
   (-cons [this x]
@@ -142,6 +144,9 @@
             (make-vector -meta (inc -length) (+ (->bitnum -shift) (->bitnum 5)) new-root new-arr))
           (let [new-root (push-tail -shift -root tail-node -length -root)]
             (make-vector -meta (inc -length) -shift new-root new-arr))))))
+
+  (-empty [this]
+    (with-meta EMPTY-VECTOR (meta this)))
 
   IPersistentVector
   (-assoc-n [this n x]
