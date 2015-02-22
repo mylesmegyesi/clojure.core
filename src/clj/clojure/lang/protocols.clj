@@ -68,13 +68,15 @@
 
 (defprotocol IMeta
   (-meta [this])
-  (-with-meta [this new-meta])
   (-reset-meta! [this new-meta])
   (-alter-meta! [this f args]))
 
 (defprotocol INamed
   (-name [this])
   (-namespace [this]))
+
+(defprotocol IObj
+  (-with-meta [this new-meta]))
 
 (defprotocol IPending
   (-is-realized? [this]))

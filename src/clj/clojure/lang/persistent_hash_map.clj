@@ -10,7 +10,7 @@
                                                   bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
                                                   + inc * - dec]]
             [clojure.lang.protocols       :refer [IAssociative ICounted ILookup
-                                                  IMeta IPersistentMap ISeqable ISeq]]
+                                                  IMeta IObj IPersistentMap ISeqable ISeq]]
             [clojure.next                 :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right + inc * - dec]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
@@ -468,6 +468,8 @@
 
   IMeta
   (-meta [this] -meta)
+
+  IObj
   (-with-meta [this new-meta]
     (new-hash-map new-meta count -root -has-nil? -nil-value))
 

@@ -6,7 +6,7 @@
             [clojure.lang.equivalence :refer [platform-equals-method]]
             [clojure.lang.hash        :refer [platform-hash-method]]
             [clojure.lang.show        :refer [platform-show-method]]
-            [clojure.lang.protocols   :refer [IMeta INamed]]
+            [clojure.lang.protocols   :refer [IMeta IObj INamed]]
             [clojure.next             :refer :all :exclude [count first]]
             [clojure.string]))
 
@@ -84,6 +84,8 @@
 
     'IMeta
     (list '-meta ['this] '-meta)
+
+    'IObj
     (list '-with-meta ['this 'new-meta]
           (list 'new type '-ns '-name '-str '-hash-code 'new-meta))
 

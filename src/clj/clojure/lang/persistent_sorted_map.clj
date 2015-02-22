@@ -5,7 +5,7 @@
             [clojure.lang.map-entry       :refer [new-map-entry]]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.exceptions      :refer [new-argument-error new-unsupported-error]]
-            [clojure.lang.protocols       :refer [ICounted ILookup IMeta
+            [clojure.lang.protocols       :refer [ICounted ILookup IMeta IObj
                                                   IAssociative IPersistentMap ISeqable ISeq]]
             [clojure.next                 :refer :all :exclude [empty? count comparator]]))
 
@@ -416,6 +416,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IObj
   (-with-meta [this m]
     (make-sorted-map -root -count -comparator m))
 

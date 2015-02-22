@@ -5,7 +5,7 @@
             [clojure.lang.map-entry       :refer [new-map-entry]]
             [clojure.lang.exceptions      :refer [new-argument-error]]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [ICounted ILookup IMeta IAssociative IPersistentMap ISeq ISeqable]]
+            [clojure.lang.protocols       :refer [ICounted ILookup IMeta IObj IAssociative IPersistentMap ISeq ISeqable]]
             [clojure.next                 :refer :all]))
 
 (declare new-array-map)
@@ -71,6 +71,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IObj
   (-with-meta [this m]
     (let [new-arr (make-array -size)]
       (acopy -arr 0 new-arr 0 -size)
