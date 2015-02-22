@@ -67,9 +67,7 @@
   (-val [this]))
 
 (defprotocol IMeta
-  (-meta [this])
-  (-reset-meta! [this new-meta])
-  (-alter-meta! [this f args]))
+  (-meta [this]))
 
 (defprotocol INamed
   (-name [this])
@@ -107,6 +105,10 @@
 (defprotocol IRatio
   (-numerator [this])
   (-denominator [this]))
+
+(defprotocol IReference
+  (-reset-meta! [this new-meta])
+  (-alter-meta! [this f args]))
 
 (defprotocol ISeq
   (-first [this])
