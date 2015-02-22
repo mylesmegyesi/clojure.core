@@ -5,7 +5,7 @@
             [clojure.lang.numbers    :refer [->int]]
             [clojure.lang.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.protocols  :refer [-as-transient -assoc-n -conj! -persistent
-                                             IAssociative ICounted IEditableCollection IMeta
+                                             IAssociative ICounted IEditableCollection IMeta IObj
                                              IPersistentCollection IPersistentVector
                                              ISeq ISeqable ITransientCollection IIndexed]]))
 
@@ -185,6 +185,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IObj
   (-with-meta [this new-meta]
     (make-vector new-meta -length -shift -root -tail))
 

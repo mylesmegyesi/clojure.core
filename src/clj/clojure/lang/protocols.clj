@@ -67,14 +67,14 @@
   (-val [this]))
 
 (defprotocol IMeta
-  (-meta [this])
-  (-with-meta [this new-meta])
-  (-reset-meta! [this new-meta])
-  (-alter-meta! [this f args]))
+  (-meta [this]))
 
 (defprotocol INamed
   (-name [this])
   (-namespace [this]))
+
+(defprotocol IObj
+  (-with-meta [this new-meta]))
 
 (defprotocol IPending
   (-is-realized? [this]))
@@ -105,6 +105,10 @@
 (defprotocol IRatio
   (-numerator [this])
   (-denominator [this]))
+
+(defprotocol IReference
+  (-reset-meta! [this new-meta])
+  (-alter-meta! [this f args]))
 
 (defprotocol ISeq
   (-first [this])

@@ -4,7 +4,7 @@
             [clojure.lang.atomic-ref        :refer :all]
             [clojure.lang.persistent-queue  :as    queue]
             [clojure.lang.persistent-vector :refer [EMPTY-VECTOR]]
-            [clojure.lang.protocols         :refer [IAgent IDeref IMeta IValidatable IWatchable
+            [clojure.lang.protocols         :refer [IAgent IDeref IMeta IReference IValidatable IWatchable
                                                     -action-queue -cons -error-handler -set-error-handler -error-mode -enqueue -notify-watches -peek -reset-meta! -set-state -restart]]
             [clojure.lang.runnable          :refer :all]
             [clojure.lang.thread            :refer [create-fixed-thread-pool-executor
@@ -207,6 +207,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IReference
   (-reset-meta! [this new-meta]
     (set! -meta new-meta)
     new-meta)

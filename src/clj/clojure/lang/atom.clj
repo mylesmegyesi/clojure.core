@@ -3,7 +3,7 @@
   (:require [clojure.lang.atomic-ref :refer [new-atomic-ref ref-set!
                                              ref-get ref-compare-and-set!]]
             [clojure.lang.exceptions :refer [new-illegal-state-error]]
-            [clojure.lang.protocols  :refer [IAtom IDeref IMeta IValidatable IWatchable
+            [clojure.lang.protocols  :refer [IAtom IDeref IMeta IReference IValidatable IWatchable
                                              -reset-meta!]]
             [clojure.next            :refer :all :exclude [cons first second rest empty? assoc dissoc]]))
 
@@ -31,6 +31,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IReference
   (-reset-meta! [this new-meta]
     (set! -meta new-meta)
     new-meta)

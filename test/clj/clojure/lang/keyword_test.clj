@@ -54,24 +54,6 @@
     (is (= false (keyword? 1)))
     (is (= false (keyword? nil)))))
 
-(deftest meta-test
-  (testing "keywords have no initial metadata"
-    (is (= {} (meta (keyword "kwd")))))
-
-  (testing "adds metadata using with-meta"
-    (let [kwd1 (keyword "the-ns" "kwd")
-          m {:some-meta "here" :private true}
-          kwd2 (with-meta kwd1 m)]
-      (is (not (identical? kwd1 kwd2)))
-      (is (= kwd1 kwd2))
-
-      (is (= m (meta kwd2)))
-      (is (= (hash kwd1)
-             (hash kwd2)))
-      (is (= "the-ns" (namespace kwd2)))
-      (is (= "kwd" (name kwd2)))
-      (is (= ":the-ns/kwd" (str kwd2))))))
-
 (deftest compare-test
   (testing "equal if ns and name are equal"
     (let [lhs (keyword "the-ns" "kwd")

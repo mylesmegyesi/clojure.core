@@ -2,7 +2,7 @@
   (:refer-clojure :only [declare defn deftype])
   (:require [clojure.next           :refer :all]
             [clojure.lang.aseq      :refer [defseq]]
-            [clojure.lang.protocols :refer [ICounted IMeta ISeq]]))
+            [clojure.lang.protocols :refer [ICounted IMeta IObj ISeq]]))
 
 (declare make-cons)
 
@@ -14,6 +14,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IObj
   (-with-meta [this mta]
     (make-cons mta -first -more))
 

@@ -3,7 +3,7 @@
   (:require [clojure.next           :refer :all]
             [clojure.lang.aseq      :refer [defseq]]
             [clojure.lang.protocols :refer [ICounted ILookup IPersistentStack IPersistentCollection
-                                            IMeta
+                                            IMeta IObj
                                             ISeq ISeqable]]))
 
 (declare make-queue)
@@ -21,6 +21,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IObj
   (-with-meta [this m] (PersistentQueueSeq. m -seq -vec-seq))
 
   ISeq
@@ -53,6 +54,7 @@
   IMeta
   (-meta [this] -meta)
 
+  IObj
   (-with-meta [this m] (make-queue m -length -seq -vec))
 
   IPersistentCollection

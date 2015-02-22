@@ -3,7 +3,7 @@
   (:require [clojure.next            :refer :all]
             [clojure.lang.aseq       :refer [defseq]]
             [clojure.lang.exceptions :refer [new-illegal-state-error]]
-            [clojure.lang.protocols  :refer [ICounted IMeta IPersistentCollection -cons
+            [clojure.lang.protocols  :refer [ICounted IMeta IObj IPersistentCollection -cons
                                              IPersistentList IPersistentStack ISeq ISeqable]]))
 
 (declare make-list)
@@ -16,6 +16,7 @@
   IMeta
   (-meta [this] meta)
 
+  IObj
   (-with-meta [this new-meta]
     (if (= new-meta meta)
       this
@@ -53,6 +54,7 @@
   IMeta
   (-meta [this] meta)
 
+  IObj
   (-with-meta [this new-meta]
     (make-list new-meta first rest count))
 

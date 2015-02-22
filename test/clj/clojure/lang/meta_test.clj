@@ -1,16 +1,18 @@
 (ns clojure.lang.meta-test
   (:refer-clojure :only [apply cons deftype let select-keys])
   (:require [clojure.test           :refer :all]
-            [clojure.lang.protocols :refer [IMeta -reset-meta!]]
+            [clojure.lang.protocols :refer [IMeta IObj IReference -reset-meta!]]
             [clojure.next           :refer :all :exclude [cons]]))
 
 (deftype TestMeta [^:unsynchronized-mutable -meta]
   IMeta
   (-meta [this] -meta)
 
+  IObj
   (-with-meta [this new-meta]
     (TestMeta. new-meta))
 
+  IReference
   (-reset-meta! [this new-meta]
     (set! -meta new-meta)
     new-meta)
