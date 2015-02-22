@@ -1,8 +1,8 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
-                         apply binding cond declare defmacro defn defn-
+                         apply binding class cond declare defmacro defmulti defmethod defn defn-
                          even? extend-type fn if-let let nil? number? require satisfies?
-                         doseq list list* loop format pr-str into < butlast when when-let])
+                         doseq list list* load loop format pr-str into < butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
             [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception]]
@@ -748,6 +748,48 @@
     (when *assert*
       `(when-not ~assertion
          (throw (new-assertion-error (str "Assert failed: " ~message "\n" (pr-str '~assertion))))))))
+
+(def ^:dynamic *print-dup* false)
+(def ^:dynamic *print-meta* false)
+(def ^:dynamic *print-readably* true)
+(declare pr)
+
+(require ['clojure.lang.input-output :refer ['default-out 'platform-out-str 'print-meta
+                                             'platform-newline 'platform-flush 'platform-write]])
+(def ^:dynamic *out* (default-out))
+
+(defmulti print-method (fn [x writer]
+                         (let [t (get (meta x) :type)]
+                           (if (keyword? t) t (class x)))))
+
+(defn newline []
+  (platform-newline)
+  nil)
+
+(defn flush []
+  (platform-flush)
+  nil)
+
+(defn print-simple [o w]
+  (print-meta o w)
+  (platform-write w (str o)))
+
+(defmulti print-method (fn [x wrtr]
+                         (let [t (get (meta x) :type)]
+                           (if (keyword? t) t (class x)))))
+
+(defn pr
+  ([] nil)
+  ([x]
+   (print-method x *out*)))
+
+(defmacro with-out-str [& body]
+  `(let [o# (platform-out-str)]
+    (binding [*out* o#]
+      ~@body
+      (str o#))))
+
+(load "lang/next_print")
 
 (require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
 
