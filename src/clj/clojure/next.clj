@@ -256,20 +256,21 @@
 (defn denominator [ratio]
   (-denominator ratio))
 
-(defn alter-meta! [this f & args]
-  (-alter-meta! this f args))
+(defn alter-meta! [m f & args]
+  (-alter-meta! m f args))
 
-(defn meta [this]
-  (-meta this))
+(defn meta [m]
+  (if (satisfies? IMeta m)
+    (-meta m)))
 
-(defn reset-meta! [this new-meta]
-  (-reset-meta! this new-meta))
+(defn reset-meta! [m new-meta]
+  (-reset-meta! m new-meta))
 
-(defn with-meta [this new-meta]
-  (-with-meta this new-meta))
+(defn with-meta [m new-meta]
+  (-with-meta m new-meta))
 
-(defn vary-meta [this f & args]
-  (with-meta this (apply f (meta this) args)))
+(defn vary-meta [m f & args]
+  (with-meta m (apply f (meta m) args)))
 
 (defn name [named]
   (-name named))

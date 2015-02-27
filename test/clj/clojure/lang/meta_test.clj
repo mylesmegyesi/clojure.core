@@ -1,5 +1,5 @@
 (ns clojure.lang.meta-test
-  (:refer-clojure :only [apply cons deftype let select-keys])
+  (:refer-clojure :only [apply cons deftype let nil? select-keys])
   (:require [clojure.test           :refer :all]
             [clojure.lang.protocols :refer [IMeta IObj IReference -reset-meta!]]
             [clojure.next           :refer :all :exclude [cons]]))
@@ -23,6 +23,9 @@
       (-reset-meta! this new-meta))))
 
 (deftest meta-test
+  (testing "meta returns nil for objects that do not implement IMeta"
+    (is (nil? (meta 1))))
+
   (testing "meta returns the meta of an object"
     (let [mta {:so :meta}
           obj (TestMeta. mta)]
