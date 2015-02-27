@@ -60,6 +60,10 @@
     (is
       (nil? (binding [*assert* false] (eval '(assert false)))))))
 
+(deftest get-test
+  (testing "returns nil when the object does not satisfy ILookup"
+    (is (nil? (get :foo :bar)))))
+
 (deftest conj-test
   (testing "conj with no arguments returns an empty vector"
     (is (= [] (conj))))

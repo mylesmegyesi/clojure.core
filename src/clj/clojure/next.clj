@@ -247,8 +247,10 @@
   (-includes? coll k))
 
 (defn get
-  ([coll k] (-lookup coll k nil))
-  ([coll k not-found] (-lookup coll k not-found)))
+  ([coll k] (get coll k nil))
+  ([coll k not-found]
+    (if (satisfies? ILookup coll)
+      (-lookup coll k not-found))))
 
 (defn numerator [ratio]
   (-numerator ratio))
