@@ -60,7 +60,7 @@
 
 (deftest meta-test
   (testing "symbols have no initial metadata"
-    (is (= {} (meta (symbol "sym")))))
+    (is (nil? (meta (symbol "sym")))))
 
   (testing "adds metadata using with-meta"
     (let [sym1 (symbol "the-ns" "sym")
