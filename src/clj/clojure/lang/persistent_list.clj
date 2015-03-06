@@ -4,7 +4,7 @@
             [clojure.lang.aseq       :refer [defseq]]
             [clojure.lang.exceptions :refer [new-illegal-state-error]]
             [clojure.lang.protocols  :refer [ICounted IMeta IObj IPersistentCollection -cons
-                                             IPersistentList IPersistentStack ISeq ISeqable]]))
+                                             IPersistentList IPersistentStack ISeq ISeqable ISequential]]))
 
 (declare make-list)
 (declare EMPTY-LIST)
@@ -33,6 +33,8 @@
 
   (-pop [this]
     (throw (new-illegal-state-error "Can't pop empty list")))
+
+  ISequential
 
   ISeq
   (-first [this] nil)
