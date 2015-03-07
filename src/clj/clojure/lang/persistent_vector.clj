@@ -7,13 +7,15 @@
             [clojure.lang.protocols  :refer [-as-transient -assoc-n -conj! -persistent
                                              IAssociative ICounted IEditableCollection IMeta IObj
                                              IPersistentCollection IPersistentVector
-                                             ISeq ISeqable ITransientCollection IIndexed]]))
+                                             ISeq ISeqable ISequential ITransientCollection IIndexed]]))
 
 (declare make-vector-seq)
 
 (deftype ^:private ChunkedSeq [-first -arr -length -position]
   ICounted
   (-count [this] -length)
+
+  ISequential
 
   ISeq
   (-first [this] -first)
