@@ -1,8 +1,12 @@
 (ns clojure.lang.seq-test
-  (:refer-clojure :only [fn let list nil? >])
+  (:refer-clojure :only [defmacro fn let list list* nil? >])
   (:require [clojure.test             :refer :all]
             [clojure.next             :refer :all]
+            [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
             [clojure.support.test-seq :refer [test-seq test-seqable]]))
+
+(defmacro out-of-bounds-exception-thrown? [& body]
+  (list 'is (list* 'thrown? out-of-bounds-exception body)))
 
 (deftest second-test
   (testing "second of nil is nil"
@@ -103,3 +107,21 @@
 
   (testing "reduces the collection with a supplied start value"
     (is (= 10 (reduce + 1 (test-seqable '(2 3 4)))))))
+
+(deftest nth-test
+  (testing "find the nth of a seq"
+    (let [s (test-seqable '(1 2 3))]
+      (is (= 2 (nth s 1)))))
+
+  (testing "raise an out of bounds exception when finding the nth larger than seq size"
+    (let [s (test-seqable '(1 2 3))]
+      (out-of-bounds-exception-thrown? (nth s 42))))
+
+  (testing "find the nth of a seq with a default"
+    (let [s (test-seqable '(1 2 3))]
+      (is (= 2 (nth s 1 "not found")))))
+
+  (testing "return default when finding the nth larger than seq size"
+    (let [s (test-seqable '(1 2 3))]
+      (is (= "not found" (nth s 42 "not found"))))))
+
