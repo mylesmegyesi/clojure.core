@@ -5,7 +5,7 @@
                          doseq list list* load loop format pr-str into < butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
-            [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception]]
+            [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception new-out-of-bounds-exception]]
             [clojure.lang.random     :refer [rand-float]]
             [clojure.lang.protocols  :refer :all]))
 
@@ -372,11 +372,33 @@
       (pred (first sq)) (recur pred (next sq))
       :else false)))
 
+(defn- nth-sequential
+  ([coll n]
+    (loop [s (seq coll)
+           cnt 0]
+      (if (nil? s)
+        (throw (new-out-of-bounds-exception ""))
+        (if (= cnt n)
+          (first s)
+          (recur (next s) (inc cnt))))))
+  ([coll n not-found]
+    (loop [s (seq coll)
+           cnt 0]
+      (if (nil? s)
+        not-found
+        (if (= cnt n)
+          (first s)
+          (recur (next s) (inc cnt)))))))
+
 (defn nth
   ([coll n]
-    (-nth coll n))
+    (cond
+      (satisfies? IIndexed coll) (-nth coll n)
+      (satisfies? ISequential coll) (nth-sequential coll n)))
   ([coll n not-found]
-    (-nth coll n not-found)))
+    (cond
+      (satisfies? IIndexed coll) (-nth coll n not-found)
+      (satisfies? ISequential coll) (nth-sequential coll n not-found))))
 
 (defn hash [obj]
   (-hash obj))
