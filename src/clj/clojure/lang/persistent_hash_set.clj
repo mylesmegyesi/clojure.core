@@ -1,16 +1,11 @@
 (ns clojure.lang.persistent-hash-set
-  (:refer-clojure :only [apply declare defn defn- hash-map])
-  (:require [clojure.lang.apersistent-set :refer [defset make-pairs]]))
+  (:refer-clojure :only [apply declare defn defn-])
+  (:require [clojure.lang.apersistent-set :refer [defset]]))
 
-(declare new-hash-set)
+(declare make-hash-set)
 
-(defset PersistentHashSet new-hash-set)
+(defset PersistentHashSet make-hash-set)
 
-(defn new-hash-set [-hash-map]
+(defn make-hash-set [-hash-map]
   (PersistentHashSet. -hash-map))
 
-(defn hash-set
-  ([] (new-hash-set (hash-map)))
-  ([& xs]
-    (new-hash-set
-      (apply hash-map (make-pairs xs)))))

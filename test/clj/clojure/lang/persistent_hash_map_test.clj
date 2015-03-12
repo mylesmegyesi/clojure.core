@@ -2,7 +2,6 @@
   (:refer-clojure :only [nil? let defn- loop])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.persistent-map-test :refer [map-test]]
-            [clojure.lang.persistent-hash-set :refer [hash-set]]
             [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
             [clojure.lang.persistent-set      :refer [union]]
             [clojure.next                     :refer :all]))

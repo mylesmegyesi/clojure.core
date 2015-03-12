@@ -505,6 +505,15 @@
                            size)))))
       EMPTY-HASH-MAP)))
 
+(require ['clojure.lang.apersistent-set :refer ['make-pairs]])
+(require ['clojure.lang.persistent-hash-set :refer ['make-hash-set]])
+
+(defn hash-set
+  ([] (make-hash-set (clojure.core/hash-map)))
+  ([& xs]
+    (make-hash-set
+      (apply clojure.core/hash-map (make-pairs xs)))))
+
 (defn comparator [predicate]
   (fn [x y]
     (cond
@@ -537,6 +546,16 @@
 
 (defn sorted-map [& args]
   (make-sorted-map compare args))
+
+(require ['clojure.lang.persistent-sorted-set :refer ['make-sorted-set]])
+
+(defn sorted-set [& ks]
+  (make-sorted-set
+    (apply clojure.core/sorted-map (make-pairs ks))))
+
+(defn sorted-set-by [compare-fn & ks]
+  (make-sorted-set
+    (apply clojure.core/sorted-map-by (clojure.core/cons compare-fn (make-pairs ks)))))
 
 (require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR]])
 

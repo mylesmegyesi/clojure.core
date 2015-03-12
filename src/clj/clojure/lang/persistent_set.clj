@@ -1,8 +1,7 @@
 (ns clojure.lang.persistent-set
   (:refer-clojure :only [apply cons defn every? fn <= >=])
-  (:require [clojure.lang.persistent-hash-set :refer [hash-set]]
-            [clojure.lang.protocols           :refer [-conj -difference -disj -intersection -union]]
-            [clojure.next                     :refer :all :exclude [cons every? conj]]))
+  (:require [clojure.lang.protocols :refer [-conj -difference -disj -intersection -union]]
+            [clojure.next           :refer :all :exclude [cons every? conj]]))
 
 (defn difference
   ([this] this)
