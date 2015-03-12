@@ -781,6 +781,7 @@
 (declare pr)
 
 (require ['clojure.lang.input-output :refer ['default-out 'platform-out-str 'platform-append-space
+                                             'platform-print-constructor
                                              'platform-newline 'platform-flush 'platform-write]])
 (def ^:dynamic *out* (default-out))
 
@@ -795,6 +796,9 @@
 (defn flush []
   (platform-flush)
   nil)
+
+(defn print-ctor [obj print-args wrtr]
+  (platform-print-constructor obj print-args wrtr))
 
 (defn- print-meta [o w]
   (when-let [m (meta o)]
@@ -882,8 +886,6 @@
     (binding [*out* o#]
       ~@body
       (str o#))))
-
-(load "lang/next_print")
 
 (require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
 
