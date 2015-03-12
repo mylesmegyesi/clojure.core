@@ -815,12 +815,12 @@
   (print-meta obj wrtr)
   (platform-write wrtr (str obj)))
 
-(defn- print-sequential [begin, print-one, sep, end, sequence, w]
+(defn- print-sequential [begin print-one sep end sequence wrtr]
   (binding [*print-level* (and (not *print-dup*) *print-level* (dec *print-level*))]
     (if (and *print-level* (neg? *print-level*))
-      (platform-write w "#")
+      (platform-write wrtr "#")
       (do
-        (platform-write w begin)
+        (platform-write wrtr begin)
         (when-let [xs (seq sequence)]
           (if (and (not *print-dup*) *print-length*)
             ; TODO: switch to [[x & xs] xs] once
@@ -830,22 +830,22 @@
               (let [x (first rxs)
                     xs (next rxs)]
                 (if (zero? print-length)
-                  (platform-write w "...")
+                  (platform-write wrtr "...")
                   (do
-                    (print-one x w)
+                    (print-one x wrtr)
                     (when xs
-                      (platform-write w sep)
+                      (platform-write wrtr sep)
                       (recur xs (dec print-length)))))))
             ; TODO: switch to [[x & xs] xs] once
             ; it is using clojure.core/nth
             (loop [rxs xs]
               (let [x (first rxs)
                     xs (next rxs)]
-                (print-one x w)
+                (print-one x wrtr)
                 (when xs
-                  (platform-write w sep)
+                  (platform-write wrtr sep)
                   (recur xs))))))
-        (platform-write w end)))))
+        (platform-write wrtr end)))))
 
 (defn- print-map [m pr-on wrtr]
   (print-sequential "{"
@@ -875,6 +875,14 @@
 (defmethod print-method clojure.lang.protocols.IPersistentMap [obj wrtr]
   (print-meta obj wrtr)
   (print-map obj print-method wrtr))
+
+(defmethod print-method clojure.lang.protocols.IPersistentVector [obj wrtr]
+  (print-meta obj wrtr)
+  (print-sequential "[" print-method " " "]" obj wrtr))
+
+(defmethod print-method clojure.lang.protocols.IPersistentSet [obj wrtr]
+  (print-meta obj wrtr)
+  (print-sequential "#{" print-method " " "}" obj wrtr))
 
 (defn pr
   ([] nil)

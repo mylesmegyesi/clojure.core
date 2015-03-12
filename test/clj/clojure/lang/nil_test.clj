@@ -28,5 +28,8 @@
     (is (= "foo" (nth nil 0 "foo")))
     (is (= "foo" (nth nil 42 "foo"))))
 
+  (testing "count of nil is 0"
+    (is (zero? (count nil))))
+
   (testing "the type of nil is nil"
     (is (nil? (type nil)))))
