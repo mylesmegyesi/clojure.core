@@ -55,7 +55,7 @@
       (or ~@xs))))
 
 (defmacro when-not-nil [x y & body]
-  {:private true}
+  ^:private
   `(let [x-nil?# (nil? ~x)
          y-nil?# (nil? ~y)]
      (cond
@@ -312,10 +312,10 @@
 
 (declare atom)
 (declare reset!)
-(require ['clojure.lang.lazy-seq])
+(require ['clojure.lang.lazy-seq :refer ['make-lazy-seq]])
 
 (defmacro lazy-seq [& s-body]
-  (list 'clojure.lang.lazy-seq/make-lazy-seq (list* 'clojure.core/fn [] s-body)))
+  (list make-lazy-seq (list* 'clojure.core/fn [] s-body)))
 
 (defn constantly [rval]
   (fn [& args] rval))
@@ -505,6 +505,39 @@
                            size)))))
       EMPTY-HASH-MAP)))
 
+(defn comparator [predicate]
+  (fn [x y]
+    (cond
+      (predicate x y) -1
+      (predicate y x) 1
+      :else 0)))
+
+(defn- compare-numbers [x y]
+  (cond
+    (< x y) -1
+    (< y x) 1
+    :else 0))
+
+(defn compare [x y]
+  (if (= x y)
+    0
+    (if (not (nil? x))
+      (if (nil? y)
+        1
+        (if (number? x)
+          (compare-numbers x y)
+          (-compare-to x y)))
+      -1)))
+
+(require ['clojure.lang.persistent-sorted-map :refer ['make-sorted-map]])
+
+(defn sorted-map-by [compare-fn & args]
+  (let [comparable (comparator compare-fn)]
+    (make-sorted-map comparable args)))
+
+(defn sorted-map [& args]
+  (make-sorted-map compare args))
+
 (require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR]])
 
 (defn vector [& args]
@@ -680,27 +713,6 @@
 
 (defn future-done? [f]
   (future-submission/is-done? f))
-
-(defn comparator [predicate]
-  (fn [x y]
-    (if (predicate x y) -1 0)))
-
-(defn- compare-numbers [x y]
-  (cond
-    (< x y) -1
-    (< y x) 1
-    :else 0))
-
-(defn compare [x y]
-  (if (= x y)
-    0
-    (if (not (nil? x))
-      (if (nil? y)
-        1
-        (if (number? x)
-          (compare-numbers x y)
-          (-compare-to x y)))
-      -1)))
 
 (require ['clojure.lang.hash :refer ['hash-combine]])
 (require ['clojure.lang.show :refer ['build-string]])

@@ -496,3 +496,4 @@
   (PersistentHashMap. -meta -count -root -has-nil? -nil-value))
 
 (def EMPTY-HASH-MAP (new-hash-map nil ZERO nil false nil))
+
