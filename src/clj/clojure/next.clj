@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding class cond declare defmacro defmulti defmethod defn defn-
-                         even? extend-type fn if-let let nil? number? require satisfies?
+                         even? extend-type fn if-let let neg? pos? nil? number? require satisfies?
                          doseq list list* load loop format pr-str into < butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
@@ -225,7 +225,9 @@
   (is-zero? i))
 
 (defn count [obj]
-  (-count obj))
+  (if obj
+    (-count obj)
+    0))
 
 (require ['clojure.lang.delay :refer ['new-delay '-force]])
 
@@ -728,7 +730,7 @@
    (if (nil? name)
      (throw (Exception. "Can't create symbol with nil name")))
    (sym/new-symbol ns name (if ns (str ns "/" name) name)
-               (hash (hash-combine (hash name) (hash ns))) {})))
+               (hash (hash-combine (hash name) (hash ns))) nil)))
 
 (require ['clojure.lang.keyword :as 'kwd])
 
@@ -774,15 +776,18 @@
 (def ^:dynamic *print-dup* false)
 (def ^:dynamic *print-meta* false)
 (def ^:dynamic *print-readably* true)
+(def ^:dynamic *print-level* nil)
+(def ^:dynamic *print-length* nil)
 (declare pr)
 
-(require ['clojure.lang.input-output :refer ['default-out 'platform-out-str 'print-meta
+(require ['clojure.lang.input-output :refer ['default-out 'platform-out-str 'platform-append-space
+                                             'platform-print-constructor
                                              'platform-newline 'platform-flush 'platform-write]])
 (def ^:dynamic *out* (default-out))
 
-(defmulti print-method (fn [x writer]
-                         (let [t (get (meta x) :type)]
-                           (if (keyword? t) t (class x)))))
+(defmulti print-method (fn [obj writer]
+                         (let [t (get (meta obj) :type)]
+                           (if (keyword? t) t (class obj)))))
 
 (defn newline []
   (platform-newline)
@@ -792,26 +797,103 @@
   (platform-flush)
   nil)
 
-(defn print-simple [o w]
-  (print-meta o w)
-  (platform-write w (str o)))
+(defn print-ctor [obj print-args wrtr]
+  (platform-print-constructor obj print-args wrtr))
 
-(defmulti print-method (fn [x wrtr]
-                         (let [t (get (meta x) :type)]
-                           (if (keyword? t) t (class x)))))
+(defn- print-meta [o w]
+  (when-let [m (meta o)]
+    (when (and (pos? (count m))
+            (or *print-dup*
+              (and *print-meta* *print-readably*)))
+      (platform-write w "^")
+      (if (and (= (count m) 1) (:tag m))
+          (print-method (:tag m) w)
+          (print-method m w))
+      (platform-write w " "))))
+
+(defn print-simple [obj wrtr]
+  (print-meta obj wrtr)
+  (platform-write wrtr (str obj)))
+
+(defn- print-sequential [begin print-one sep end sequence wrtr]
+  (binding [*print-level* (and (not *print-dup*) *print-level* (dec *print-level*))]
+    (if (and *print-level* (neg? *print-level*))
+      (platform-write wrtr "#")
+      (do
+        (platform-write wrtr begin)
+        (when-let [xs (seq sequence)]
+          (if (and (not *print-dup*) *print-length*)
+            ; TODO: switch to [[x & xs] xs] once
+            ; it is using clojure.core/nth
+            (loop [rxs xs
+                   print-length *print-length*]
+              (let [x (first rxs)
+                    xs (next rxs)]
+                (if (zero? print-length)
+                  (platform-write wrtr "...")
+                  (do
+                    (print-one x wrtr)
+                    (when xs
+                      (platform-write wrtr sep)
+                      (recur xs (dec print-length)))))))
+            ; TODO: switch to [[x & xs] xs] once
+            ; it is using clojure.core/nth
+            (loop [rxs xs]
+              (let [x (first rxs)
+                    xs (next rxs)]
+                (print-one x wrtr)
+                (when xs
+                  (platform-write wrtr sep)
+                  (recur xs))))))
+        (platform-write wrtr end)))))
+
+(defn- print-map [m pr-on wrtr]
+  (print-sequential "{"
+    (fn [e wrtr]
+      (do
+        (pr-on (key e) wrtr)
+        (platform-append-space wrtr)
+        (pr-on (val e) wrtr)))
+    "," "}" (seq m) wrtr))
+
+(defmethod print-method :default [obj wrtr]
+  (print-simple obj wrtr))
+
+(defmethod print-method nil [obj wrtr]
+  (platform-write wrtr "nil"))
+
+(defmethod print-method clojure.lang.keyword.Keyword [obj wrtr]
+  (platform-write wrtr (str obj)))
+
+(defmethod print-method clojure.lang.symbol.Symbol [obj wrtr]
+  (print-simple obj wrtr))
+
+(defmethod print-method clojure.lang.protocols.ISeq [obj wrtr]
+  (print-meta obj wrtr)
+  (print-sequential "(" print-method " " ")" obj wrtr))
+
+(defmethod print-method clojure.lang.protocols.IPersistentMap [obj wrtr]
+  (print-meta obj wrtr)
+  (print-map obj print-method wrtr))
+
+(defmethod print-method clojure.lang.protocols.IPersistentVector [obj wrtr]
+  (print-meta obj wrtr)
+  (print-sequential "[" print-method " " "]" obj wrtr))
+
+(defmethod print-method clojure.lang.protocols.IPersistentSet [obj wrtr]
+  (print-meta obj wrtr)
+  (print-sequential "#{" print-method " " "}" obj wrtr))
 
 (defn pr
   ([] nil)
-  ([x]
-   (print-method x *out*)))
+  ([obj]
+    (print-method obj *out*)))
 
 (defmacro with-out-str [& body]
   `(let [o# (platform-out-str)]
     (binding [*out* o#]
       ~@body
       (str o#))))
-
-(load "lang/next_print")
 
 (require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
 

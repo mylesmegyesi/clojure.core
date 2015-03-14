@@ -95,7 +95,5 @@
       (conj conjable :val1 :val2 :val3)
       (is (= :val3 (first (deref conj-args))))
       (is (= :val2 (first (next (deref conj-args)))))
-      (is (= :val1 (first (next (next (deref conj-args))))))))
-
-  )
+      (is (= :val1 (first (next (next (deref conj-args)))))))))
 
