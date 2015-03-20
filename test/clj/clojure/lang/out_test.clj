@@ -3,7 +3,6 @@
   (:require [clojure.test                       :refer :all]
             [clojure.next                       :refer :all]
             [clojure.support.test-seq           :refer [test-seq]]
-            [clojure.lang.persistent-sorted-set :refer [sorted-set]]
             [clojure.lang.protocols             :refer [IMeta ISeq ISeqable ISequential]]))
 
 (deftest print-simple-test
