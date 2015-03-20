@@ -3,7 +3,6 @@
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-list       :refer [EMPTY-LIST]]
-            [clojure.lang.persistent-sorted-map :refer :all]
             [clojure.lang.exceptions            :refer [argument-error]]
             [clojure.next                       :refer :all :exclude [reduce conj]]))
 

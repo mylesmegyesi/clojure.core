@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [cond comparator count declare defn defn- defprotocol deftype empty? even? format if-let let loop nil? > < ->])
+  (:refer-clojure :only [cond count declare defn defn- defprotocol deftype empty? even? format if-let let loop nil? > < ->])
   (:require [clojure.lang.apersistent-map :refer [defmap]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.map-entry       :refer [new-map-entry]]
@@ -7,7 +7,7 @@
             [clojure.lang.exceptions      :refer [new-argument-error new-unsupported-error]]
             [clojure.lang.protocols       :refer [ICounted ILookup IMeta IObj
                                                   IAssociative IPersistentMap ISeqable ISeq]]
-            [clojure.next                 :refer :all :exclude [empty? count comparator]]))
+            [clojure.next                 :refer :all :exclude [empty? count]]))
 
 (declare red-node?)
 (declare black-node?)
@@ -20,7 +20,7 @@
 (declare make-sorted-black-node)
 (declare make-sorted-black-branch)
 
-(declare make-sorted-map)
+(declare new-sorted-map)
 
 (declare balance-left-del)
 (declare balance-right-del)
@@ -401,7 +401,7 @@
     (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
       (if (= tree -root)
         this
-        (make-sorted-map tree (+ -count cnt) -comparator -meta))))
+        (new-sorted-map tree (+ -count cnt) -comparator -meta))))
 
   ICounted
   (-count [this] -count)
@@ -418,26 +418,26 @@
 
   IObj
   (-with-meta [this m]
-    (make-sorted-map -root -count -comparator m))
+    (new-sorted-map -root -count -comparator m))
 
   IPersistentMap
   (-dissoc [this k]
     (let [[tree cnt] (sorted-map-dissoc -root -comparator k)]
       (if (= tree -root)
         this
-        (make-sorted-map tree (- -count cnt) -comparator -meta))))
+        (new-sorted-map tree (- -count cnt) -comparator -meta))))
 
   ISeqable
   (-seq [this]
     (make-sorted-map-seq (make-seq-stack -root nil) -count)))
 
-(defn- make-sorted-map [root cnt compare-fn mta]
+(defn- new-sorted-map [root cnt compare-fn mta]
   (PersistentTreeMap. root cnt compare-fn mta))
 
-(defn- create-sorted-map [compare-fn args]
+(defn make-sorted-map [compare-fn args]
   (let [arg-count (count args)]
     (if (even? arg-count)
-      (let [empty-sorted-map (make-sorted-map nil 0 compare-fn nil)]
+      (let [empty-sorted-map (new-sorted-map nil 0 compare-fn nil)]
         (loop [kvs args
                -sorted-map empty-sorted-map]
           (if (empty? kvs)
@@ -451,9 +451,3 @@
                (format "PersistentTreeMap can only be created with even number of arguments: %s arguments given"
                 arg-count))))))
 
-(defn sorted-map-by [compare-fn & args]
-  (let [comparable (comparator compare-fn)]
-    (create-sorted-map comparable args)))
-
-(defn sorted-map [& args]
-  (create-sorted-map compare args))

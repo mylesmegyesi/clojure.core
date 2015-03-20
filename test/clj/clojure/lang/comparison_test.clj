@@ -48,8 +48,12 @@
     (let [cmp (comparator <)]
       (is (= -1 (cmp 1 2)))))
 
-  (testing "comparator returns 0 if the predicate returns false"
+  (testing "comparator returns 1 if the predicate returns false"
     (let [cmp (comparator <)]
-      (is (= 0 (cmp 2 1)))))
+      (is (= 1 (cmp 2 1)))))
+
+  (testing "comparator returns 0 if the predicate is neither true nor false"
+    (let [cmp (comparator <)]
+      (is (= 0 (cmp 1 1)))))
 
   )
