@@ -811,14 +811,14 @@
 (def ^:dynamic *print-length* nil)
 (declare pr)
 
+(defmulti print-method (fn [obj writer]
+                         (let [t (get (meta obj) :type)]
+                           (if (keyword? t) t (class obj)))))
+
 (require ['clojure.lang.input-output :refer ['default-out 'platform-out-str 'platform-append-space
                                              'platform-print-constructor
                                              'platform-newline 'platform-flush 'platform-write]])
 (def ^:dynamic *out* (default-out))
-
-(defmulti print-method (fn [obj writer]
-                         (let [t (get (meta obj) :type)]
-                           (if (keyword? t) t (class obj)))))
 
 (defn newline []
   (platform-newline)

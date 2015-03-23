@@ -1,7 +1,8 @@
 (ns clojure.lang.input-output-test
   (:refer-clojure :only [binding class fn let reify true?])
   (:require [clojure.test :refer :all]
-            [clojure.next :refer :all]))
+            [clojure.next :refer :all])
+  (:import  [clojure.lang.platform FallBackNumber]))
 
 (deftest platform-print-constructor-test
   (testing "printing the constructor without print-args"
@@ -34,3 +35,25 @@
         (flush)
         (is (true? (deref flushed)))))))
 
+(deftest platform-pr-test
+  (testing "pr for a Number"
+    (is (=
+          (with-out-str (pr (FallBackNumber. 42)))
+          "42")))
+
+  (testing "pr for a BigDecimal"
+    (is (=
+          (with-out-str (pr 42.2M))
+          "42.2M")))
+
+  (testing "pr for a BigInt"
+    (is (=
+          (with-out-str (pr 42N))
+          "42N")))
+
+  (testing "pr for a Class"
+    (is (=
+          (with-out-str (pr (class (Object.))))
+          "java.lang.Object")))
+
+  )
