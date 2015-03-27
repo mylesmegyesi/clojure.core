@@ -134,6 +134,9 @@
           s2 (sorted-set 2)]
       (is (superset? s1 s2))))
 
+  (testing "a sorted-set is a set"
+    (is (set? (sorted-set))))
+
   )
 
 (deftype Thing [t]

@@ -134,6 +134,9 @@
           s2 (hash-set 2)]
       (is (superset? s1 s2))))
 
+  (testing "a hash-set is a set"
+    (is (set? (hash-set))))
+
   )
 
 (deftype Thing [t]

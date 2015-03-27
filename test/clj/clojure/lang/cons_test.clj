@@ -1,5 +1,5 @@
 (ns clojure.lang.cons-test
-  (:refer-clojure :only [let list? nil?])
+  (:refer-clojure :only [let nil?])
   (:require [clojure.test             :refer :all]
             [clojure.next             :refer :all]
             [clojure.support.test-seq :refer [test-seq test-seqable]]))
@@ -7,7 +7,7 @@
 (deftest cons-test
   (testing "cons with a nil collection returns a list with a single element"
     (let [cons-nil (cons :elem nil)]
-      (is (list? cons-nil))
+      (is (clojure.core/list? cons-nil))
       (is (= :elem (first cons-nil)))
       (is (nil? (next cons-nil)))))
 
