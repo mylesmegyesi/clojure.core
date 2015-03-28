@@ -3,7 +3,7 @@
   (:require [clojure.test            :refer :all]
             [clojure.next            :refer :all]
             [clojure.lang.exceptions :refer [assertion-error]]
-            [clojure.lang.protocols  :refer [IPersistentVector IPersistentCollection]]))
+            [clojure.lang.protocols  :refer :all]))
 
 (defmacro assertion-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
@@ -96,4 +96,28 @@
       (is (= :val3 (first (deref conj-args))))
       (is (= :val2 (first (next (deref conj-args)))))
       (is (= :val1 (first (next (next (deref conj-args)))))))))
+
+(deftest set?-test
+  (testing "returns true for an IPersistentSet"
+    (let [s (reify IPersistentSet)]
+      (is (set? s))))
+
+  (testing "returns false for not a set"
+    (is (not (set? 1)))))
+
+(deftest coll?-test
+  (testing "returns true for a IPersistentCollection"
+    (let [c (reify IPersistentCollection)]
+      (is (coll? c))))
+
+  (testing "returns false for not a coll"
+    (is (not (coll? 1)))))
+
+(deftest list?-test
+  (testing "returns true for a IPersistentList"
+    (let [l (reify IPersistentList)]
+      (is (list? l))))
+
+  (testing "returns false for not a list"
+    (is (not (list? 1)))))
 

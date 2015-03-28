@@ -431,7 +431,7 @@
   ([m k v & kvs]
    (assoc-seq (-assoc m k v) (seq kvs))))
 
-(defn dissoc-seq [m ks]
+(defn- dissoc-seq [m ks]
   (if ks
     (recur (-dissoc m (first ks)) (next ks))
     m))
@@ -444,6 +444,18 @@
 
 (defn contains-key? [m k]
   (-contains-key? m k))
+
+(defn map? [m]
+  (satisfies? IPersistentMap m))
+
+(defn set? [s]
+  (satisfies? IPersistentSet s))
+
+(defn coll? [c]
+  (satisfies? IPersistentCollection c))
+
+(defn list? [l]
+  (satisfies? IPersistentList l))
 
 (require ['clojure.lang.array :as 'arr])
 

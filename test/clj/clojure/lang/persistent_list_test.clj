@@ -42,6 +42,11 @@
     (is (= (list 2 3) (rest (list 1 2 3)))))
 )
 
+(deftest list?-test
+  (testing "is a list"
+    (is (list? (list))))
+)
+
 (deftest meta-test
   (testing "meta"
     (is (= nil (meta (list :meta-list)))))

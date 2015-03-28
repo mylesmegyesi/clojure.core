@@ -323,6 +323,13 @@
           m2 (constructor :k2 2)]
       (is (not (= (hash m1) (hash m2)))))))
 
+(defn map-satisfies-test [constructor]
+  (testing "map? returns true"
+    (is (map? (constructor))))
+
+  (testing "something other than a map returns false"
+    (is (not (map? 1)))))
+
 (defn map-test [class-name constructor]
   (map-creation-test class-name constructor)
   (map-assoc-test constructor)
@@ -330,7 +337,8 @@
   (map-contains?-test constructor)
   (map-equivalence-test constructor)
   (map-meta-test constructor)
-  (map-hash-test constructor))
+  (map-hash-test constructor)
+  (map-satisfies-test constructor))
 
 (deftest keys-test
   (testing "returns nil if there are no entries"
