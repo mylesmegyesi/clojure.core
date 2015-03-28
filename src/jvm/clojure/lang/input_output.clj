@@ -1,7 +1,8 @@
 (ns clojure.lang.input-output
-  (:refer-clojure :only [class defmacro let])
+  (:refer-clojure :only [class defmacro defmethod let])
   (:require [clojure.next :refer :all])
-  (:import [java.io Writer OutputStreamWriter StringWriter]))
+  (:import [java.io Writer OutputStreamWriter StringWriter]
+           [clojure.next]))
 
 (defmacro platform-print-constructor [obj print-args wrtr]
   `(do
@@ -29,4 +30,18 @@
 
 (defmacro platform-out-str []
   `(new StringWriter))
+
+(defmethod print-method java.lang.Number [n ^Writer wrtr]
+  (.write wrtr (str n)))
+
+(defmethod print-method java.math.BigDecimal [n ^Writer wrtr]
+  (.write wrtr (str n))
+  (.write wrtr "M"))
+
+(defmethod print-method clojure.lang.BigInt [n ^Writer wrtr]
+  (.write wrtr (str n))
+  (.write wrtr "N"))
+
+(defmethod print-method java.lang.Class [^Class c ^Writer wrtr]
+  (.write wrtr (.getName c)))
 

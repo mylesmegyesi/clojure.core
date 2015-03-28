@@ -28,4 +28,8 @@ public final class FallBackNumber extends Number {
     return ((Number) num).floatValue();
   }
 
+  public String toString() {
+    return num.toString();
+  }
+
 }
