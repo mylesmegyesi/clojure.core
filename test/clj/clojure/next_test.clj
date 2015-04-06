@@ -12,10 +12,6 @@
   (testing "current clojure version as a string"
     (is (= "1.6.0" (clojure-version)))))
 
-(deftest pr-test
-  (testing "pr with no arguments returns nil"
-    (is (nil? (pr)))))
-
 (deftest constantly-test
   (testing "returns the return value"
     (is (= :val ((constantly :val)))))
