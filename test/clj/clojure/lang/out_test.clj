@@ -14,6 +14,34 @@
             (with-out-str (print-simple o *out*))
             (str o))))))
 
+(deftest pr-return-test
+  (testing "pr always returns a nil value"
+    (with-out-str
+      (is (nil? (pr)))
+      (is (nil? (pr "foo")))
+      (is (nil? (pr "foo" "bar" "baz"))))))
+
+(deftest prn-return-test
+  (testing "prn always returns a nil value"
+    (with-out-str
+      (is (nil? (prn)))
+      (is (nil? (prn "foo")))
+      (is (nil? (prn "foo" "bar" "baz"))))))
+
+(deftest print-return-test
+  (testing "print always returns a nil value"
+    (with-out-str
+      (is (nil? (print)))
+      (is (nil? (print "foo")))
+      (is (nil? (print "foo" "bar" "baz"))))))
+
+(deftest print-return-test
+  (testing "println always returns a nil value"
+    (with-out-str
+      (is (nil? (println)))
+      (is (nil? (println "foo")))
+      (is (nil? (println "foo" "bar" "baz"))))))
+
 (deftest pr-test
   (testing "pr for a :default meta type that is not an IObj"
     (let [obj (reify
@@ -87,6 +115,12 @@
     (binding [*print-length* 2]
       (is (= "(1 2 ...)"
              (with-out-str (pr (test-seq '(1 2 3)))))))))
+
+(deftest prn-test
+  (testing "prn adds a newline to a pr statement"
+    (is (=
+          (str "foo" (with-out-str (newline)))
+          (with-out-str (prn "foo"))))))
 
 (deftest newline-test
   (testing "newline returns nil"

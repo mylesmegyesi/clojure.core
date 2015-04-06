@@ -821,6 +821,7 @@
 (def ^:dynamic *print-readably* true)
 (def ^:dynamic *print-level* nil)
 (def ^:dynamic *print-length* nil)
+(def ^:dynamic *flush-on-newline* true)
 (declare pr)
 
 (defmulti print-method (fn [obj writer]
@@ -930,7 +931,27 @@
 (defn pr
   ([] nil)
   ([obj]
-    (print-method obj *out*)))
+    (print-method obj *out*))
+  ([x & more]
+    (pr x)
+    (platform-append-space *out*)
+    (if-let [nmore (next more)]
+      (recur (first more) nmore)
+      (apply pr more))))
+
+(defn prn [& more]
+  (apply pr more)
+  (platform-newline)
+  (when *flush-on-newline*
+    (platform-flush)))
+
+(defn print [& more]
+  (binding [*print-readably* nil]
+    (apply pr more)))
+
+(defn println [& more]
+  (binding [*print-readably* nil]
+    (apply prn more)))
 
 (defmacro with-out-str [& body]
   `(let [o# (platform-out-str)]
