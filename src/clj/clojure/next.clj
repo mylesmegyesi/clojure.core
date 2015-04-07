@@ -30,13 +30,6 @@
 (defn type [x]
   (platform-object/type x))
 
-(require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
-                                        'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
-                                        'increment 'incrementp 'decrement 'decrementp
-                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
-                                        'is-zero?
-                                        '->short '->byte '->int '->long]])
-
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
   ([] true)
@@ -53,6 +46,29 @@
    `(if-let [or-expr# ~x]
       or-expr#
       (or ~@xs))))
+
+(defn ratio? [x]
+  (satisfies? IRatio x))
+
+(defn integer? [x]
+  (satisfies? IInteger x))
+
+(defn float? [x]
+  (satisfies? IFloat x))
+
+(defn decimal? [x]
+  (satisfies? IDecimal x))
+
+(defn rational? [x]
+  (or (integer? x) (ratio? x) (decimal? x)))
+
+(declare bigint)
+(require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
+                                        'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
+                                        'increment 'incrementp 'decrement 'decrementp
+                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
+                                        'is-zero?
+                                        '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec]])
 
 (defmacro when-not-nil [x y & body]
   ^:private
@@ -104,21 +120,6 @@
   [& args]
   (not (apply == args)))
 
-(defn ratio? [x]
-  (satisfies? IRatio x))
-
-(defn integer? [x]
-  (satisfies? IInteger x))
-
-(defn float? [x]
-  (satisfies? IFloat x))
-
-(defn decimal? [x]
-  (satisfies? IDecimal x))
-
-(defn rational? [x]
-  (or (integer? x) (ratio? x) (decimal? x)))
-
 (defn byte [x]
   (->byte x))
 
@@ -130,6 +131,21 @@
 
 (defn long [x]
   (->long x))
+
+(defn double [x]
+  (->double x))
+
+(defn float [x]
+  (->float x))
+
+(defn bigint [x]
+  (->bigint x))
+
+(defn biginteger [x]
+  (->biginteger x))
+
+(defn bigdec [x]
+  (->bigdec x))
 
 (defn bit-shift-right [n shift]
   (bshift-right n shift))

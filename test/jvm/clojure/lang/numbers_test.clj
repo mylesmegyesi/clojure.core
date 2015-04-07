@@ -1,8 +1,6 @@
 (ns clojure.lang.numbers-test
   (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let if-not when
-                         bigint biginteger float double
-                         < >
-                         ])
+                         < >])
   (:require [clojure.test            :refer [deftest is testing]]
             [clojure.lang.numbers    :refer :all]
             [clojure.next            :refer :all])
@@ -205,7 +203,6 @@
                 (str "expected type " test-subject " but got " (type (operation (t2 left-side) (t1 right-side))))))))
         (recur (clojure.core/rest types)))))
 
-(defn- bigdecimal [n] (BigDecimal. n))
 (defn- number [n] (FallBackNumber. n))
 
 (deftest bit-not-test
@@ -328,7 +325,7 @@
       (is (= 3 (add t2 t1)))))
 
   (testing "adding a ratio to a bigdecimal and vica-versa"
-    (let [t1 (bigdecimal 0.5)
+    (let [t1 (bigdec 0.5)
           t2 (make-ratio 1 2)]
       (is (= BigDecimal (type (add t1 t2))))
       (is (= BigDecimal (type (add t2 t1))))
@@ -360,12 +357,12 @@
       (is (= 3 (add t2 t1))))))
 
 (deftest big-decimal-addition-test
-  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
+  (op-test {BigDecimal [[bigdec] [number int long bigint biginteger bigdec]]}
            #(add %1 %2)
-           (bigdecimal 3.0) 1.0 2.0))
+           (bigdec 3.0) 1.0 2.0))
 
 (deftest decimal-addition-test
-  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
+  (op-test {Double [[double float] [number int long bigint biginteger bigdec double float]]}
            #(add %1 %2)
            3.0 1.0 2.0))
 
@@ -396,7 +393,7 @@
 
   (testing "adding a float to a bigdecimal and vica-versa"
     (let [t1 (float 1.1)
-          t2 (bigdecimal 2.2)]
+          t2 (bigdec 2.2)]
       (is (= Double (type (add t1 t2))))
       (is (= Double (type (add t2 t1))))
       (let [result1 (add t1 t2)]
@@ -406,7 +403,7 @@
 
   (testing "adding a double to a bigdecimal and vica-versa"
     (let [t1 (double 1.1)
-          t2 (bigdecimal 2.2)]
+          t2 (bigdec 2.2)]
       (is (= Double (type (add t1 t2))))
       (is (= Double (type (add t2 t1))))
       (let [result1 (add t1 t2)]
@@ -455,9 +452,9 @@
 
 (deftest big-decimal-increment-test
   (testing "incrementing a big decimal"
-    (is (< 2.1 (increment (bigdecimal 1.2))))
-    (is (> 2.3 (increment (bigdecimal 1.2))))
-    (is (= BigDecimal (type (increment (bigdecimal 1.2)))))))
+    (is (< 2.1 (increment (bigdec 1.2))))
+    (is (> 2.3 (increment (bigdec 1.2))))
+    (is (= BigDecimal (type (increment (bigdec 1.2)))))))
 
 (deftest double-increment-test
   (testing "incrementing a float"
@@ -530,7 +527,7 @@
       (is (= 6 (multiply t2 t1)))))
 
   (testing "multiplying a ratio by a bigdecimal and vica-versa"
-    (let [t1 (bigdecimal 0.5)
+    (let [t1 (bigdec 0.5)
           t2 (make-ratio 1 2)]
       (is (= BigDecimal (type (multiply t1 t2))))
       (is (= BigDecimal (type (multiply t2 t1))))
@@ -562,12 +559,12 @@
       (is (= 6 (multiply t2 t1))))))
 
 (deftest big-decimal-multiplication-test
-  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
+  (op-test {BigDecimal [[bigdec] [number int long bigint biginteger bigdec]]}
            #(multiply %1 %2)
-           (bigdecimal 6.0) 3.0 2.0))
+           (bigdec 6.0) 3.0 2.0))
 
 (deftest decimal-multiplication-test
-  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
+  (op-test {Double [[double float] [number int long bigint biginteger bigdec double float]]}
            #(multiply %1 %2)
            6.0 2.0 3.0))
 
@@ -598,7 +595,7 @@
 
   (testing "multiplying a float by a bigdecimal and vica-versa"
     (let [t1 (float 1.1)
-          t2 (bigdecimal 2.2)]
+          t2 (bigdec 2.2)]
       (is (= Double (type (multiply t1 t2))))
       (is (= Double (type (multiply t2 t1))))
       (let [result1 (multiply t1 t2)]
@@ -608,7 +605,7 @@
 
   (testing "multiplying a double by a bigdecimal and vica-versa"
     (let [t1 (double 1.1)
-          t2 (bigdecimal 2.2)]
+          t2 (bigdec 2.2)]
       (is (= Double (type (multiply t1 t2))))
       (is (= Double (type (multiply t2 t1))))
       (let [result1 (multiply t1 t2)]
@@ -693,14 +690,14 @@
       (is (= 1 (subtract t2 t1)))))
 
   (testing "subtracting a ratio by a bigdecimal and vica-versa"
-    (let [t1 (bigdecimal 3.0)
+    (let [t1 (bigdec 3.0)
           t2 (make-ratio 1 2)
           result (subtract t1 t2)]
       (is (= BigDecimal (type result)))
       (is (< result 2.51))
       (is (> result 2.49)))
     (let [t1 (make-ratio 3 1)
-          t2 (bigdecimal 0.5)
+          t2 (bigdec 0.5)
           result (subtract t1 t2)]
       (is (= BigDecimal (type result)))
       (is (< result 2.51))
@@ -746,12 +743,12 @@
   (is (= (make-ratio -2 3) (subtract (make-ratio 2 3)))))
 
 (deftest big-decimal-subtraction-test
-  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
+  (op-test {BigDecimal [[bigdec] [number int long bigint biginteger bigdec]]}
            #(subtract %1 %2)
-           (bigdecimal 1.0) 3.0 2.0))
+           (bigdec 1.0) 3.0 2.0))
 
 (deftest decimal-subtraction-test
-  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
+  (op-test {Double [[double float] [number int long bigint biginteger bigdec double float]]}
            #(subtract %1 %2)
            1.0 3.0 2.0))
 
@@ -788,12 +785,12 @@
 
   (testing "subtracting a float by a bigdecimal and vica-versa"
     (let [t1 (float 2.1)
-          t2 (bigdecimal 1.2)
+          t2 (bigdec 1.2)
           result (subtract t1 t2)]
       (is (= Double (type result)))
       (is (< result 0.91))
       (is (> result 0.89)))
-    (let [t1 (bigdecimal 2.1)
+    (let [t1 (bigdec 2.1)
           t2 (float 1.2)
           result (subtract t1 t2)]
       (is (= Double (type result)))
@@ -802,12 +799,12 @@
 
   (testing "dividng a double by a bigdecimal and vica-versa"
     (let [t1 (double 2.1)
-          t2 (bigdecimal 1.2)
+          t2 (bigdec 1.2)
           result (subtract t1 t2)]
       (is (= Double (type result)))
       (is (< result 0.91))
       (is (> result 0.89)))
-    (let [t1 (bigdecimal 2.1)
+    (let [t1 (bigdec 2.1)
           t2 (double 1.2)
           result (subtract t1 t2)]
       (is (= Double (type result)))
@@ -854,9 +851,9 @@
 
 (deftest big-decimal-decrementing-test
   (testing "decrementing a big decimal"
-    (is (< 0.1 (decrement (bigdecimal 1.2))))
-    (is (> 0.3 (decrement (bigdecimal 1.2))))
-    (is (= BigDecimal (type (decrement (bigdecimal 1.2)))))))
+    (is (< 0.1 (decrement (bigdec 1.2))))
+    (is (> 0.3 (decrement (bigdec 1.2))))
+    (is (= BigDecimal (type (decrement (bigdec 1.2)))))))
 
 (deftest double-decrement-test
   (testing "decrementing a float"
@@ -930,14 +927,14 @@
       (is (= 2 (divide t2 t1)))))
 
   (testing "dividing a ratio by a bigdecimal and vica-versa"
-    (let [t1 (bigdecimal 0.4)
+    (let [t1 (bigdec 0.4)
           t2 (make-ratio 5 2)
           result (divide t1 t2)]
       (is (= BigDecimal (type result)))
       (is (< result 0.161))
       (is (> result 0.159)))
     (let [t1 (make-ratio 2 5)
-          t2 (bigdecimal 2.5)
+          t2 (bigdec 2.5)
           result (divide t1 t2)]
       (is (= BigDecimal (type result)))
       (is (< result 0.161))
@@ -980,12 +977,12 @@
       (is (= 2 (divide t2 t1))))))
 
 (deftest big-decimal-division-test
-  (op-test {BigDecimal [[bigdecimal] [number int long bigint biginteger bigdecimal]]}
+  (op-test {BigDecimal [[bigdec] [number int long bigint biginteger bigdec]]}
            #(divide %1 %2)
-           (bigdecimal 1.0) 2.0 2.0))
+           (bigdec 1.0) 2.0 2.0))
 
 (deftest decimal-division-test
-  (op-test {Double [[double float] [number int long bigint biginteger bigdecimal double float]]}
+  (op-test {Double [[double float] [number int long bigint biginteger bigdec double float]]}
            #(divide %1 %2)
            1.0 2.0 2.0))
 
@@ -1022,12 +1019,12 @@
 
   (testing "dividng a float by a bigdecimal and vica-versa"
     (let [t1 (float 2.1)
-          t2 (bigdecimal 1.2)
+          t2 (bigdec 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
       (is (< result 1.76))
       (is (> result 1.74)))
-    (let [t1 (bigdecimal 2.1)
+    (let [t1 (bigdec 2.1)
           t2 (float 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
@@ -1036,12 +1033,12 @@
 
   (testing "dividng a double by a bigdecimal and vica-versa"
     (let [t1 (double 2.1)
-          t2 (bigdecimal 1.2)
+          t2 (bigdec 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
       (is (< result 1.76))
       (is (> result 1.74)))
-    (let [t1 (bigdecimal 2.1)
+    (let [t1 (bigdec 2.1)
           t2 (double 1.2)
           result (divide t1 t2)]
       (is (= Double (type result)))
@@ -1072,8 +1069,8 @@
   (is (not (is-zero? (make-ratio 1 1)))))
 
 (deftest big-decimal-zero-test
-  (is (is-zero? (bigdecimal 0.0)))
-  (is (not (is-zero? (bigdecimal 1.0)))))
+  (is (is-zero? (bigdec 0.0)))
+  (is (not (is-zero? (bigdec 1.0)))))
 
 (deftest double-zero-test
   (is (is-zero? (double 0.0)))

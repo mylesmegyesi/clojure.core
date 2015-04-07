@@ -1,5 +1,5 @@
 (ns clojure.lang.numbers
-  (:refer-clojure :only [let fn defmacro defn defn- mod extend-protocol extend-type])
+  (:refer-clojure :only [cond let fn defmacro defn defn- mod extend-protocol extend-type])
   (:require [clojure.lang.protocols :refer [IDecimal IFloat IHash IInteger IRatio
                                             -denominator -numerator]]
             [clojure.next           :refer :all])
@@ -111,6 +111,45 @@
 
 (defmacro ->int [x]
   `(. Cast (castToInt ~x)))
+
+(defmacro ->double [x]
+  `(. Cast (castToDouble ~x)))
+
+(defmacro ->float [x]
+  `(. Cast (castToFloat ~x)))
+
+(defmacro ->bigint [x]
+  `(let [x# ~x]
+     (cond
+       (instance? BigInt x#) x#
+       (instance? BigInteger x#) (BigInt/fromBigInteger x#)
+       (decimal? x#) (bigint (.toBigInteger ^BigDecimal x#))
+       (float? x#) (bigint (. BigDecimal valueOf (->double x#)))
+       (ratio? x#) (bigint (.bigIntegerValue ^Ratio x#))
+       (clojure.core/number? x#) (BigInt/valueOf (->long x#))
+       :else (bigint (BigInteger. x#)))))
+
+(defmacro ->biginteger [x]
+  `(let [x# ~x]
+     (cond
+       (instance? BigInteger x#) x#
+       (instance? BigInt x#) (.toBigInteger ^BigInt x#)
+       (decimal? x#) (.toBigInteger ^BigDecimal x#)
+       (float? x#) (.toBigInteger (. BigDecimal valueOf (->double x#)))
+       (ratio? x#) (.bigIntegerValue ^Ratio x#)
+       (clojure.core/number? x#) (BigInteger/valueOf (->long x#))
+       :else (BigInteger. x#))))
+
+(defmacro ->bigdec [x]
+  `(let [x# ~x]
+     (cond
+       (decimal? x#) x#
+       (float? x#) (. BigDecimal valueOf (->double x#))
+       (ratio? x#) (divide (BigDecimal. (.getNumerator ^Ratio x#)) (.getDenominator ^Ratio x#))
+       (instance? BigInt x#) (.toBigDecimal ^BigInt x#)
+       (instance? BigInteger x#) (BigDecimal. ^BigInteger x#)
+       (clojure.core/number? x#) (BigDecimal/valueOf (->long x#))
+       :else (BigDecimal. x#))))
 
 (extend-type Ratio
   IRatio
