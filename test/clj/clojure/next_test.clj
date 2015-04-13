@@ -1,9 +1,12 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map nil? true? reify var-set])
+  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map nil? true? false? reify var-set])
   (:require [clojure.test            :refer :all]
             [clojure.next            :refer :all]
-            [clojure.lang.exceptions :refer [assertion-error]]
+            [clojure.lang.exceptions :refer [argument-error assertion-error]]
             [clojure.lang.protocols  :refer :all]))
+
+(defmacro argument-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? argument-error msg body)))
 
 (defmacro assertion-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
@@ -116,4 +119,11 @@
 
   (testing "returns false for not a list"
     (is (not (list? 1)))))
+
+(deftest contains?-test
+  (testing "returns false for nil"
+    (is (false? (contains? nil :anything))))
+
+  (testing "throws an argument-error for an unhandlable type"
+    (argument-error-is-thrown? #"contains\? not supported on type" (contains? :anything :anything))))
 

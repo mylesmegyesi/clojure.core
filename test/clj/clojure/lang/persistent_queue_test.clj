@@ -2,6 +2,7 @@
   (:refer-clojure :only [let nil?])
   (:require [clojure.test                  :refer :all]
             [clojure.lang.persistent-queue :refer :all]
+            [clojure.lang.protocols        :refer [-contains]]
             [clojure.next                  :refer :all]))
 
 (deftest persistent-queue-test
@@ -29,9 +30,9 @@
     (let [single-item-queue    (conj EMPTY-QUEUE :anything)
           multi-item-queue     (conj (conj (conj EMPTY-QUEUE :something) :anything) :at-all)
           non-containing-queue (conj EMPTY-QUEUE :thing)]
-      (is (contains? single-item-queue :anything))
-      (is (contains? multi-item-queue :anything))
-      (is (not (contains? non-containing-queue :anything)))))
+      (is (-contains single-item-queue :anything))
+      (is (-contains multi-item-queue :anything))
+      (is (not (-contains non-containing-queue :anything)))))
 
   (testing "meta"
     (let [meta-queue (with-meta EMPTY-QUEUE {:so :meta})]

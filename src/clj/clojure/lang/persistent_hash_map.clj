@@ -446,6 +446,13 @@
                         -has-nil?
                         -nil-value)))))
 
+  (-contains-key? [this k]
+    (if (nil? k)
+      -has-nil?
+      (if (nil? -root)
+        false
+        (not (identical? NOT-FOUND (node-find -root ZERO (->bitnum (hash k)) k NOT-FOUND))))))
+
   ICounted
   (-count [this] -count)
 
@@ -458,13 +465,6 @@
       (node-find -root ZERO (->bitnum (hash key)) key not-found)
       :else
       not-found))
-
-  (-includes? [this key]
-    (if (nil? key)
-      -has-nil?
-      (if (nil? -root)
-        false
-        (not (identical? NOT-FOUND (node-find -root ZERO (->bitnum (hash key)) key NOT-FOUND))))))
 
   IMeta
   (-meta [this] -meta)

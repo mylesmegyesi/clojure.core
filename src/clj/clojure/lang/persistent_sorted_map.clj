@@ -403,13 +403,13 @@
         this
         (new-sorted-map tree (+ -count cnt) -comparator -meta))))
 
+  (-contains-key? [this k]
+    (sorted-map-includes? -root -comparator k))
+
   ICounted
   (-count [this] -count)
 
   ILookup
-  (-includes? [this k]
-    (sorted-map-includes? -root -comparator k))
-
   (-lookup [this k default]
     (sorted-map-lookup -root -comparator k default))
 
