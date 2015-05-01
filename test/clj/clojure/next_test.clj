@@ -43,6 +43,10 @@
   (testing "return the value if the test returns not true"
     (is (= :bar (when-not (= 1 2) :bar)))))
 
+(deftest identity-test
+  (testing "identity returns the provided argument"
+    (is (= :foo (identity :foo)))))
+
 (deftest assert-test
   (testing "*assert* is true by default"
     (is (true? *assert*)))
