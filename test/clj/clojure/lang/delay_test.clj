@@ -1,5 +1,5 @@
 (ns clojure.lang.delay-test
-  (:refer-clojure :only [let fn pmap map filter identity loop list])
+  (:refer-clojure :only [let fn pmap map filter loop list])
   (:require [clojure.test :refer :all]
             [clojure.next :refer :all]))
 

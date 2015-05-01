@@ -229,6 +229,8 @@
     (-count obj)
     0))
 
+(defn identity [x] x)
+
 (require ['clojure.lang.delay :refer ['new-delay '-force]])
 
 (defmacro delay [& body]
