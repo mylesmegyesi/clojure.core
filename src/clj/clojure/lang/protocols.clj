@@ -59,8 +59,7 @@
 (defprotocol IInteger)
 
 (defprotocol ILookup
-  (-includes? [this k])
-  (-lookup [this k not-found]))
+  (-lookup [this k] [this k not-found]))
 
 (defprotocol IMapEntry
   (-key [this])
@@ -92,7 +91,11 @@
 (defprotocol IPersistentMap
   (-dissoc [this k]))
 
+(defprotocol IPersistentQueue
+  (-contains [this k]))
+
 (defprotocol IPersistentSet
+  (-contains?    [this x])
   (-conj         [this xs])
   (-difference   [this sets])
   (-disj         [this xs])

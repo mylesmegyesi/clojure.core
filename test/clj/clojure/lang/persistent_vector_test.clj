@@ -66,10 +66,10 @@
       (out-of-bounds-exception-is-thrown?
         (assoc new-vec 5 :b))))
 
-  (testing "contains-key"
+  (testing "contains?"
     (let [new-vec (vector :a :b :c :d)]
-      (is (contains-key? new-vec 3))
-      (is (not (contains-key? new-vec 5)))))
+      (is (contains? new-vec 3))
+      (is (not (contains? new-vec 5)))))
 )
 
 (deftest vector-seq-test

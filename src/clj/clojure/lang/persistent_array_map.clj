@@ -56,6 +56,9 @@
         (aset new-array 1 v)
         (new-array-map new-array new-size (/ new-size 2) -meta))))
 
+  (-contains-key? [this k]
+    (not (nil? (index-of -arr -size k))))
+
   ICounted
   (-count [this] -count)
 
@@ -64,9 +67,6 @@
     (if-let [idx (index-of -arr -size k)]
       (aget -arr (inc idx))
       not-found))
-
-  (-includes? [this k]
-    (not (nil? (index-of -arr -size k))))
 
   IMeta
   (-meta [this] -meta)

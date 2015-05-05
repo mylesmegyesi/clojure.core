@@ -247,9 +247,6 @@
 (defn force [obj]
   (-force obj))
 
-(defn contains? [coll k]
-  (-includes? coll k))
-
 (defn get
   ([coll k] (get coll k nil))
   ([coll k not-found]
@@ -413,6 +410,7 @@
 (defn val [entry]
   (-val entry))
 
+(declare contains?)
 (require ['clojure.lang.persistent-map :refer ['new-key-seq 'new-val-seq]])
 
 (defn keys [m]
@@ -443,21 +441,6 @@
   ([m k] (-dissoc m k))
   ([m k & ks]
    (dissoc-seq (-dissoc m k) (seq ks))))
-
-(defn contains-key? [m k]
-  (-contains-key? m k))
-
-(defn map? [m]
-  (satisfies? IPersistentMap m))
-
-(defn set? [s]
-  (satisfies? IPersistentSet s))
-
-(defn coll? [c]
-  (satisfies? IPersistentCollection c))
-
-(defn list? [l]
-  (satisfies? IPersistentList l))
 
 (require ['clojure.lang.array :as 'arr])
 
@@ -587,6 +570,26 @@
 
 (defn vector? [v]
   (satisfies? IPersistentVector v))
+
+(defn map? [m]
+  (satisfies? IPersistentMap m))
+
+(defn set? [s]
+  (satisfies? IPersistentSet s))
+
+(defn coll? [c]
+  (satisfies? IPersistentCollection c))
+
+(defn list? [l]
+  (satisfies? IPersistentList l))
+
+(defn contains? [coll k]
+  (cond
+    (nil? coll) false
+    (satisfies? IAssociative coll) (-contains-key? coll k)
+    (map? coll) (-contains-key? coll k)
+    (set? coll) (-contains? coll k)
+    :else (throw (new-argument-error (str "contains? not supported on type: " (type coll))))))
 
 (defn get-validator [this]
   (-get-validator this))

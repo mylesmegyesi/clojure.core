@@ -2,7 +2,7 @@
   (:refer-clojure :only [declare defn deftype if-let let list loop nil? satisfies?])
   (:require [clojure.next           :refer :all]
             [clojure.lang.aseq      :refer [defseq]]
-            [clojure.lang.protocols :refer [ICounted ILookup IPersistentStack IPersistentCollection
+            [clojure.lang.protocols :refer [ICounted IPersistentStack IPersistentCollection IPersistentQueue
                                             IMeta IObj
                                             ISeq ISeqable]]))
 
@@ -42,15 +42,6 @@
   ICounted
   (-count [this] -length)
 
-  ILookup
-  (-includes? [this k]
-    (loop [s (seq this)]
-      (if (nil? s)
-        false
-        (if (= k (first s))
-          true
-          (recur (next s))))))
-
   IMeta
   (-meta [this] -meta)
 
@@ -78,6 +69,15 @@
         (make-queue -meta (dec -length) new-seq -vec)
         (let [new-seq (seq -vec)]
           (make-queue -meta (dec -length) new-seq nil)))))
+
+  IPersistentQueue
+  (-contains [this k]
+    (loop [s (seq this)]
+      (if (nil? s)
+        false
+        (if (= k (first s))
+          true
+          (recur (next s))))))
 
   ISeqable
   (-seq [this]

@@ -66,10 +66,10 @@
     (list '-lookup ['this 'x 'default]
       (list 'clojure.core/get '-map 'x 'default))
 
-    (list '-includes? ['this 'x]
+    'clojure.lang.protocols/IPersistentSet
+    (list '-contains? ['this 'x]
       (list 'clojure.core/contains? '-map 'x))
 
-    'clojure.lang.protocols/IPersistentSet
     (list '-difference ['this 'sets]
       (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-difference '-map 'sets)]
         (list gen-next 'next-map)))
