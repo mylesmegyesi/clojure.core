@@ -1,5 +1,5 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [bigint double float bigdec defmacro reify let list list* nil?])
+  (:refer-clojure :only [apply defmacro defn reify let list list* nil? remove resolve])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [class-cast-exception argument-error]]
             [clojure.lang.protocols  :refer [IEquivalence]]
@@ -496,3 +496,29 @@
     (class-cast-exception-thrown? (zero? "Foo")))
 
   )
+
+(defn conversion-test [test conversion]
+  (let [test-without-question-mark (apply str (remove #(= \? %) (str test)))]
+    (testing (str test " converts an integer to a type of " test-without-question-mark)
+      (is (@(resolve test) (@(resolve conversion) 42))))
+
+    (testing (str test " converts a float to a type of " test-without-question-mark)
+      (is (@(resolve test) (@(resolve conversion) 42.2))))
+
+    (testing (str test " converts a big int to a type of " test-without-question-mark)
+      (is (@(resolve test) (@(resolve conversion) 42N))))
+
+    (testing (str test " converts a big decimal to a type of " test-without-question-mark)
+      (is (@(resolve test) (@(resolve conversion) 42.2M))))))
+
+(deftest number-conversion-test
+  (conversion-test 'integer? 'byte)
+  (conversion-test 'integer? 'short)
+  (conversion-test 'integer? 'int)
+  (conversion-test 'integer? 'long)
+  (conversion-test 'float?   'double)
+  (conversion-test 'float?   'float)
+  (conversion-test 'integer? 'bigint)
+  (conversion-test 'integer? 'biginteger)
+  (conversion-test 'decimal? 'bigdec))
+

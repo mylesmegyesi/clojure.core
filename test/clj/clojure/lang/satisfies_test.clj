@@ -1,5 +1,5 @@
 (ns clojure.lang.satisfies-test
-  (:refer-clojure :only [bigint biginteger deftype double float])
+  (:refer-clojure :only [deftype])
   (:require [clojure.test           :refer :all]
             [clojure.next           :refer :all]
             [clojure.lang.protocols :refer :all]))

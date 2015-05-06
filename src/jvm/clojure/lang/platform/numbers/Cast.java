@@ -105,5 +105,22 @@ public final class Cast {
     }
   }
 
+  public static double castToDouble(Object x) {
+    return ((Number) x).doubleValue();
+  }
+
+  public static float castToFloat(Object x) {
+    if (x instanceof Float) {
+      return ((Float) x).floatValue();
+    }
+
+    double n = ((Number) x).doubleValue();
+    if (n < -Float.MAX_VALUE || n > Float.MAX_VALUE) {
+      throw new IllegalArgumentException("Value out of range for float: " + x);
+    }
+
+    return (float) n;
+  }
+
 }
 
