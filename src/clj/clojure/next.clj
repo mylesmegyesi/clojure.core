@@ -821,6 +821,12 @@
       `(when-not ~assertion
          (throw (new-assertion-error (str "Assert failed: " ~message "\n" (pr-str '~assertion))))))))
 
+(defmacro while [test & body]
+  `(loop []
+     (when ~test
+       `@body
+       (recur))))
+
 (def ^:dynamic *print-dup* false)
 (def ^:dynamic *print-meta* false)
 (def ^:dynamic *print-readably* true)

@@ -1,5 +1,5 @@
 (ns clojure.lang.platform.future-test
-  (:refer-clojure :only [let true? while])
+  (:refer-clojure :only [let true?])
   (:require [clojure.test :refer :all]
             [clojure.next :refer :all]))
 

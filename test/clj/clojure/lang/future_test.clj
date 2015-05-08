@@ -1,5 +1,5 @@
 (ns clojure.lang.future-test
-  (:refer-clojure :only [let while])
+  (:refer-clojure :only [let])
   (:require [clojure.test        :refer :all]
             [clojure.next        :refer :all]
             [clojure.lang.thread :refer [sleep]]))
