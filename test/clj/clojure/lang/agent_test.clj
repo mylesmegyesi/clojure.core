@@ -1,5 +1,5 @@
 (ns clojure.lang.agent-test
-  (:refer-clojure :only [class defmacro false? fn let list list* nil? true? while])
+  (:refer-clojure :only [class defmacro false? fn let list list* nil? true?])
   (:require [clojure.test            :refer :all]
             [clojure.next            :refer :all]
             [clojure.lang.thread     :refer [sleep]]

@@ -131,3 +131,15 @@
   (testing "throws an argument-error for an unhandlable type"
     (argument-error-is-thrown? #"contains\? not supported on type" (contains? :anything :anything))))
 
+(deftest while-test
+  (testing "while completes if the test is falsy"
+    (is (nil? (while false))))
+
+  (testing "while runs while a test is truthy"
+    (let [atm (atom true)
+          fut (future (while (deref atm)))]
+      (is (not (future-done? fut)))
+      (reset! atm false)
+      (deref fut)
+      (is (future-done? fut)))))
+
