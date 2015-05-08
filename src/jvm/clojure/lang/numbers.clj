@@ -6,7 +6,6 @@
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
            [clojure.lang BigInt]
-           [clojure.lang.platform NumberOps]
            [clojure.lang.platform Ratio]
            [clojure.lang.platform.numbers Cast]
            [clojure.lang.platform.numbers Equivalence]
