@@ -1,5 +1,5 @@
 (ns clojure.lang.symbol-test
-  (:refer-clojure :only [let get nil? defn])
+  (:refer-clojure :only [let get nil? defn subs])
   (:require [clojure.test                 :refer :all]
             [clojure.lang.assertions      :refer :all]
             [clojure.next                 :refer :all :exclude [get]]))
@@ -151,3 +151,23 @@
     (let [lhs (symbol "ns" "b")
           rhs (symbol "ns" "a")]
       (is-greater-than lhs rhs))))
+
+(deftest gensym-test
+  (testing "gensym returns a symbol"
+    (is (symbol? (gensym)))
+    (is (symbol? (gensym "foo"))))
+
+  (testing "gensym without a prefix will use G__ as a default prefix"
+    (let [tsym (gensym)
+          tsym-name (name tsym)]
+      (is (= (subs tsym-name 0 3) "G__"))))
+
+  (testing "gensym with a prefix will use the prefix"
+    (let [tsym (gensym "foo")
+          tsym-name (name tsym)]
+      (is (= (subs tsym-name 0 3) "foo"))))
+
+  (testing "two gensyms will not have have the same name"
+    (let [tsym1-name (name (gensym))
+          tsym2-name (name (gensym))]
+      (is (not= tsym1-name tsym2-name)))))
