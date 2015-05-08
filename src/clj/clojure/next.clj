@@ -796,6 +796,15 @@
    (sym/new-symbol ns name (if ns (str ns "/" name) name)
                (hash (hash-combine (hash name) (hash ns))) nil)))
 
+(require ['clojure.lang.atomic-counter :refer ['new-atomic-counter 'get-and-increment-atomic-counter]])
+
+(def ^:private gensym-counter (new-atomic-counter 1))
+(defn- next-gensym-value [] (get-and-increment-atomic-counter gensym-counter))
+
+(defn gensym
+  ([] (gensym "G__"))
+  ([prefix] (symbol (str prefix (next-gensym-value)))))
+
 (require ['clojure.lang.keyword :as 'kwd])
 
 (defn keyword? [x]
