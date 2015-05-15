@@ -995,6 +995,14 @@
       ~@body
       (str o#))))
 
+(require ['clojure.lang.time :refer ['nano-time]])
+
+(defmacro time [expr]
+  `(let [start# (nano-time)
+         ret# ~expr]
+     (prn (str "Elapsed time: " (/ (double (- (nano-time) start#)) 1000000.0) " msecs"))
+     ret#))
+
 (require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
 
 (extend-type nil
