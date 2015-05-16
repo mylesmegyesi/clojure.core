@@ -584,6 +584,15 @@
           (-persistent v)))
       (-persistent empty-transient))))
 
+(defn transient [coll]
+  (-as-transient coll))
+
+(defn persistent! [coll]
+  (-persistent coll))
+
+(defn conj! [coll x]
+  (-conj! coll x))
+
 (defn vector? [v]
   (satisfies? IPersistentVector v))
 

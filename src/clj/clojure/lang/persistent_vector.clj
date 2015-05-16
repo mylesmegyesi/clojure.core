@@ -77,13 +77,21 @@
 (declare make-vector)
 (declare make-transient-vec)
 
-(deftype ^:private TransientVector [-meta -length -shift -root -tail]
+(deftype ^:private TransientVector [-meta
+                                    ^:unsynchronized-mutable -length
+                                    ^:unsynchronized-mutable -shift
+                                    ^:unsynchronized-mutable -root
+                                    ^:unsynchronized-mutable -tail]
+  ICounted
+  (-count [this] -length)
+
   ITransientCollection
   (-conj! [this x]
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
       (do
         (aset -tail (bit-and (->bitnum -length) (->bitnum 0x01f)) x)
-        (make-transient-vec -meta (inc -length) -shift -root -tail))
+        (set! -length (inc -length))
+        this)
       (let [tail-node (make-node (get-edit -root) -tail)
             new-tail (make-array 32)]
         (aset new-tail 0 x)
@@ -91,9 +99,16 @@
           (let [new-root (make-node (get-edit -root))]
             (aset (get-array new-root) 0 -root)
             (aset (get-array new-root) 1 (new-path (get-edit -root) -shift tail-node))
-            (make-transient-vec -meta (inc -length) (+ (->bitnum -shift) (->bitnum 5)) new-root new-tail))
+            (set! -length (inc -length))
+            (set! -shift (+ (->bitnum -shift) (->bitnum 5)))
+            (set! -root new-root)
+            (set! -tail new-tail)
+            this)
           (let [new-root (push-tail -shift -root tail-node -length -root)]
-            (make-transient-vec -meta (inc -length) -shift new-root new-tail))))))
+            (set! -root new-root)
+            (set! -tail new-tail)
+            (set! -length (inc -length))
+            this)))))
 
   (-persistent [this]
     (let [trimmed-tail (make-array (- (->bitnum -length) (->bitnum (tailoff -length))))]

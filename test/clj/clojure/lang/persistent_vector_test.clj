@@ -110,3 +110,21 @@
     (let [v-seq (seq (vector :a :b :c))]
       (is (= :a (first (seq v-seq))))))
 )
+
+(deftest transient-vector-test
+  (testing "returns the count"
+    (let [size3-transient (transient (vector 3 2 1))
+          size0-transient (transient (vector))]
+      (is (= 3 (count size3-transient)))
+      (is (= 0 (count size0-transient)))))
+
+  (testing "conj! onto a transient"
+    (let [t (transient (vector))]
+      (conj! t :first)
+      (conj! t :second)
+      (let [result (persistent! t)]
+        (is (= 2 (count result)))
+        (is (= :first (first result)))
+        (is (= :second (second result))))))
+
+  )
