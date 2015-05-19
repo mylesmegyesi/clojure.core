@@ -593,6 +593,9 @@
 (defn conj! [coll x]
   (-conj! coll x))
 
+(defn assoc! [coll index x]
+  (-assoc! coll index x))
+
 (defn vector? [v]
   (satisfies? IPersistentVector v))
 

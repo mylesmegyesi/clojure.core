@@ -20,7 +20,7 @@
 (defmacro new-unsupported-error [& args]
   (list* 'new unsupported-error args))
 
-(def out-of-bounds-exception ArrayIndexOutOfBoundsException)
+(def out-of-bounds-exception IndexOutOfBoundsException)
 
 (defmacro new-out-of-bounds-exception [& args]
   (list* 'new out-of-bounds-exception args))

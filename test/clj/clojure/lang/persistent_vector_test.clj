@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [defn defmacro apply list list* let nil? re-pattern range])
+  (:refer-clojure :only [apply defn defmacro doseq for list list* let nil? range re-pattern])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [argument-error out-of-bounds-exception]]
             [clojure.next            :refer :all]))
@@ -127,4 +127,43 @@
         (is (= :first (first result)))
         (is (= :second (second result))))))
 
+  (testing "conj! over 32 values"
+    (let [t (transient (vector))
+          r (range 0 33)]
+      (doseq [value r]
+        (conj! t value))
+      (let [result (persistent! t)]
+        (for [index r]
+          (is (= (nth index result) (clojure.core/nth index r)))))))
+
+  (testing "assoc! conjs when associng the last index"
+    (let [t (transient (vector))]
+      (assoc! t 0 :first)
+      (assoc! t 1 :second)
+      (let [result (persistent! t)]
+        (is (=  2 (count result)))
+        (is (= :first (first result)))
+        (is (= :second (second result))))))
+
+  (testing "assoc! sets a vector index"
+    (let [t (transient (vector 1 2 3))]
+      (assoc! t 1 :two)
+      (let [result (persistent! t)]
+        (is (= :two (second result))))))
+
+  (testing "assoc! raises an exception when the index is out of bounds"
+    (let [t (transient (vector))]
+      (out-of-bounds-exception-is-thrown?
+        (assoc! t -1 :foo))
+      (out-of-bounds-exception-is-thrown?
+        (assoc! t 1 :foo))))
+
+  (testing "assoc! over 32 values"
+    (let [t (transient (vector))
+          r (range 0 33)]
+      (doseq [value r]
+        (assoc! t value value))
+      (let [result (persistent! t)]
+        (for [index r]
+          (is (= nth index result) (clojure.core/nth index r))))))
   )
