@@ -131,6 +131,10 @@
   (-conj! [this value])
   (-persistent [this]))
 
+(defprotocol ITransientVector
+  (-assoc! [this index value])
+  (-pop! [this]))
+
 (defprotocol IValidatable
   (-get-validator  [this])
   (-set-validator! [this validator-fn]))

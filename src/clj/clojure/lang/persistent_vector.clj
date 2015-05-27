@@ -7,7 +7,8 @@
             [clojure.lang.protocols  :refer [-as-transient -assoc-n -conj! -persistent
                                              IAssociative ICounted IEditableCollection IMeta IObj
                                              IPersistentCollection IPersistentVector
-                                             ISeq ISeqable ISequential ITransientCollection IIndexed]]))
+                                             ITransientCollection ITransientVector
+                                             ISeq ISeqable ISequential IIndexed]]))
 
 (declare make-vector-seq)
 
@@ -74,16 +75,34 @@
           (aset (get-array new-node) subidx (new-path (get-edit root) (- (->bitnum level) (->bitnum 5)) tail-node)))))
     new-node))
 
+(defn- do-assoc [level node n x]
+  (let [new-node (make-node (get-edit node) (aclone (get-array node)))]
+    (if (= level 0)
+      (do
+        (aset (get-array new-node) (bit-and (->bitnum n) (->bitnum 0x01f)) x)
+        new-node)
+      (let [subidx (bit-and (unsigned-bit-shift-right (->bitnum n) (->bitnum level)) (->bitnum 0x01f))]
+        (aset (get-array new-node) subidx (do-assoc (- level 5) (aget (get-array node) subidx) n x))
+        new-node))))
+
 (declare make-vector)
 (declare make-transient-vec)
 
-(deftype ^:private TransientVector [-meta -length -shift -root -tail]
+(deftype ^:private TransientVector [-meta
+                                    ^:unsynchronized-mutable -length
+                                    ^:unsynchronized-mutable -shift
+                                    ^:unsynchronized-mutable -root
+                                    ^:unsynchronized-mutable -tail]
+  ICounted
+  (-count [this] -length)
+
   ITransientCollection
   (-conj! [this x]
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
       (do
         (aset -tail (bit-and (->bitnum -length) (->bitnum 0x01f)) x)
-        (make-transient-vec -meta (inc -length) -shift -root -tail))
+        (set! -length (inc -length))
+        this)
       (let [tail-node (make-node (get-edit -root) -tail)
             new-tail (make-array 32)]
         (aset new-tail 0 x)
@@ -91,14 +110,31 @@
           (let [new-root (make-node (get-edit -root))]
             (aset (get-array new-root) 0 -root)
             (aset (get-array new-root) 1 (new-path (get-edit -root) -shift tail-node))
-            (make-transient-vec -meta (inc -length) (+ (->bitnum -shift) (->bitnum 5)) new-root new-tail))
+            (set! -length (inc -length))
+            (set! -shift (+ (->bitnum -shift) (->bitnum 5)))
+            (set! -root new-root)
+            (set! -tail new-tail)
+            this)
           (let [new-root (push-tail -shift -root tail-node -length -root)]
-            (make-transient-vec -meta (inc -length) -shift new-root new-tail))))))
+            (set! -root new-root)
+            (set! -tail new-tail)
+            (set! -length (inc -length))
+            this)))))
 
   (-persistent [this]
     (let [trimmed-tail (make-array (- (->bitnum -length) (->bitnum (tailoff -length))))]
       (acopy -tail 0 trimmed-tail 0 (alength trimmed-tail))
       (make-vector -meta -length -shift -root trimmed-tail)))
+
+  ITransientVector
+  (-assoc! [this index value]
+    (if (and (>= index 0) (< index -length))
+      (if (>= index (tailoff -length))
+        (do (aset -tail (bit-and (->bitnum index) (->bitnum 0x01f)) value) this)
+        (do (set! -root (do-assoc -shift -root index value)) this))
+      (if (= index -length)
+        (do (-conj! this value) this)
+        (throw (new-out-of-bounds-exception)))))
 )
 
 (defn- editable-root [root]
@@ -114,16 +150,6 @@
 
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))
-
-(defn- do-assoc [level node n x]
-  (let [new-node (make-node (get-edit node) (aclone (get-array node)))]
-    (if (= level 0)
-      (do
-        (aset (get-array new-node) (bit-and (->bitnum n) (->bitnum 0x01f)) x)
-        new-node)
-      (let [subidx (bit-and (unsigned-bit-shift-right (->bitnum n) (->bitnum level)) (->bitnum 0x01f))]
-        (aset (get-array new-node) subidx (do-assoc (- level 5) (aget (get-array node) subidx) n x))
-        new-node))))
 
 (declare EMPTY-VECTOR)
 
