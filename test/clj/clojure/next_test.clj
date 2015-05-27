@@ -1,5 +1,5 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map nil? true? false? reify var-set])
+  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map nil? true? false? reify subs var-set])
   (:require [clojure.test            :refer :all]
             [clojure.next            :refer :all]
             [clojure.lang.exceptions :refer [argument-error assertion-error]]
@@ -142,4 +142,13 @@
       (reset! atm false)
       (deref fut)
       (is (future-done? fut)))))
+
+(deftest time-test
+  (testing "displaying time elapsed with evaluating an expression in milliseconds"
+    (let [out-str (with-out-str (time (+ 1 1)))]
+      (is (= (subs out-str 0 13) "Elapsed time:"))))
+
+  (testing "time returns the result of the expression"
+    (with-out-str
+      (is (= 2 (time (+ 1 1)))))))
 
