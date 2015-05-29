@@ -10,6 +10,11 @@
 (defmacro new-assertion-error [& args]
   (list* 'new assertion-error args))
 
+(def illegal-access-error IllegalAccessError)
+
+(defmacro new-illegal-access-error [& args]
+  (list* 'new illegal-access-error args))
+
 (def illegal-state-error IllegalStateException)
 
 (defmacro new-illegal-state-error [& args]
