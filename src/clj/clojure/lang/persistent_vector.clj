@@ -1,14 +1,16 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop when < > >= ->])
+  (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop nil? when < > >= ->])
   (:require [clojure.next            :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.exceptions :refer [new-argument-error new-out-of-bounds-exception]]
+            [clojure.lang.exceptions :refer [new-argument-error new-out-of-bounds-exception
+                                             new-illegal-access-error new-illegal-state-error]]
             [clojure.lang.numbers    :refer [->int]]
             [clojure.lang.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.protocols  :refer [-as-transient -assoc-n -conj! -persistent
                                              IAssociative ICounted IEditableCollection IMeta IObj
                                              IPersistentCollection IPersistentVector
                                              ITransientCollection ITransientVector
-                                             ISeq ISeqable ISequential IIndexed]]))
+                                             ISeq ISeqable ISequential IIndexed]]
+            [clojure.lang.thread     :refer [thread-reference]]))
 
 (declare make-vector-seq)
 
@@ -85,6 +87,15 @@
         (aset (get-array new-node) subidx (do-assoc (- level 5) (aget (get-array node) subidx) n x))
         new-node))))
 
+(defn- ensure-editable
+  ([root]
+    (if (nil? (get-edit root))
+      (throw (new-illegal-access-error "Transient used after persistent! call"))))
+  ([root node]
+    (if (= (get-edit root) (get-edit node))
+      node
+      (Node. (get-edit root) (aclone (get-array node))))))
+
 (declare make-vector)
 (declare make-transient-vec)
 
@@ -94,10 +105,13 @@
                                     ^:unsynchronized-mutable -root
                                     ^:unsynchronized-mutable -tail]
   ICounted
-  (-count [this] -length)
+  (-count [this]
+    (ensure-editable -root)
+    -length)
 
   ITransientCollection
   (-conj! [this x]
+    (ensure-editable -root)
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
       (do
         (aset -tail (bit-and (->bitnum -length) (->bitnum 0x01f)) x)
@@ -122,12 +136,15 @@
             this)))))
 
   (-persistent [this]
+    (ensure-editable -root)
+    (set! -root (make-node nil (get-array -root)))
     (let [trimmed-tail (make-array (- (->bitnum -length) (->bitnum (tailoff -length))))]
       (acopy -tail 0 trimmed-tail 0 (alength trimmed-tail))
       (make-vector -meta -length -shift -root trimmed-tail)))
 
   ITransientVector
   (-assoc! [this index value]
+    (ensure-editable -root)
     (if (and (>= index 0) (< index -length))
       (if (>= index (tailoff -length))
         (do (aset -tail (bit-and (->bitnum index) (->bitnum 0x01f)) value) this)
@@ -135,10 +152,11 @@
       (if (= index -length)
         (do (-conj! this value) this)
         (throw (new-out-of-bounds-exception)))))
+
 )
 
 (defn- editable-root [root]
-  (make-node nil (aclone (get-array root))))
+  (make-node (thread-reference) (aclone (get-array root))))
 
 (defn- editable-tail [tail]
   (let [new-arr (make-array 32)]

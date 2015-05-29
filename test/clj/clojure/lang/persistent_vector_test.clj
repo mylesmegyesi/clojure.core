@@ -1,11 +1,14 @@
 (ns clojure.lang.persistent-vector-test
   (:refer-clojure :only [apply defn defmacro doseq for list list* let nil? range re-pattern])
   (:require [clojure.test            :refer :all]
-            [clojure.lang.exceptions :refer [argument-error out-of-bounds-exception]]
+            [clojure.lang.exceptions :refer [argument-error illegal-access-error out-of-bounds-exception]]
             [clojure.next            :refer :all]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))
+
+(defmacro illegal-access-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? illegal-access-error msg body)))
 
 (defmacro out-of-bounds-exception-is-thrown? [& body]
   (list 'is (list* 'thrown? out-of-bounds-exception body)))
@@ -118,6 +121,13 @@
       (is (= 3 (count size3-transient)))
       (is (= 0 (count size0-transient)))))
 
+  (testing "count throws an exception after the transient has become persistent"
+    (let [t (transient (vector))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (count t))))
+
   (testing "conj! onto a transient"
     (let [t (transient (vector))]
       (conj! t :first)
@@ -135,6 +145,13 @@
       (let [result (persistent! t)]
         (for [index r]
           (is (= (nth index result) (clojure.core/nth index r)))))))
+
+  (testing "conj! throws an exception after the transient has become persistent"
+    (let [t (transient (vector))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (conj! t :foo))))
 
   (testing "assoc! conjs when associng the last index"
     (let [t (transient (vector))]
@@ -166,4 +183,12 @@
       (let [result (persistent! t)]
         (for [index r]
           (is (= nth index result) (clojure.core/nth index r))))))
+
+  (testing "assoc! throwns an exception after the transient has become persistent"
+    (let [t (transient (vector))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (assoc! t 0 :foo))))
+
   )

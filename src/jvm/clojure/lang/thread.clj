@@ -17,6 +17,9 @@
 (defmacro set-local-state [state v]
   `(.set ~state ~v))
 
+(defmacro thread-reference []
+  `(. Thread currentThread))
+
 (defmacro create-fixed-thread-pool-executor [atomic-long]
   `(. java.util.concurrent.Executors newFixedThreadPool
     (+ 2 (.availableProcessors (. Runtime getRuntime)))
