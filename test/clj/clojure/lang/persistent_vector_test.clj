@@ -1,7 +1,8 @@
 (ns clojure.lang.persistent-vector-test
   (:refer-clojure :only [apply defn defmacro doseq for list list* let nil? range re-pattern])
   (:require [clojure.test            :refer :all]
-            [clojure.lang.exceptions :refer [argument-error illegal-access-error out-of-bounds-exception]]
+            [clojure.lang.exceptions :refer [argument-error illegal-access-error
+                                             illegal-state-error out-of-bounds-exception]]
             [clojure.next            :refer :all]))
 
 (defmacro argument-error-is-thrown? [msg & body]
@@ -9,6 +10,9 @@
 
 (defmacro illegal-access-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? illegal-access-error msg body)))
+
+(defmacro illegal-state-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? illegal-state-error msg body)))
 
 (defmacro out-of-bounds-exception-is-thrown? [& body]
   (list 'is (list* 'thrown? out-of-bounds-exception body)))
@@ -190,5 +194,34 @@
       (illegal-access-error-is-thrown?
         #"Transient used after persistent! call"
         (assoc! t 0 :foo))))
+
+  (testing "pop! throws an exception if there are no elements"
+    (let [t (transient (vector))]
+      (illegal-state-error-is-thrown?
+        #"Can't pop empty vector"
+        (pop! t))))
+
+  (testing "pop! the last value"
+    (let [t (transient (vector 1))]
+      (pop! t)
+      (let [result (persistent! t)]
+        (is (zero? (count result))))))
+
+  (testing "pop! a few values"
+    (let [t (transient (vector 1 2 3 4 5))]
+      (pop! t)
+      (pop! t)
+      (let [result (persistent! t)]
+        (is (= 3 (count result))))))
+
+  (testing "pop! over 32 values"
+    (let [t (transient (vector))
+          r (range 0 33)]
+      (doseq [value r]
+        (assoc! t value value))
+      (doseq [_ r]
+        (pop! t))
+      (let [result (persistent! t)]
+        (is (zero? (count result))))))
 
   )

@@ -77,6 +77,23 @@
           (aset (get-array new-node) subidx (new-path (get-edit root) (- (->bitnum level) (->bitnum 5)) tail-node)))))
     new-node))
 
+(defn- transient-pop-tail [level node root length]
+  (let [subidx (bit-and (->int (unsigned-bit-shift-right (->bitnum (- length 2)) (->bitnum level))) (->bitnum 0x01f))]
+    (cond
+      (> level 5)
+        (let [new-child (transient-pop-tail (- level 5) (aget (get-array node) subidx) root length)]
+          (if (and (nil? new-child) (zero? subidx))
+            nil
+            (let [ret (make-node (get-edit root) (aclone (get-array node)))]
+              (aset (get-array ret) subidx new-child)
+              ret)))
+      (zero? subidx)
+        nil
+      :else
+        (let [ret (make-node (get-edit root) (aclone (get-array node)))]
+          (aset (get-array ret) subidx nil)
+          ret))))
+
 (defn- do-assoc [level node n x]
   (let [new-node (make-node (get-edit node) (aclone (get-array node)))]
     (if (= level 0)
@@ -95,6 +112,19 @@
     (if (= (get-edit root) (get-edit node))
       node
       (Node. (get-edit root) (aclone (get-array node))))))
+
+(defn- editable-array-for [i length tail root shift]
+  (if (and (>= i 0) (< i length))
+    (if (> i (tailoff length))
+      tail
+      (loop [level shift
+             node root]
+        (if (> level 0)
+          (recur
+            (- level 5)
+            (ensure-editable root (aget (get-array node) (bit-and (unsigned-bit-shift-right (->bitnum i) (->bitnum level)) (->bitnum 0x01f)))))
+          (get-array node))))
+    (throw (new-out-of-bounds-exception))))
 
 (declare make-vector)
 (declare make-transient-vec)
@@ -152,6 +182,32 @@
       (if (= index -length)
         (do (-conj! this value) this)
         (throw (new-out-of-bounds-exception)))))
+
+  (-pop! [this]
+    (ensure-editable -root)
+    (cond
+      (zero? -length)
+        (throw (new-illegal-state-error "Can't pop empty vector"))
+      (= 1 -length)
+        (do
+          (set! -length 0)
+          this)
+      (> (bit-and (->bitnum (dec -length)) (->bitnum 0x01f)) 0)
+        (do
+          (set! -length (dec -length))
+          this)
+      :else
+        (let [new-tail (editable-array-for (- -length 2) -length -tail -root -shift)
+              new-root (transient-pop-tail -shift -root -root -length)]
+          (if (nil? new-root)
+            (set! -root (make-node (get-edit -root))))
+          (if (and (> -shift 5) (nil? (aget (get-array new-root) 1)))
+            (do
+              (set! -root (ensure-editable -root (aget (get-array new-root) 0)))
+              (set! -shift (- -shift 5))))
+          (set! -length (dec -length))
+          (set! -tail new-tail)
+          this)))
 
 )
 
