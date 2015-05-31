@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [apply defn defmacro doseq for list list* let nil? range re-pattern])
+  (:refer-clojure :only [apply defn defmacro doseq fn for list list* let nil? range repeat re-pattern take])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [argument-error illegal-access-error
                                              illegal-state-error out-of-bounds-exception]]
@@ -77,6 +77,27 @@
     (let [new-vec (vector :a :b :c :d)]
       (is (contains? new-vec 3))
       (is (not (contains? new-vec 5)))))
+
+  (testing "peek"
+    (is (nil? (peek (vector))))
+    (is (= 3 (peek (vector 1 2 3)))))
+
+  (testing "popping an empty vector throwns an exception"
+    (illegal-state-error-is-thrown?
+      #"Can't pop empty vector"
+      (pop (vector))))
+
+  (testing "popping a single element vector preserves the meta"
+    (let [v (with-meta (vector 1) {:so :meta})
+          empty-v (pop v)]
+      (is (zero? (count empty-v)))
+      (is (= {:so :meta} (meta empty-v)))))
+
+  (testing "popping many elements off of a vector"
+    (let [fifty-foos (take 50 (repeat :foo))
+          v (apply vector fifty-foos)]
+      (let [result (reduce (fn [acc _] (pop acc)) v fifty-foos)]
+        (is (empty? result)))))
 )
 
 (deftest vector-seq-test

@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop nil? when < > >= ->])
+  (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop nil? object-array when < > >= ->])
   (:require [clojure.next            :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.exceptions :refer [new-argument-error new-out-of-bounds-exception
                                              new-illegal-access-error new-illegal-state-error]]
@@ -7,12 +7,15 @@
             [clojure.lang.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.protocols  :refer [-as-transient -assoc-n -conj! -persistent
                                              IAssociative ICounted IEditableCollection IMeta IObj
-                                             IPersistentCollection IPersistentVector
+                                             IPersistentCollection IPersistentVector IPersistentStack
                                              ITransientCollection ITransientVector
                                              ISeq ISeqable ISequential IIndexed]]
             [clojure.lang.thread     :refer [thread-reference]]))
 
 (declare make-vector-seq)
+
+(declare EMPTY-VECTOR)
+(declare EMPTY-NODE)
 
 (deftype ^:private ChunkedSeq [-first -arr -length -position]
   ICounted
@@ -77,11 +80,11 @@
           (aset (get-array new-node) subidx (new-path (get-edit root) (- (->bitnum level) (->bitnum 5)) tail-node)))))
     new-node))
 
-(defn- transient-pop-tail [level node root length]
+(defn- pop-tail [level node root length]
   (let [subidx (bit-and (->int (unsigned-bit-shift-right (->bitnum (- length 2)) (->bitnum level))) (->bitnum 0x01f))]
     (cond
       (> level 5)
-        (let [new-child (transient-pop-tail (- level 5) (aget (get-array node) subidx) root length)]
+        (let [new-child (pop-tail (- level 5) (aget (get-array node) subidx) root length)]
           (if (and (nil? new-child) (zero? subidx))
             nil
             (let [ret (make-node (get-edit root) (aclone (get-array node)))]
@@ -198,7 +201,7 @@
           this)
       :else
         (let [new-tail (editable-array-for (- -length 2) -length -tail -root -shift)
-              new-root (transient-pop-tail -shift -root -root -length)]
+              new-root (pop-tail -shift -root -root -length)]
           (if (nil? new-root)
             (set! -root (make-node (get-edit -root))))
           (if (and (> -shift 5) (nil? (aget (get-array new-root) 1)))
@@ -222,10 +225,22 @@
 (defn n-in-range? [n length]
   (and (>= (->bitnum n) 0) (< (->bitnum n) (->bitnum length))))
 
+(defn- array-for [i length tail root shift]
+  (if (and (>= i 0) (< i length))
+    (if (>= i (tailoff length))
+      tail
+      (loop [node root
+             level shift]
+        (let [l (- level 5)]
+          (if (> 0 l)
+            (recur
+              (aget (get-array node) (bit-and (unsigned-bit-shift-right (->bitnum i) (->bitnum l)) (->bitnum 0x01f)))
+              l)
+            (get-array node)))))
+    (throw (new-out-of-bounds-exception))))
+
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))
-
-(declare EMPTY-VECTOR)
 
 (deftype PersistentVector [-meta -length -shift -root -tail -seq]
   IPersistentCollection
@@ -249,6 +264,31 @@
 
   (-empty [this]
     (with-meta EMPTY-VECTOR (meta this)))
+
+  IPersistentStack
+  (-peek [this]
+    (if (> -length 0)
+      (nth this (dec -length))
+      nil))
+
+  (-pop [this]
+    (cond
+      (zero? -length) (throw (new-illegal-state-error "Can't pop empty vector"))
+      (= 1 -length) (with-meta EMPTY-VECTOR -meta)
+      (< 1 (- -length (tailoff -length)))
+        (let [new-tail (object-array (dec (alength -tail)))]
+          (acopy -tail 0 new-tail 0 (alength new-tail))
+          (make-vector -meta (dec -length) -shift -root new-tail))
+      :else
+        (let [new-tail (array-for (- -length 2) -length -tail -root -shift)
+              new-root (pop-tail -shift -root -root -length)]
+          (cond
+            (nil? new-root)
+              (make-vector -meta (dec -length) -shift EMPTY-NODE new-tail)
+            (and (> -shift 5) (nil? (aget (get-array new-root) 1)))
+              (make-vector -meta (dec -length) (- -shift 5) (aget (get-array new-root) 0) new-tail)
+            :else
+              (make-vector -meta (dec -length) -shift new-root new-tail)))))
 
   IPersistentVector
   (-assoc-n [this n x]
