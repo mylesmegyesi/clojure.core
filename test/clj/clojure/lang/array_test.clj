@@ -1,8 +1,9 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [defmacro let list list*])
-  (:require [clojure.test            :refer :all]
-            [clojure.lang.exceptions :refer [out-of-bounds-exception]]
-            [clojure.next            :refer :all]))
+  (:refer-clojure :only [defmacro let list list* nil?])
+  (:require [clojure.test             :refer :all]
+            [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
+            [clojure.next             :refer :all]
+            [clojure.support.test-seq :refer [test-seq]]))
 
 (defmacro out-of-bounds-exeption-is-thrown? [& body]
   (list 'is (list* 'thrown? out-of-bounds-exception body)))
@@ -73,3 +74,18 @@
     (let [seqable '()
           arr (into-array seqable)]
       (is (= 0 (alength arr))))))
+
+(deftest object-array-test
+  (testing "returns an array of nils for given size"
+    (let [arr (object-array 42)]
+      (is (= 42 (alength arr)))
+      (is (nil? (aget arr 21)))))
+
+  (testing "returns an array from a given seq"
+    (let [s (test-seq '(1 2 3))
+          arr (object-array s)]
+      (is (= 3 (alength arr)))
+      (is (= 1 (aget arr 0)))
+      (is (= 2 (aget arr 1)))
+      (is (= 3 (aget arr 2)))))
+  )

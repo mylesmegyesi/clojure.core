@@ -493,6 +493,11 @@
            (aset arr i (first s))
            (recur (clojure.core/inc i) (next s))))))))
 
+(defn object-array [seq-or-size]
+  (if (number? seq-or-size)
+    (make-array platform-object/base-object seq-or-size)
+    (into-array platform-object/base-object seq-or-size)))
+
 (require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
 
 (defn array-map [& args]
