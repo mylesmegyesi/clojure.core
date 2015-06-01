@@ -63,7 +63,8 @@
   (or (integer? x) (ratio? x) (decimal? x)))
 
 (declare bigint)
-(require ['clojure.lang.numbers :refer ['numbers-equal? 'numbers-equivalent?
+(require ['clojure.lang.numbers :as 'platform-numbers
+                                :refer ['numbers-equal? 'numbers-equivalent?
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'incrementp 'decrement 'decrementp
                                         'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
@@ -482,11 +483,6 @@
 
 (require ['clojure.lang.array :as 'arr])
 
-(defn make-array
-  ([size] (make-array platform-object/base-object size))
-  ([type size]
-   (arr/make-array type size)))
-
 (defn aset [arr i val]
   (arr/array-set! arr i val))
 
@@ -502,6 +498,11 @@
 (defn acopy [src src-pos dest dest-pos length]
   (arr/array-copy src src-pos dest dest-pos length))
 
+(defn make-array
+  ([size] (make-array platform-object/base-object size))
+  ([type size]
+   (arr/make-array type size)))
+
 (defn into-array
   ([seqable] (into-array platform-object/base-object seqable))
   ([type seqable]
@@ -513,12 +514,64 @@
          arr
          (do
            (aset arr i (first s))
-           (recur (clojure.core/inc i) (next s))))))))
+           (recur (inc i) (next s))))))))
 
 (defn object-array [seq-or-size]
   (if (number? seq-or-size)
     (make-array platform-object/base-object seq-or-size)
     (into-array platform-object/base-object seq-or-size)))
+
+(defn- number-array
+  ([seq-or-size t]
+    (if (number? seq-or-size)
+      (make-array t seq-or-size)
+      (into-array t seq-or-size)))
+  ([size init-val-or-seq t]
+    (if (instance? t init-val-or-seq)
+      (let [ret (make-array t size)]
+        (loop [remaining (dec size)]
+          (do
+            (aset ret remaining init-val-or-seq)
+            (if (zero? remaining)
+              ret
+              (recur (dec remaining))))))
+      (into-array t (take size init-val-or-seq)))))
+
+(defn byte-array
+  ([seq-or-size]
+    (number-array seq-or-size platform-numbers/platform-byte))
+  ([size init-val-or-seq]
+    (number-array size init-val-or-seq platform-numbers/platform-byte)))
+
+(defn short-array
+  ([seq-or-size]
+    (number-array seq-or-size platform-numbers/platform-short))
+  ([size init-val-or-seq]
+    (number-array size init-val-or-seq platform-numbers/platform-short)))
+
+(defn int-array
+  ([seq-or-size]
+    (number-array seq-or-size platform-numbers/platform-int))
+  ([size init-val-or-seq]
+    (number-array size init-val-or-seq platform-numbers/platform-int)))
+
+(defn long-array
+  ([seq-or-size]
+    (number-array seq-or-size platform-numbers/platform-long))
+  ([size init-val-or-seq]
+    (number-array size init-val-or-seq platform-numbers/platform-long)))
+
+(defn float-array
+  ([seq-or-size]
+    (number-array seq-or-size platform-numbers/platform-float))
+  ([size init-val-or-seq]
+    (number-array size init-val-or-seq platform-numbers/platform-float)))
+
+(defn double-array
+  ([seq-or-size]
+    (number-array seq-or-size platform-numbers/platform-double))
+  ([size init-val-or-seq]
+    (number-array size init-val-or-seq platform-numbers/platform-double)))
 
 (require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
 
