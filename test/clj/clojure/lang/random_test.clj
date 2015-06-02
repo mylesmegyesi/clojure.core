@@ -1,7 +1,7 @@
 (ns clojure.lang.random-test
   (:refer-clojure :only [let distinct nil? repeatedly some take >= <=])
   (:require [clojure.test :refer :all]
-            [clojure.next :refer :all]))
+            [clojure.next :refer :all :exclude [take]]))
 
 (deftest rand-test
   (testing "returns a floating point number"

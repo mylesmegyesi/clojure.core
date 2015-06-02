@@ -327,16 +327,6 @@
 (require ['clojure.lang.aseq])
 (require ['clojure.lang.seqable])
 
-(declare atom)
-(declare reset!)
-(require ['clojure.lang.lazy-seq :refer ['make-lazy-seq]])
-
-(defmacro lazy-seq [& s-body]
-  (list make-lazy-seq (list* 'clojure.core/fn [] s-body)))
-
-(defn constantly [rval]
-  (fn [& args] rval))
-
 (require ['clojure.lang.cons :refer ['make-cons]])
 
 (defn cons [elem seqable]
@@ -372,6 +362,28 @@
 
 (defn second [s]
   (first (next s)))
+
+(declare atom)
+(declare reset!)
+(require ['clojure.lang.lazy-seq :refer ['make-lazy-seq]])
+
+(defmacro lazy-seq [& s-body]
+  (list make-lazy-seq (list* 'clojure.core/fn [] s-body)))
+
+(defn constantly [rval]
+  (fn [& args] rval))
+
+(defn take [n coll]
+  (lazy-seq
+    (when (pos? n)
+      (when-let [s (seq coll)]
+        (cons (first s) (take (dec n) (next s)))))))
+
+(defn take-while [pred coll]
+  (lazy-seq
+    (when-let [s (seq coll)]
+      (when (pred (first s))
+        (cons (first s) (take-while pred (next s)))))))
 
 (defn conj
   ([] [])

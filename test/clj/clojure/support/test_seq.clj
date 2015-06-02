@@ -1,7 +1,7 @@
 (ns clojure.support.test-seq
-  (:refer-clojure :only [conj count defn deftype nth loop])
+  (:refer-clojure :only [conj count defn deftype first loop])
   (:require [clojure.lang.protocols :refer [ICounted ISeq ISeqable ISequential]]
-            [clojure.next           :refer :all :exclude [nth count conj]]))
+            [clojure.next           :refer :all :exclude [first count conj]]))
 
 (deftype TestSeq [-list]
   ICounted
@@ -9,24 +9,21 @@
     (count -list))
 
   ISeqable
-  (-seq [this] this)
+  (-seq [this]
+    this)
 
   ISequential
   ISeq
   (-first [this]
-    (nth -list 0))
+    (first -list))
 
   (-next [this]
-    (if (= '() (rest -list))
-      nil
-      (TestSeq. (rest -list))))
+    (if (next -list)
+      (TestSeq. (next -list))
+      nil))
 
   (-more [this]
-    (loop [s (next (seq -list))
-           r []]
-      (if s
-        (recur (next s) (conj r (first s)))
-        r))))
+    (TestSeq. (rest -list))))
 
 (deftype TestSeqable [-list]
   ISequential

@@ -58,6 +58,9 @@
 
 (defprotocol IInteger)
 
+(defprotocol ILazySeq
+  (-sval [this]))
+
 (defprotocol ILookup
   (-lookup [this k] [this k not-found]))
 

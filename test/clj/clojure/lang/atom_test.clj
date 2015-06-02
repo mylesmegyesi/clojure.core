@@ -1,8 +1,8 @@
 (ns clojure.lang.atom-test
-  (:refer-clojure :only [and apply assoc fn defmacro defn dorun dotimes first flatten inc let list list* map nil? partition pcalls range repeat sort vec - *])
+  (:refer-clojure :only [and apply assoc fn defmacro defn dorun dotimes first flatten let list list* map nil? partition pcalls range repeat sort vec])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [illegal-state-error]]
-            [clojure.next            :refer :all :exclude [- inc * first and assoc]]))
+            [clojure.next            :refer :all :exclude [first and assoc]]))
 
 (defmacro illegal-state-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? illegal-state-error msg body)))
