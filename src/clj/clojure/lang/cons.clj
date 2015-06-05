@@ -21,10 +21,12 @@
   ISeq
   (-first [this] -first)
 
-  (-next [this] (seq -more))
+  (-next [this] -more)
 
-  (-more [this] (seq -more)))
+  (-more [this] -more))
 
 (defn make-cons
-  ([elem s] (Cons. {} elem s))
-  ([mta elem s] (Cons. mta elem s)))
+  ([elem s]
+    (Cons. {} elem s))
+  ([mta elem s]
+    (Cons. mta elem s)))

@@ -90,3 +90,17 @@
       (is (= 1 (first taken)))
       (is (= 2 (second taken))))))
 
+(deftest repeat-test
+  (testing "repeat a value"
+    (let [repeater (repeat "inf")]
+      (is (= "inf" (first repeater)))
+      (is (= "inf" (nth repeater 42)))))
+
+  (testing "take n of a repeated value"
+    (let [n (repeat 2 "inf")]
+      (is (= 2 (count n)))
+      (is (= "inf" (first n)))
+      (is (= "inf" (second n)))))
+
+  )
+
