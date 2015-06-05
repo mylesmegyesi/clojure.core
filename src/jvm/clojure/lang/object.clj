@@ -4,6 +4,9 @@
 
 (def base-object Object)
 
+(defmacro new-base-object []
+  `(Object.))
+
 (defmacro instance? [x y]
   `(.isInstance ~x ~y))
 

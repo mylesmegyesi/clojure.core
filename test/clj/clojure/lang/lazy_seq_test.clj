@@ -1,5 +1,5 @@
 (ns clojure.lang.lazy-seq-test
-  (:refer-clojure :only [defn let nil?])
+  (:refer-clojure :only [defn fn let nil? >])
   (:require [clojure.test                 :refer :all]
             [clojure.next                 :refer :all]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
@@ -25,7 +25,9 @@
     (is (= 1 (count (lazy-seq (test-seqable '(1)))))))
 
   (testing "rest of a lazy seq"
-    (is (= '(2 3) (rest (lazy-seq (test-seqable '(1 2 3)))))))
+    (let [r (rest (lazy-seq (test-seqable '(1 2 3))))]
+      (is (= 2 (first r)))
+      (is (= 3 (second r)))))
 
   (testing "rest of an empty lazy seq"
     (is (= EMPTY-LIST (rest (lazy-seq))))))
@@ -45,3 +47,46 @@
   (testing "with-meta resets the meta value"
     (let [lazy-seq-with-meta (with-meta (lazy-seq) {:so :meta})]
       (is (= {:so :meta} (meta lazy-seq-with-meta))))))
+
+(deftest take-test
+  (testing "take zero will an empty lazy-seq"
+    (is (empty? (take 0 (test-seqable '(1 2 3))))))
+
+  (testing "take some of a seq"
+    (let [taken (take 2 (test-seqable '(1 2 3)))]
+      (is (= 2 (count taken)))
+      (is (= 1 (first taken)))
+      (is (= 2 (second taken)))))
+
+  (testing "take all of a seq"
+    (let [taken (take 2 (test-seqable '(1 2)))]
+      (is (= 2 (count taken)))
+      (is (= 1 (first taken)))
+      (is (= 2 (second taken)))))
+
+  (testing "taking more elements than are in the seq returns the whole seq"
+    (let [taken (take 3 (test-seqable '(1 2)))]
+      (is (= 2 (count taken)))
+      (is (= 1 (first taken)))
+      (is (= 2 (second taken))))))
+
+(deftest take-while-test
+  (testing "take while false"
+    (let [pred (fn [_] false)
+          taken (take-while pred (test-seqable '(1 2 3)))]
+      (is (empty? taken))))
+
+  (testing "take some of a seq"
+    (let [pred #(> 3 %)
+          taken (take-while pred (test-seqable '(1 2 3)))]
+      (is (= 2 (count taken)))
+      (is (= 1 (first taken)))
+      (is (= 2 (second taken)))))
+
+  (testing "take all of a seq"
+    (let [pred #(> 3 %)
+          taken (take-while pred (test-seqable '(1 2)))]
+      (is (= 2 (count taken)))
+      (is (= 1 (first taken)))
+      (is (= 2 (second taken))))))
+

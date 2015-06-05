@@ -4,7 +4,8 @@
             [clojure.lang.equivalence :refer [platform-equals-method]]
             [clojure.lang.hash        :refer [platform-hash-method]]
             [clojure.lang.protocols]
-            [clojure.next             :refer :all :exclude [cons empty? first rest every? assoc dissoc reduce keys]]))
+            [clojure.next             :refer :all :exclude [assoc cons dissoc empty? every?
+                                                            first keys reduce rest take]]))
 
 (defn make-pairs [xs]
   (flatten (map #(take 2 (repeat %)) xs)))
