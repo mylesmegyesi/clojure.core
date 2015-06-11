@@ -391,6 +391,10 @@
   ([x] (lazy-seq (cons x (repeat x))))
   ([n x] (take n (repeat x))))
 
+(defn repeatedly
+  ([f] (lazy-seq (cons (f) (repeatedly f))))
+  ([n f] (take n (repeatedly f))))
+
 (defn conj
   ([] [])
   ([coll] coll)
