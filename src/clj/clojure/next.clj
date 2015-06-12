@@ -613,6 +613,9 @@
 (defn assoc! [coll index x]
   (-assoc! coll index x))
 
+(defn pop! [coll]
+  (-pop! coll))
+
 (defn vector? [v]
   (satisfies? IPersistentVector v))
 

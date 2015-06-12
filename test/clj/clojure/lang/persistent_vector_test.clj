@@ -1,7 +1,8 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [apply defn defmacro doseq for list list* let nil? range re-pattern])
+  (:refer-clojure :only [apply defn defmacro doseq fn for list list* let nil? range repeat re-pattern take])
   (:require [clojure.test            :refer :all]
-            [clojure.lang.exceptions :refer [argument-error illegal-access-error out-of-bounds-exception]]
+            [clojure.lang.exceptions :refer [argument-error illegal-access-error
+                                             illegal-state-error out-of-bounds-exception]]
             [clojure.next            :refer :all]))
 
 (defmacro argument-error-is-thrown? [msg & body]
@@ -9,6 +10,9 @@
 
 (defmacro illegal-access-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? illegal-access-error msg body)))
+
+(defmacro illegal-state-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? illegal-state-error msg body)))
 
 (defmacro out-of-bounds-exception-is-thrown? [& body]
   (list 'is (list* 'thrown? out-of-bounds-exception body)))
@@ -73,6 +77,27 @@
     (let [new-vec (vector :a :b :c :d)]
       (is (contains? new-vec 3))
       (is (not (contains? new-vec 5)))))
+
+  (testing "peek"
+    (is (nil? (peek (vector))))
+    (is (= 3 (peek (vector 1 2 3)))))
+
+  (testing "popping an empty vector throwns an exception"
+    (illegal-state-error-is-thrown?
+      #"Can't pop empty vector"
+      (pop (vector))))
+
+  (testing "popping a single element vector preserves the meta"
+    (let [v (with-meta (vector 1) {:so :meta})
+          empty-v (pop v)]
+      (is (zero? (count empty-v)))
+      (is (= {:so :meta} (meta empty-v)))))
+
+  (testing "popping many elements off of a vector"
+    (let [fifty-foos (take 50 (repeat :foo))
+          v (apply vector fifty-foos)]
+      (let [result (reduce (fn [acc _] (pop acc)) v fifty-foos)]
+        (is (empty? result)))))
 )
 
 (deftest vector-seq-test
@@ -190,5 +215,34 @@
       (illegal-access-error-is-thrown?
         #"Transient used after persistent! call"
         (assoc! t 0 :foo))))
+
+  (testing "pop! throws an exception if there are no elements"
+    (let [t (transient (vector))]
+      (illegal-state-error-is-thrown?
+        #"Can't pop empty vector"
+        (pop! t))))
+
+  (testing "pop! the last value"
+    (let [t (transient (vector 1))]
+      (pop! t)
+      (let [result (persistent! t)]
+        (is (zero? (count result))))))
+
+  (testing "pop! a few values"
+    (let [t (transient (vector 1 2 3 4 5))]
+      (pop! t)
+      (pop! t)
+      (let [result (persistent! t)]
+        (is (= 3 (count result))))))
+
+  (testing "pop! over 32 values"
+    (let [t (transient (vector))
+          r (range 0 33)]
+      (doseq [value r]
+        (assoc! t value value))
+      (doseq [_ r]
+        (pop! t))
+      (let [result (persistent! t)]
+        (is (zero? (count result))))))
 
   )
