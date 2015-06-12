@@ -72,7 +72,9 @@
   IValidatable
   (-get-validator [this] -validator)
 
-  (-set-validator! [this f] (set! -validator f) nil)
+  (-set-validator! [this f]
+    (validate-with-exception f (ref-get -state))
+    (set! -validator f) nil)
 
   IWatchable
   (-add-watch [this k f]
