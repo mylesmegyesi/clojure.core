@@ -1,5 +1,5 @@
 (ns clojure.lang.cons
-  (:refer-clojure :only [declare defn deftype])
+  (:refer-clojure :only [declare defn deftype list nil?])
   (:require [clojure.next           :refer :all]
             [clojure.lang.aseq      :refer [defseq]]
             [clojure.lang.protocols :refer [ICounted IMeta IObj ISeq]]))
@@ -23,8 +23,13 @@
 
   (-next [this] (seq -more))
 
-  (-more [this] (seq -more)))
+  (-more [this]
+    (if (nil? -more)
+      (list)
+      -more)))
 
 (defn make-cons
-  ([elem s] (Cons. {} elem s))
-  ([mta elem s] (Cons. mta elem s)))
+  ([elem s]
+    (Cons. {} elem s))
+  ([mta elem s]
+    (Cons. mta elem s)))

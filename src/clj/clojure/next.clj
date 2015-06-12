@@ -332,7 +332,9 @@
 (defn cons [elem seqable]
   (if (nil? seqable)
     (list elem)
-    (make-cons elem (seq seqable))))
+    (if (satisfies? ISeq seqable)
+      (make-cons elem seqable)
+      (make-cons elem (seq seqable)))))
 
 (defn first [s]
   (-first (seq s)))
@@ -384,6 +386,14 @@
     (when-let [s (seq coll)]
       (when (pred (first s))
         (cons (first s) (take-while pred (next s)))))))
+
+(defn repeat
+  ([x] (lazy-seq (cons x (repeat x))))
+  ([n x] (take n (repeat x))))
+
+(defn repeatedly
+  ([f] (lazy-seq (cons (f) (repeatedly f))))
+  ([n f] (take n (repeatedly f))))
 
 (defn conj
   ([] [])

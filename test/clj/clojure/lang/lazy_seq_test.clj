@@ -1,5 +1,5 @@
 (ns clojure.lang.lazy-seq-test
-  (:refer-clojure :only [defn fn let nil? >])
+  (:refer-clojure :only [defn fn let nil? > >=])
   (:require [clojure.test                 :refer :all]
             [clojure.next                 :refer :all]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
@@ -89,4 +89,32 @@
       (is (= 2 (count taken)))
       (is (= 1 (first taken)))
       (is (= 2 (second taken))))))
+
+(deftest repeat-test
+  (testing "repeat a value"
+    (let [repeater (repeat "inf")]
+      (is (= "inf" (first repeater)))
+      (is (= "inf" (nth repeater 42)))))
+
+  (testing "take n of a repeated value"
+    (let [n (repeat 2 "inf")]
+      (is (= 2 (count n)))
+      (is (= "inf" (first n)))
+      (is (= "inf" (second n))))))
+
+(deftest repeatedly-test
+  (testing "repeat a function"
+    (let [repeater (repeatedly #(rand))
+          f (first repeater)
+          s (second repeater)]
+      (is (and (>= f 0) (> 1 f)))
+      (is (and (>= s 0) (> 1 s)))))
+
+  (testing "take n of a repeated function"
+    (let [n (repeatedly 2 #(rand))
+          f (first n)
+          s (second n)]
+      (is (= 2 (count n)))
+      (is (and (>= f 0) (> 1 f)))
+      (is (and (>= s 0) (> 1 s))))))
 

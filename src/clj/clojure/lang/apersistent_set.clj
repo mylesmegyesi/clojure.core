@@ -5,7 +5,7 @@
             [clojure.lang.hash        :refer [platform-hash-method]]
             [clojure.lang.protocols]
             [clojure.next             :refer :all :exclude [assoc cons dissoc empty? every?
-                                                            first keys reduce rest take]]))
+                                                            first keys reduce repeat rest take]]))
 
 (defn make-pairs [xs]
   (flatten (map #(take 2 (repeat %)) xs)))

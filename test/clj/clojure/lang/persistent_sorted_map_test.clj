@@ -4,7 +4,7 @@
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-list       :refer [EMPTY-LIST]]
             [clojure.lang.exceptions            :refer [argument-error]]
-            [clojure.next                       :refer :all :exclude [reduce conj]]))
+            [clojure.next                       :refer :all :exclude [reduce conj repeatedly]]))
 
 (deftest sorted-map-test
   (map-test "PersistentTreeMap" sorted-map))
