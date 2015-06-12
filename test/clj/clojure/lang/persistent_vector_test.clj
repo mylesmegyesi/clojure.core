@@ -3,7 +3,7 @@
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [argument-error illegal-access-error
                                              illegal-state-error out-of-bounds-exception]]
-            [clojure.next            :refer :all]))
+            [clojure.next            :refer :all :exclude [repeat take]]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))
