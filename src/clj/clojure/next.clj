@@ -765,6 +765,13 @@
         (send agnt count-down))
       (threading/latch-await latch timeout-ms))))
 
+(defn- setup-reference [reference options]
+  (when-let [ref-meta (get options :meta)]
+    (reset-meta! reference ref-meta))
+  (when-let [validator (get options :validator)]
+    (set-validator! reference validator))
+    reference)
+
 (require ['clojure.lang.atomic-ref :refer ['new-atomic-ref]])
 (require ['clojure.lang.atom :refer ['new-atom]])
 
@@ -773,10 +780,9 @@
     (atom state :meta nil :validator nil))
   ([state & args]
     (let [config (apply array-map args)]
-      (new-atom (new-atomic-ref state)
-                (get config :meta)
-                (get config :validator)
-                {}))))
+      (setup-reference
+        (new-atom (new-atomic-ref state) nil nil {})
+        config))))
 
 (defn memoize [f]
   (let [cache-atom (atom (hash-map))]

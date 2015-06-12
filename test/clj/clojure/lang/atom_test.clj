@@ -12,6 +12,10 @@
     (let [atm (atom "atm")]
       (is (= "atm" (deref atm)))))
 
+  (testing "does not allow an invalid initial state"
+    (illegal-state-error-is-thrown? #"Invalid reference state"
+      (atom "orange" :validator #(not= "orange" %))))
+
   (testing "allows an atom's state to be set if the current state's comparison succeeds"
     (let [atm     (atom "atm")
           success (compare-and-set! atm "atm" "new atm")]
