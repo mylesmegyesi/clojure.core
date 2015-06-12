@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [defmacro let list list* nil?])
+  (:refer-clojure :only [defmacro defn- let list list* map nil?])
   (:require [clojure.test             :refer :all]
             [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
             [clojure.next             :refer :all]
@@ -87,5 +87,53 @@
       (is (= 3 (alength arr)))
       (is (= 1 (aget arr 0)))
       (is (= 2 (aget arr 1)))
-      (is (= 3 (aget arr 2)))))
-  )
+      (is (= 3 (aget arr 2))))))
+
+(defn- number-array-test [array-fn type-fn]
+  (testing "returns an array of nils for a given size"
+    (let [arr (array-fn 42)]
+      (is (= 42 (alength arr)))
+      (is (nil? (aget arr 21)))))
+
+  (testing "returns an array from a given seq"
+    (let [s (test-seq (map #(type-fn %) '(1 2 3)))
+          arr (array-fn s)]
+      (is (= 3 (alength arr)))
+      (is (= (type-fn 1) (aget arr 0)))
+      (is (= (type-fn 2) (aget arr 1)))
+      (is (= (type-fn 3) (aget arr 2)))))
+
+  (testing "returns an array of a given size where all elements are the same"
+    (let [n42 (type-fn 42)
+          arr (array-fn 3 n42)]
+      (is (= 3 (alength arr)))
+      (is (= n42 (aget arr 0)))
+      (is (= n42 (aget arr 1)))
+      (is (= n42 (aget arr 2)))))
+
+  (testing "returns an array of a given size sourcing from a seq"
+    (let [s (test-seq (map #(type-fn %) '(1 2 3)))
+          arr (array-fn 3 s)]
+      (is (= 3 (alength arr)))
+      (is (= (type-fn 1) (aget arr 0)))
+      (is (= (type-fn 2) (aget arr 1)))
+      (is (= (type-fn 3) (aget arr 2))))))
+
+(deftest byte-array-test
+  (number-array-test byte-array byte))
+
+(deftest short-array-test
+  (number-array-test short-array short))
+
+(deftest int-array-test
+  (number-array-test int-array int))
+
+(deftest long-array-test
+  (number-array-test long-array long))
+
+(deftest float-array-test
+  (number-array-test float-array float))
+
+(deftest double-array-test
+  (number-array-test double-array double))
+

@@ -19,6 +19,13 @@
            [clojure.lang.platform.numbers Negation]
            [clojure.lang.platform.numbers Zero]))
 
+(def platform-byte   Byte)
+(def platform-short  Short)
+(def platform-int    Integer)
+(def platform-long   Long)
+(def platform-float  Float)
+(def platform-double Double)
+
 (defmacro bnot [x]
   `(. BitOps (numberBitNot ~x)))
 
@@ -105,17 +112,17 @@
 (defmacro ->short [x]
   `(. Cast (castToShort ~x)))
 
-(defmacro ->long [x]
-  `(. Cast (castToLong ~x)))
-
 (defmacro ->int [x]
   `(. Cast (castToInt ~x)))
 
-(defmacro ->double [x]
-  `(. Cast (castToDouble ~x)))
+(defmacro ->long [x]
+  `(. Cast (castToLong ~x)))
 
 (defmacro ->float [x]
   `(. Cast (castToFloat ~x)))
+
+(defmacro ->double [x]
+  `(. Cast (castToDouble ~x)))
 
 (defmacro ->bigint [x]
   `(let [x# ~x]
