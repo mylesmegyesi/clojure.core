@@ -33,6 +33,12 @@
 (defn nil? [n]
   (identical? n nil))
 
+(defn true? [t]
+  (identical? t true))
+
+(defn false? [f]
+  (identical? f false))
+
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
   ([] true)

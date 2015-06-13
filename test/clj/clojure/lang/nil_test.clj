@@ -1,5 +1,5 @@
 (ns clojure.lang.nil-test
-  (:refer-clojure :only [true? false?])
+  (:refer-clojure :only [])
   (:require [clojure.test                 :refer :all]
             [clojure.next                 :refer :all]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]))

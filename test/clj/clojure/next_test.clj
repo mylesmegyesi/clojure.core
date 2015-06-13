@@ -1,5 +1,5 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map true? false? reify subs var-set])
+  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map reify subs var-set])
   (:require [clojure.test            :refer :all]
             [clojure.next            :refer :all]
             [clojure.lang.exceptions :refer [argument-error assertion-error]]

@@ -1,5 +1,5 @@
 (ns clojure.lang.enumerable-test
-  (:refer-clojure :only [defmacro false? list list* let true?])
+  (:refer-clojure :only [defmacro list list* let])
   (:require [clojure.test                     :refer :all]
             [clojure.next                     :refer :all]
             [clojure.lang.enumerable          :refer :all]
