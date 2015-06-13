@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [cond count declare defn defn- defprotocol deftype empty? even? format if-let let loop nil? > < ->])
+  (:refer-clojure :only [cond count declare defn defn- defprotocol deftype empty? even? format if-let let loop > < ->])
   (:require [clojure.lang.apersistent-map :refer [defmap]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.map-entry       :refer [new-map-entry]]

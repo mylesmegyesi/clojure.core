@@ -1,5 +1,5 @@
 (ns clojure.lang.array
-  (:refer-clojure :only [defmacro let loop nil? inc])
+  (:refer-clojure :only [defmacro let loop inc])
   (:require [clojure.lang.numbers :refer [unsafe-cast-int]]
             [clojure.next         :refer :all :exclude [inc]])
   (:import [java.lang.reflect Array]))

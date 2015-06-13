@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-queue-test
-  (:refer-clojure :only [let nil?])
+  (:refer-clojure :only [let])
   (:require [clojure.test                  :refer :all]
             [clojure.lang.persistent-queue :refer :all]
             [clojure.lang.protocols        :refer [-contains]]

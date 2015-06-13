@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [defmacro defn- let list list* map nil?])
+  (:refer-clojure :only [defmacro defn- let list list* map])
   (:require [clojure.test             :refer :all]
             [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
             [clojure.next             :refer :all]

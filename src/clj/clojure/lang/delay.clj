@@ -1,5 +1,5 @@
 (ns clojure.lang.delay
-  (:refer-clojure :only [deftype defn when nil? locking])
+  (:refer-clojure :only [deftype defn when locking])
   (:require [clojure.next           :refer :all]
             [clojure.lang.protocols :refer [IDeref -deref IPending -is-realized?]]))
 

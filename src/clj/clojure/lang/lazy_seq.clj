@@ -1,5 +1,5 @@
 (ns clojure.lang.lazy-seq
-  (:refer-clojure :only [declare defn defn- deftype let list locking loop nil?])
+  (:refer-clojure :only [declare defn defn- deftype let list locking loop])
   (:require [clojure.lang.object    :as    platform-object]
             [clojure.lang.protocols :refer [ICounted ILazySeq IMeta IObj ISeq ISeqable ISequential
                                             -sval -seq -first -next -more]]

@@ -1,5 +1,5 @@
 (ns clojure.lang.out-test
-  (:refer-clojure :only [binding let nil? reify re-matches subs])
+  (:refer-clojure :only [binding let reify re-matches subs])
   (:require [clojure.test                       :refer :all]
             [clojure.next                       :refer :all]
             [clojure.support.test-seq           :refer [test-seq]]

@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [declare defn defn- let loop < when if-let even? format nil?])
+  (:refer-clojure :only [declare defn defn- let loop < when if-let even? format])
   (:require [clojure.lang.apersistent-map :refer [defmap]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.map-entry       :refer [new-map-entry]]
