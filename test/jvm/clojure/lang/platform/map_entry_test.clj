@@ -1,7 +1,9 @@
 (ns clojure.lang.platform.map-entry-test
   (:refer-clojure :only [let])
   (:require [clojure.test           :refer :all]
-            [clojure.lang.map-entry :refer [new-map-entry]]))
+            [clojure.next           :refer :all]
+            [clojure.lang.map-entry :refer [new-map-entry]])
+  (:import  [java.util AbstractMap AbstractMap$SimpleEntry]))
 
 (deftest map-entry-platform-test
 
@@ -9,5 +11,10 @@
     (let [m1 (new-map-entry :k 1)
           m2 (new-map-entry :k 1)]
       (is (.equals m1 m2))))
+
+  (testing "Map.Entry can be accessed with key and val"
+    (let [m (AbstractMap$SimpleEntry. :k :v)]
+      (is (= :k (key m)))
+      (is (= :v (val m)))))
 
   )
