@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [apply defn defmacro doseq fn for list list* let nil? range repeat re-pattern take])
+  (:refer-clojure :only [apply defn defmacro doseq fn for list list* let range repeat re-pattern take])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [argument-error illegal-access-error
                                              illegal-state-error out-of-bounds-exception]]

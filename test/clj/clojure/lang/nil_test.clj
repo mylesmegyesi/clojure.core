@@ -1,8 +1,15 @@
 (ns clojure.lang.nil-test
-  (:refer-clojure :only [nil?])
+  (:refer-clojure :only [])
   (:require [clojure.test                 :refer :all]
             [clojure.next                 :refer :all]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]))
+
+(deftest nil?-test
+  (testing "returns true if nil"
+    (is (true? (nil? nil))))
+
+  (testing "returns false otherwise"
+    (is (false? (nil? :not-nil)))))
 
 (deftest nil-test
   (testing "count of nil is zero"

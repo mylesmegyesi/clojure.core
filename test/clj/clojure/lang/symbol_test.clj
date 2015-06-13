@@ -1,5 +1,5 @@
 (ns clojure.lang.symbol-test
-  (:refer-clojure :only [let get nil? defn subs])
+  (:refer-clojure :only [let get defn subs])
   (:require [clojure.test                 :refer :all]
             [clojure.lang.assertions      :refer :all]
             [clojure.next                 :refer :all :exclude [get]]))

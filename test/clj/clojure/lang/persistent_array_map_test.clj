@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-array-map-test
-  (:refer-clojure :only [deftype nil? let])
+  (:refer-clojure :only [deftype let])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.persistent-map-test :refer [map-test]]
             [clojure.lang.protocols           :refer [ISeqable ISequential]]

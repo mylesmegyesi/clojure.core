@@ -1,5 +1,5 @@
 (ns clojure.lang.cons-test
-  (:refer-clojure :only [let nil?])
+  (:refer-clojure :only [let])
   (:require [clojure.test             :refer :all]
             [clojure.next             :refer :all]
             [clojure.support.test-seq :refer [test-seq test-seqable]]))

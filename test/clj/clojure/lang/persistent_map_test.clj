@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-map-test
-  (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* nil? re-pattern select-keys loop when < cond >])
+  (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* re-pattern select-keys loop when < cond >])
   (:require [clojure.test                 :refer :all]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.comparison]

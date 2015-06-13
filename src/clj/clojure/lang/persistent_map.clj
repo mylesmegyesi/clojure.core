@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-map
-  (:refer-clojure :only [deftype defn defn- declare nil? if-let when-let when loop])
+  (:refer-clojure :only [deftype defn defn- declare if-let when-let when loop])
   (:require [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.protocols       :refer [ICounted ISeq -assoc -dissoc]]

@@ -1,5 +1,5 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [apply defmacro defn reify let list list* nil? remove resolve])
+  (:refer-clojure :only [apply defmacro defn reify let list list* remove resolve])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [class-cast-exception argument-error]]
             [clojure.lang.protocols  :refer [IEquivalence]]

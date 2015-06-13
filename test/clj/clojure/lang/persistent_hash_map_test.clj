@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-hash-map-test
-  (:refer-clojure :only [nil? let defn- loop])
+  (:refer-clojure :only [let defn- loop])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.persistent-map-test :refer [map-test]]
             [clojure.lang.persistent-list     :refer [EMPTY-LIST]]

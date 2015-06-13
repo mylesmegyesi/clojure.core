@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding class cond declare defmacro defmulti defmethod defn defn-
-                         even? extend-type fn if-let let neg? pos? nil? number? require satisfies?
+                         even? extend-type fn if-let let neg? pos? number? require satisfies?
                          doseq list list* load loop format pr-str into < butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
@@ -29,6 +29,15 @@
 
 (defn type [x]
   (platform-object/type x))
+
+(defn nil? [n]
+  (identical? n nil))
+
+(defn true? [t]
+  (identical? t true))
+
+(defn false? [f]
+  (identical? f false))
 
 (defmacro and
   "Returns true if all expressions are logically truthy, false otherwise."
