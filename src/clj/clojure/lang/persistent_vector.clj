@@ -3,12 +3,13 @@
   (:require [clojure.next            :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.exceptions :refer [new-argument-error new-out-of-bounds-exception
                                              new-illegal-access-error new-illegal-state-error]]
-            [clojure.lang.numbers    :refer [->int]]
+            [clojure.lang.numbers    :refer [->int platform-long platform-big-int platform-big-integer]]
             [clojure.lang.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.protocols  :refer [-as-transient -assoc-n -conj! -persistent
-                                             IAssociative ICounted IEditableCollection IMeta IObj
+            [clojure.lang.protocols  :refer [-as-transient -assoc-n -assoc-n!
+                                             -conj! -persistent -lookup -nth
+                                             IAssociative ICounted IEditableCollection IMeta IObj ILookup
                                              IPersistentCollection IPersistentVector IPersistentStack
-                                             ITransientCollection ITransientVector
+                                             ITransientAssociative ITransientCollection ITransientVector
                                              ISeq ISeqable ISequential IIndexed]]
             [clojure.lang.thread     :refer [thread-reference]]))
 
@@ -107,6 +108,20 @@
         (aset (get-array new-node) subidx (do-assoc (- level 5) (aget (get-array node) subidx) n x))
         new-node))))
 
+(defn- array-for [i length tail root shift]
+  (if (and (>= i 0) (< i length))
+    (if (>= i (tailoff length))
+      tail
+      (loop [node root
+             level shift]
+        (let [l (- level 5)]
+          (if (> 0 l)
+            (recur
+              (aget (get-array node) (bit-and (unsigned-bit-shift-right (->bitnum i) (->bitnum l)) (->bitnum 0x01f)))
+              l)
+            (get-array node)))))
+    (throw (new-out-of-bounds-exception))))
+
 (defn- ensure-editable
   ([root]
     (if (nil? (get-edit root))
@@ -129,6 +144,12 @@
           (get-array node))))
     (throw (new-out-of-bounds-exception))))
 
+(defn- is-integer? [i]
+  (or (integer? i)
+      (instance? platform-long i)
+      (instance? platform-big-int i)
+      (instance? platform-big-integer i)))
+
 (declare make-vector)
 (declare make-transient-vec)
 
@@ -141,6 +162,31 @@
   (-count [this]
     (ensure-editable -root)
     -length)
+
+  ILookup
+  (-lookup [this k not-found]
+    (ensure-editable -root)
+    (if (is-integer? k)
+      (let [i (int k)]
+        (if (and (>= i 0) (< i -length))
+          (-nth this i)
+          not-found)
+      not-found)))
+
+  IIndexed
+  (-nth [this n not-found]
+    (if (and (>= n 0) (< n -length))
+      (do
+        (ensure-editable -root)
+        (let [node (array-for n -length -tail -root -shift)]
+          (aget node (bit-and (->bitnum n) (->bitnum 0x01f)))))
+      not-found))
+
+  ITransientAssociative
+  (-assoc! [this k v]
+    (if (is-integer? k)
+      (-assoc-n! this (int k) v)
+      (throw (new-argument-error "Key must be integer"))))
 
   ITransientCollection
   (-conj! [this x]
@@ -176,7 +222,7 @@
       (make-vector -meta -length -shift -root trimmed-tail)))
 
   ITransientVector
-  (-assoc! [this index value]
+  (-assoc-n! [this index value]
     (ensure-editable -root)
     (if (and (>= index 0) (< index -length))
       (if (>= index (tailoff -length))
@@ -224,20 +270,6 @@
 
 (defn n-in-range? [n length]
   (and (>= (->bitnum n) 0) (< (->bitnum n) (->bitnum length))))
-
-(defn- array-for [i length tail root shift]
-  (if (and (>= i 0) (< i length))
-    (if (>= i (tailoff length))
-      tail
-      (loop [node root
-             level shift]
-        (let [l (- level 5)]
-          (if (> 0 l)
-            (recur
-              (aget (get-array node) (bit-and (unsigned-bit-shift-right (->bitnum i) (->bitnum l)) (->bitnum 0x01f)))
-              l)
-            (get-array node)))))
-    (throw (new-out-of-bounds-exception))))
 
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))

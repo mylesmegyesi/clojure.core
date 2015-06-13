@@ -216,6 +216,12 @@
         #"Transient used after persistent! call"
         (assoc! t 0 :foo))))
 
+  (testing "assoc! throws an exception if the key is not an integer"
+    (let [t (transient (vector))]
+      (argument-error-is-thrown?
+        #"Key must be integer"
+        (assoc! t :foo :bar))))
+
   (testing "pop! throws an exception if there are no elements"
     (let [t (transient (vector))]
       (illegal-state-error-is-thrown?
