@@ -6,17 +6,13 @@
             [clojure.lang.protocols   :refer [IMapEntry -key -val]]
             [clojure.next             :refer :all]))
 
-(defmacro map-entry-equals?
-  {:private true}
-  [k v other]
+(defmacro map-entry-equals? ^:private [k v other]
   `(let [other# ~other]
      (and (satisfies? IMapEntry other#)
           (= ~k (key other#))
           (= ~v (val other#)))))
 
-(defmacro map-entry-equals?-init
-  {:private true}
-  [this-arg other-arg]
+(defmacro map-entry-equals?-init ^:private [this-arg other-arg]
   (list 'map-entry-equals? 'k 'v other-arg))
 
 (defmacro defmapentry [type]

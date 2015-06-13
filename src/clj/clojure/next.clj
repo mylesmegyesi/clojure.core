@@ -582,6 +582,33 @@
   ([size init-val-or-seq]
     (number-array size init-val-or-seq platform-numbers/platform-double)))
 
+(defn vector? [v]
+  (satisfies? IPersistentVector v))
+
+(defn map? [m]
+  (satisfies? IPersistentMap m))
+
+(defn set? [s]
+  (satisfies? IPersistentSet s))
+
+(defn coll? [c]
+  (satisfies? IPersistentCollection c))
+
+(defn list? [l]
+  (satisfies? IPersistentList l))
+
+(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR]])
+
+(defn vector [& args]
+  (let [arg-seq (seq args)
+        empty-transient (-as-transient EMPTY-VECTOR)]
+    (if arg-seq
+      (loop [xs arg-seq v empty-transient]
+        (if xs
+          (recur (next xs) (-conj! v (first xs)))
+          (-persistent v)))
+      (-persistent empty-transient))))
+
 (require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
 
 (defn array-map [& args]
@@ -661,18 +688,6 @@
   (make-sorted-set
     (apply clojure.core/sorted-map-by (clojure.core/cons compare-fn (make-pairs ks)))))
 
-(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR]])
-
-(defn vector [& args]
-  (let [arg-seq (seq args)
-        empty-transient (-as-transient EMPTY-VECTOR)]
-    (if arg-seq
-      (loop [xs arg-seq v empty-transient]
-        (if xs
-          (recur (next xs) (-conj! v (first xs)))
-          (-persistent v)))
-      (-persistent empty-transient))))
-
 (defn transient [coll]
   (-as-transient coll))
 
@@ -687,21 +702,6 @@
 
 (defn pop! [coll]
   (-pop! coll))
-
-(defn vector? [v]
-  (satisfies? IPersistentVector v))
-
-(defn map? [m]
-  (satisfies? IPersistentMap m))
-
-(defn set? [s]
-  (satisfies? IPersistentSet s))
-
-(defn coll? [c]
-  (satisfies? IPersistentCollection c))
-
-(defn list? [l]
-  (satisfies? IPersistentList l))
 
 (defn contains? [coll k]
   (cond

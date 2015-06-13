@@ -24,21 +24,6 @@
       (map #(is (= :val (apply constant-fn %)))
         [[] [1] [1 2] [1 2 3]]))))
 
-(deftype TestVector []
-  IPersistentVector)
-
-(deftest vector?-test
-  (testing "returns true if it is a vector"
-    (is (vector? (vector))))
-
-  (testing "returns true if the object implements IPersistentVector"
-    (is (vector? (TestVector.))))
-
-  (testing "returns false otherwise"
-    (is (not (vector? #{})))
-    (is (not (vector? '())))
-    (is (not (vector? nil)))))
-
 (deftest when-not-test
   (testing "returns nil if the test returns true"
     (is (nil? (when-not (= 1 1) :bar))))
