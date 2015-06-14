@@ -1,12 +1,10 @@
 (ns clojure.lang.agent-test
-  (:refer-clojure :only [class defmacro fn let list list*])
-  (:require [clojure.test            :refer :all]
-            [clojure.next            :refer :all]
-            [clojure.lang.thread     :refer [sleep]]
-            [clojure.lang.exceptions :refer [argument-error new-runtime-exception runtime-exception]]))
-
-(defmacro runtime-exception-is-thrown? [msg & body]
-  (list 'is (list* 'thrown-with-msg? runtime-exception msg body)))
+  (:refer-clojure :only [class defmacro fn let])
+  (:require [clojure.test                         :refer :all]
+            [clojure.next                         :refer :all]
+            [clojure.lang.thread                  :refer [sleep]]
+            [clojure.lang.exceptions              :refer [new-runtime-exception]]
+            [clojure.support.exception-assertions :refer [runtime-exception-is-thrown?]]))
 
 (deftest agent-test
   (testing "creates an agent which can be deferenced"
