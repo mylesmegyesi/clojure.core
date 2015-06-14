@@ -1,14 +1,11 @@
 (ns clojure.lang.persistent-map-test
-  (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let list list* re-pattern select-keys loop when < cond >])
-  (:require [clojure.test                 :refer :all]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
+  (:refer-clojure :only [defmacro defprotocol deftype defn extend-type fn let re-pattern select-keys loop when < cond >])
+  (:require [clojure.test                         :refer :all]
+            [clojure.lang.persistent-list         :refer [EMPTY-LIST]]
             [clojure.lang.comparison]
-            [clojure.lang.exceptions      :refer [argument-error]]
-            [clojure.lang.protocols       :refer [IComparable IEquivalence IHash]]
-            [clojure.next                 :refer :all]))
-
-(defmacro argument-error-is-thrown? [msg & body]
-  (list 'is (list* 'thrown-with-msg? argument-error msg body)))
+            [clojure.lang.protocols               :refer [IComparable IEquivalence IHash]]
+            [clojure.support.exception-assertions :refer [argument-error-is-thrown?]]
+            [clojure.next                         :refer :all]))
 
 (defprotocol Boxed
   (get-value [this]))

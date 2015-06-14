@@ -1,22 +1,9 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [apply defn defmacro doseq fn for list list* let range reify re-pattern])
-  (:require [clojure.test            :refer :all]
-            [clojure.lang.exceptions :refer [argument-error illegal-access-error
-                                             illegal-state-error out-of-bounds-exception]]
-            [clojure.lang.protocols  :refer [IPersistentVector]]
-            [clojure.next            :refer :all]))
-
-(defmacro argument-error-is-thrown? [msg & body]
-  (list 'is (list* 'thrown-with-msg? argument-error msg body)))
-
-(defmacro illegal-access-error-is-thrown? [msg & body]
-  (list 'is (list* 'thrown-with-msg? illegal-access-error msg body)))
-
-(defmacro illegal-state-error-is-thrown? [msg & body]
-  (list 'is (list* 'thrown-with-msg? illegal-state-error msg body)))
-
-(defmacro out-of-bounds-exception-is-thrown? [& body]
-  (list 'is (list* 'thrown? out-of-bounds-exception body)))
+  (:refer-clojure :only [apply defn defmacro doseq fn for let range reify re-pattern])
+  (:require [clojure.test                         :refer :all]
+            [clojure.lang.protocols               :refer [IPersistentVector]]
+            [clojure.support.exception-assertions :refer :all]
+            [clojure.next                         :refer :all]))
 
 (deftest vector-test
   (testing "returns the count"

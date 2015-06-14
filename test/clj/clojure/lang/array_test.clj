@@ -1,12 +1,9 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [defmacro defn- let list list* map])
-  (:require [clojure.test             :refer :all]
-            [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
-            [clojure.next             :refer :all]
-            [clojure.support.test-seq :refer [test-seq]]))
-
-(defmacro out-of-bounds-exeption-is-thrown? [& body]
-  (list 'is (list* 'thrown? out-of-bounds-exception body)))
+  (:refer-clojure :only [defmacro defn- let map])
+  (:require [clojure.test                         :refer :all]
+            [clojure.next                         :refer :all]
+            [clojure.support.exception-assertions :refer [out-of-bounds-exception-is-thrown?]]
+            [clojure.support.test-seq             :refer [test-seq]]))
 
 (deftest aget-and-set-test
   (testing "setting mutates the given array"
@@ -16,26 +13,32 @@
 
   (testing "throws an exception if setting at index greater than or equal to max size"
     (let [arr (make-array 1)]
-      (out-of-bounds-exeption-is-thrown?
+      (out-of-bounds-exception-is-thrown?
+        #".*"
         (aset arr 1 :val))
-      (out-of-bounds-exeption-is-thrown?
+      (out-of-bounds-exception-is-thrown?
+        #".*"
         (aset arr 2 :val))))
 
   (testing "throws an exception if setting at index less than zero"
     (let [arr (make-array 1)]
-      (out-of-bounds-exeption-is-thrown?
+      (out-of-bounds-exception-is-thrown?
+        #".*"
         (aset arr -1 :val))))
 
   (testing "throws an exception if getting at index greater than or equal to max size"
     (let [arr (make-array 1)]
-      (out-of-bounds-exeption-is-thrown?
+      (out-of-bounds-exception-is-thrown?
+        #".*"
         (aget arr 1))
-      (out-of-bounds-exeption-is-thrown?
+      (out-of-bounds-exception-is-thrown?
+        #".*"
         (aget arr 2))))
 
   (testing "throws an exception if setting at index less than zero"
     (let [arr (make-array 1)]
-      (out-of-bounds-exeption-is-thrown?
+      (out-of-bounds-exception-is-thrown?
+        #".*"
         (aget arr -1))))
 
   )

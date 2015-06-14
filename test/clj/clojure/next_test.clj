@@ -1,15 +1,10 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let list list* map reify subs var-set])
-  (:require [clojure.test            :refer :all]
-            [clojure.next            :refer :all]
-            [clojure.lang.exceptions :refer [argument-error assertion-error]]
-            [clojure.lang.protocols  :refer :all]))
-
-(defmacro argument-error-is-thrown? [msg & body]
-  (list 'is (list* 'thrown-with-msg? argument-error msg body)))
-
-(defmacro assertion-error-is-thrown? [msg & body]
-  (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
+  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let map reify subs var-set])
+  (:require [clojure.test                         :refer :all]
+            [clojure.next                         :refer :all]
+            [clojure.lang.protocols               :refer :all]
+            [clojure.support.exception-assertions :refer [argument-error-is-thrown?
+                                                          assertion-error-is-thrown?]]))
 
 (deftest clojure-version-test
   (testing "current clojure version as a string"
