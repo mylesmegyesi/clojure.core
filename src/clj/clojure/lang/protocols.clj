@@ -130,12 +130,15 @@
 (defprotocol IShow
   (-show [this]))
 
+(defprotocol ITransientAssociative
+  (-assoc! [this k v]))
+
 (defprotocol ITransientCollection
   (-conj! [this value])
   (-persistent [this]))
 
 (defprotocol ITransientVector
-  (-assoc! [this index value])
+  (-assoc-n! [this index value])
   (-pop! [this]))
 
 (defprotocol IValidatable

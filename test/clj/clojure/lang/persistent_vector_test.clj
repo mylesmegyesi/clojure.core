@@ -1,9 +1,10 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [apply defn defmacro doseq fn for list list* let range repeat re-pattern take])
+  (:refer-clojure :only [apply defn defmacro doseq fn for list list* let range reify re-pattern])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [argument-error illegal-access-error
                                              illegal-state-error out-of-bounds-exception]]
-            [clojure.next            :refer :all :exclude [repeat take]]))
+            [clojure.lang.protocols  :refer [IPersistentVector]]
+            [clojure.next            :refer :all]))
 
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))
@@ -94,11 +95,20 @@
       (is (= {:so :meta} (meta empty-v)))))
 
   (testing "popping many elements off of a vector"
-    (let [fifty-foos (take 50 (repeat :foo))
+    (let [fifty-foos (clojure.core/repeat 50 :foo)
           v (apply vector fifty-foos)]
       (let [result (reduce (fn [acc _] (pop acc)) v fifty-foos)]
-        (is (empty? result)))))
-)
+        (is (empty? result))))))
+
+(deftest vector?-test
+  (testing "returns true for a vector"
+    (is (vector? (vector))))
+
+  (testing "returns true for any implementer of IPersistentVector"
+    (is (vector? (reify IPersistentVector))))
+
+  (testing "returns false otherwise"
+    (is (not (vector? :foo)))))
 
 (deftest vector-seq-test
   (testing "seq returns nil when empty"
@@ -215,6 +225,12 @@
       (illegal-access-error-is-thrown?
         #"Transient used after persistent! call"
         (assoc! t 0 :foo))))
+
+  (testing "assoc! throws an exception if the key is not an integer"
+    (let [t (transient (vector))]
+      (argument-error-is-thrown?
+        #"Key must be integer"
+        (assoc! t :foo :bar))))
 
   (testing "pop! throws an exception if there are no elements"
     (let [t (transient (vector))]

@@ -1,16 +1,97 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [declare defn defn- let loop < when if-let even? format])
+  (:refer-clojure :only [cond declare defn defn- deftype let loop max when if-let even? format >= <])
   (:require [clojure.lang.apersistent-map :refer [defmap]]
+            [clojure.lang.array           :refer [array-copy]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.map-entry       :refer [new-map-entry]]
-            [clojure.lang.exceptions      :refer [new-argument-error]]
+            [clojure.lang.exceptions      :refer [new-argument-error new-illegal-access-error]]
+            [clojure.lang.key-value       :refer [platform-map-entry-type]]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [ICounted ILookup IMeta IObj IAssociative IPersistentMap ISeq ISeqable]]
+            [clojure.lang.protocols       :refer [ICounted ILookup IAssociative IPersistentMap
+                                                  IMeta IObj ISeq ISeqable
+                                                  IEditableCollection ITransientCollection
+                                                  ITransientAssociative
+                                                  -assoc!]]
+            [clojure.lang.thread          :refer [thread-reference]]
             [clojure.next                 :refer :all]))
 
-(declare new-array-map)
+(def ^:private hashtable-threshold 16)
 
-(declare new-array-map-seq)
+(declare new-array-map
+         new-array-map-seq
+         make-transient-array-map)
+
+(defn- ensure-editable [owner]
+  (if (nil? owner)
+    (throw (new-illegal-access-error "Transient used after persistent! call"))))
+
+(defn- index-of [arr size value]
+  (loop [i 0]
+    (when (< i size)
+      (if (= value (aget arr i))
+        i
+        (recur (+ i 2))))))
+
+(deftype TransientArrayMap [^:volatile-mutable -length
+                            ^:volatile-mutable -owner
+                            -arr
+                            -meta]
+  ICounted
+  (-count [this]
+    (ensure-editable -owner)
+    (/ -length 2))
+
+  ITransientAssociative
+  (-assoc! [this k v]
+    (ensure-editable -owner)
+    (let [idx (index-of -arr (alength -arr) k)]
+      (if idx
+        (do
+          (when (not= (aget -arr (inc idx)) v)
+            (aset -arr (inc idx) v))
+          this)
+        (do
+          (when (>= -length (alength -arr))
+            ;TODO: Become HashMap Transient
+            )
+          (aset -arr -length k)
+          (aset -arr (inc -length) v)
+          (set! -length (+ -length 2))
+          this))))
+
+  ITransientCollection
+  (-conj! [this o]
+    (ensure-editable -owner)
+    (cond
+      (instance? platform-map-entry-type o)
+        (-assoc! this (key o) (val o))
+      (vector? o)
+        (if (= (count o) 2)
+          (-assoc! this (nth o 0) (nth o 1))
+          (throw (new-argument-error "Vector arg to map conj must be a pair")))
+      :else
+        (loop [s (seq o)]
+          (if s
+            (let [entry (first s)]
+              (-assoc! this (key entry) (val entry))
+              (recur (next s)))
+            this))))
+
+  (-persistent [this]
+    (ensure-editable -owner)
+    (set! -owner nil)
+    (let [arr (object-array -length)]
+      (array-copy -arr 0 arr 0 -length)
+      (new-array-map arr (alength arr) (/ -length 2) -meta)))
+
+  )
+
+(defn make-transient-array-map [arr mta]
+  (let [length (alength arr)
+        owner (thread-reference)
+        t-arr (object-array (max hashtable-threshold length))]
+    (array-copy arr 0 t-arr 0 length)
+    (TransientArrayMap. length owner t-arr mta)))
 
 (defseq PersistentArrayMapSeq [arr count position]
   ICounted
@@ -30,13 +111,6 @@
 (defn- new-array-map-seq [arr count position]
   (when (not= 0 count)
     (PersistentArrayMapSeq. arr count position)))
-
-(defn- index-of [arr size value]
-  (loop [i 0]
-    (when (< i size)
-      (if (= value (aget arr i))
-        i
-        (recur (+ i 2))))))
 
 (defmap PersistentArrayMap [-arr -size -count -meta]
   IAssociative
@@ -61,6 +135,10 @@
 
   ICounted
   (-count [this] -count)
+
+  IEditableCollection
+  (-as-transient [this]
+    (make-transient-array-map -arr -meta))
 
   ILookup
   (-lookup [this k not-found]

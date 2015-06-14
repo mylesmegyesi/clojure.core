@@ -1,10 +1,17 @@
 (ns clojure.lang.persistent-array-map-test
-  (:refer-clojure :only [deftype let])
+  (:refer-clojure :only [defmacro deftype let list list*])
   (:require [clojure.test                     :refer :all]
+            [clojure.lang.exceptions          :refer [argument-error illegal-access-error]]
             [clojure.lang.persistent-map-test :refer [map-test]]
             [clojure.lang.protocols           :refer [ISeqable ISequential]]
             [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
             [clojure.next                     :refer :all]))
+
+(defmacro argument-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? argument-error msg body)))
+
+(defmacro illegal-access-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? illegal-access-error msg body)))
 
 (deftype FixedSequential [seq]
   ISequential
@@ -101,6 +108,81 @@
   (testing "seqs are equal to sequential things"
     (let [s1 (seq (array-map :k1 1 :k2 2))
           s2 (seq (array-map :k1 1 :k2 2))]
-      (is (= s1 (FixedSequential. s2)))))
+      (is (= s1 (FixedSequential. s2))))))
+
+(deftest transient-array-map
+  (testing "meta is preserved"
+    (let [m (with-meta (array-map) {:so :meta})
+          t (persistent! (transient m))]
+      (is (= {:so :meta} (meta t)))))
+
+  (testing "persistent! can only be invoked once"
+    (let [t (transient (array-map))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (persistent! t))))
+
+  (testing "counting a transient array map"
+    (let [zero-size (transient (array-map))
+          two-size (transient (array-map :a 1 :b 2))]
+      (is (= 0 (count zero-size)))
+      (is (= 2 (count two-size)))))
+
+  (testing "count raises an error if the transient has been made persistent"
+    (let [t (transient (array-map))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (count t))))
+
+  (testing "assoc! to a transient"
+    (let [t (transient (array-map :a 1))]
+      (assoc! t :b 2)
+      (assoc! t :c 3)
+      (let [p (persistent! t)]
+        (is (= 3 (count p)))
+        (is (= :a (key (first p))))
+        (is (= :b (key (first (rest p)))))
+        (is (= :c (key (first (rest (rest p)))))))))
+
+  (testing "assoc! to an existing key val pair"
+    (let [t (transient (array-map :a 1))]
+      (assoc! t :a 2)
+      (let [p (persistent! t)]
+        (is (= 1 (count p)))
+        (is (= 2 (val (first p)))))))
+
+  (testing "assoc! raises an error if the transient has been made persistent"
+    (let [t (transient (array-map))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (assoc! t :a 1))))
+
+  (testing "conj! a vector tuple"
+    (let [tuple (vector :k :v)
+          t (transient (array-map))]
+      (conj! t tuple)
+      (let [p (persistent! t)]
+        (is (= 1 (count p)))
+        (is (= :k (key (first p))))
+        (is (= :v (val (first p)))))))
+
+  (testing "conj! a vector tuple to an existing key"
+    (let [tuple (vector :k :v)
+          t (transient (array-map :k :not-v))]
+      (conj! t tuple)
+      (let [p (persistent! t)]
+        (is (= 1 (count p)))
+        (is (= :k (key (first p))))
+        (is (= :v (val (first p)))))))
+
+  (testing "an argument error is raised when conj! is invoked with a vector tuple not of size 2"
+    (let [t (transient (array-map))]
+      (argument-error-is-thrown?
+        #"Vector arg to map conj must be a pair"
+        (conj! t (vector :k)))))
 
   )
+
