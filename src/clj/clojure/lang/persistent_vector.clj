@@ -174,12 +174,14 @@
       not-found)))
 
   IIndexed
+  (-nth [this n]
+    (ensure-editable -root)
+    (let [node (array-for n -length -tail -root -shift)]
+      (aget node (bit-and (->bitnum n) (->bitnum 0x01f)))))
+
   (-nth [this n not-found]
     (if (and (>= n 0) (< n -length))
-      (do
-        (ensure-editable -root)
-        (let [node (array-for n -length -tail -root -shift)]
-          (aget node (bit-and (->bitnum n) (->bitnum 0x01f)))))
+      (-nth this n)
       not-found))
 
   ITransientAssociative

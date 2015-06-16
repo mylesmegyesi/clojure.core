@@ -150,6 +150,33 @@
         #"Transient used after persistent! call"
         (count t))))
 
+  (testing "nth of a transient vector"
+    (let [t (transient (vector 0 1 2))]
+      (is (= 1 (nth t 1)))))
+
+  (testing "nth throws an out of bounds exception without a not-found value"
+    (let [t (transient (vector 0 1 2))]
+      (out-of-bounds-exception-is-thrown?
+        #".*"
+        (nth t 99))))
+
+  (testing "nth returns the default value when provided and n is out of bounds"
+    (let [t (transient (vector 0 1 2))]
+      (is (= :foo (nth t 99 :foo)))))
+
+  (testing "nth throws an exception after the transient has become persistent without a default"
+    (let [t (transient (vector))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (nth t 0))))
+
+  ; I'm pretty sure this is a bug in clojure
+  (testing "nth returns the default value after being made persistent"
+    (let [t (transient (vector))]
+      (persistent! t)
+      (is (= :foo (nth t 0 :foo)))))
+
   (testing "conj! onto a transient"
     (let [t (transient (vector))]
       (conj! t :first)
