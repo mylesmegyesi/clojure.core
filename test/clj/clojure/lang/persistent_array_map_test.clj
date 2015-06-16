@@ -184,5 +184,50 @@
         #"Vector arg to map conj must be a pair"
         (conj! t (vector :k)))))
 
-  )
+  (testing "conj! raises an error if the transient has been made persistent"
+    (let [t (transient (array-map))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (conj! t (vector :k :v)))))
+
+  (testing "dissoc! a key that is not in the map"
+    (let [t (transient (array-map :k :v))]
+      (dissoc! t :foo)
+      (let [p (persistent! t)]
+        (is (= 1 (count p)))
+        (is (= :k (key (first p))))
+        (is (= :v (val (first p)))))))
+
+  (testing "dissoc! a key that is in the map"
+    (let [t (transient (array-map :k :v))]
+      (dissoc! t :k)
+      (let [p (persistent! t)]
+        (is (empty? p)))))
+
+  (testing "dissoc! raises an error if the transient has been made persistent"
+    (let [t (transient (array-map))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (dissoc! t :k))))
+
+  (testing "get a value for a given key"
+    (let [t (transient (array-map :k :v))]
+      (is (= :v (get t :k)))))
+
+  (testing "get returns nil when the key is not found and a not found is not specified"
+    (let [t (transient (array-map :k :v))]
+      (is (nil? (get t :foo)))))
+
+  (testing "get returns the not found value when not found"
+    (let [t (transient (array-map :k :v))]
+      (is (= :sentinel (get t :foo :sentinel)))))
+
+  (testing "get raises an error if the transient has been made persistent"
+    (let [t (transient (array-map))]
+      (persistent! t)
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (get t :k)))))
 

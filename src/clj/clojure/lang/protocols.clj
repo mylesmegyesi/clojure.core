@@ -137,6 +137,9 @@
   (-conj! [this value])
   (-persistent [this]))
 
+(defprotocol ITransientMap
+  (-dissoc! [this value]))
+
 (defprotocol ITransientVector
   (-assoc-n! [this index value])
   (-pop! [this]))
