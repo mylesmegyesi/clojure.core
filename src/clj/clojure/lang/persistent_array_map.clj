@@ -10,7 +10,7 @@
             [clojure.lang.protocols       :refer [ICounted ILookup IAssociative IPersistentMap
                                                   IMeta IObj ISeq ISeqable
                                                   IEditableCollection ITransientCollection
-                                                  ITransientAssociative
+                                                  ITransientAssociative ITransientMap
                                                   -assoc!]]
             [clojure.lang.thread          :refer [thread-reference]]
             [clojure.next                 :refer :all]))
@@ -40,6 +40,14 @@
   (-count [this]
     (ensure-editable -owner)
     (/ -length 2))
+
+  ILookup
+  (-lookup [this k not-found]
+    (ensure-editable -owner)
+    (let [idx (index-of -arr (alength -arr) k)]
+      (if idx
+        (aget -arr (inc idx))
+        not-found)))
 
   ITransientAssociative
   (-assoc! [this k v]
@@ -83,6 +91,17 @@
     (let [arr (object-array -length)]
       (array-copy -arr 0 arr 0 -length)
       (new-array-map arr (alength arr) (/ -length 2) -meta)))
+
+  ITransientMap
+  (-dissoc! [this value]
+    (ensure-editable -owner)
+    (let [idx (index-of -arr (alength -arr) value)]
+      (when idx
+        (when (>= -length 2)
+          (aset -arr idx (aget -arr (- -length 2)))
+          (aset -arr (inc idx) (aget -arr (dec -length))))
+        (set! -length (- -length 2)))
+      this))
 
   )
 

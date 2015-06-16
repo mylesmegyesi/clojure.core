@@ -700,6 +700,9 @@
 (defn assoc! [coll index x]
   (-assoc! coll index x))
 
+(defn dissoc! [coll index]
+  (-dissoc! coll index))
+
 (defn pop! [coll]
   (-pop! coll))
 
