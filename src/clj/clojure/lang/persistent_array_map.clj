@@ -34,8 +34,7 @@
 
 (deftype TransientArrayMap [^:volatile-mutable -length
                             ^:volatile-mutable -owner
-                            -arr
-                            -meta]
+                            -arr]
   ICounted
   (-count [this]
     (ensure-editable -owner)
@@ -90,7 +89,7 @@
     (set! -owner nil)
     (let [arr (object-array -length)]
       (array-copy -arr 0 arr 0 -length)
-      (new-array-map arr (alength arr) (/ -length 2) -meta)))
+      (new-array-map arr (alength arr) (/ -length 2) nil)))
 
   ITransientMap
   (-dissoc! [this value]
@@ -105,12 +104,12 @@
 
   )
 
-(defn make-transient-array-map [arr mta]
+(defn make-transient-array-map [arr]
   (let [length (alength arr)
         owner (thread-reference)
         t-arr (object-array (max hashtable-threshold length))]
     (array-copy arr 0 t-arr 0 length)
-    (TransientArrayMap. length owner t-arr mta)))
+    (TransientArrayMap. length owner t-arr)))
 
 (defseq PersistentArrayMapSeq [arr count position]
   ICounted
@@ -157,7 +156,7 @@
 
   IEditableCollection
   (-as-transient [this]
-    (make-transient-array-map -arr -meta))
+    (make-transient-array-map -arr))
 
   ILookup
   (-lookup [this k not-found]
