@@ -2,15 +2,19 @@
   (:refer-clojure :only [defn defn- declare defprotocol deftype -> let if-let when even? loop format cond >= <])
   (:require [clojure.lang.apersistent-map :refer [defmap]]
             [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.atomic-ref      :refer [new-atomic-ref]]
+            [clojure.lang.key-value       :refer [platform-map-entry-type]]
+            [clojure.lang.atomic-ref      :refer [new-atomic-ref ref-get ref-set!]]
             [clojure.lang.map-entry       :refer [new-map-entry]]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.exceptions      :refer [new-argument-error]]
+            [clojure.lang.exceptions      :refer [new-argument-error new-illegal-access-error]]
             [clojure.lang.hash-map        :refer [->bitnum empty-object
                                                   bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
                                                   + inc * - dec]]
+            [clojure.lang.thread          :refer [thread-reference]]
             [clojure.lang.protocols       :refer [IAssociative ICounted ILookup
-                                                  IMeta IObj IPersistentMap ISeqable ISeq]]
+                                                  IMeta IObj IPersistentMap ISeqable ISeq
+                                                  IEditableCollection ITransientAssociative ITransientCollection ITransientMap
+                                                  -assoc!]]
             [clojure.next                 :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right + inc * - dec]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
@@ -428,6 +432,108 @@
 
 (def ^:private NOT-FOUND (empty-object))
 
+(defn- ensure-editable [edit]
+  (when (nil? (ref-get edit))
+    (throw (new-illegal-access-error "Transient used after persistent! call"))))
+
+(deftype TransientHashMap [-edit
+                           ^:volatile-mutable -root
+                           ^:volatile-mutable -count
+                           ^:volatile-mutable -has-nil?
+                           ^:volatile-mutable -nil-value
+                           -leaf-flag]
+
+  ICounted
+  (-count [this]
+    (ensure-editable -edit)
+    -count)
+
+  ILookup
+  (-lookup [this k not-found]
+    (ensure-editable -edit)
+    (cond
+      (nil? k)
+        (if -has-nil?
+          -nil-value
+          not-found)
+      (nil? -root)
+        not-found
+      :else
+        (node-find -root ZERO (->bitnum (hash k)) k not-found)))
+
+  ITransientAssociative
+  (-assoc! [this k v]
+    (ensure-editable -edit)
+    (if (nil? k)
+      (do
+        (when (not= -nil-value v)
+          (set! -nil-value v))
+        (when (not -has-nil?)
+          (set! -count (inc -count))
+          (set! -has-nil? true)))
+      (do
+        (set-value! -leaf-flag nil)
+        (let [node (if (nil? -root)
+                     EMPTY-BitmapIndexedNode
+                     -root)
+              node (node-assoc-ref node -edit ZERO (hash k) k v -leaf-flag)]
+          (when (not= node -root)
+            (set! -root node))
+          (when (not (nil? (get-value -leaf-flag)))
+            (set! -count (inc -count))))))
+    this)
+
+  ITransientCollection
+  (-conj! [this o]
+    (ensure-editable -edit)
+    (cond
+      (instance? platform-map-entry-type o)
+        (-assoc! this (key o) (val o))
+      (vector? o)
+        (if (= (count o) 2)
+          (-assoc! this (nth o 0) (nth o 1))
+          (throw (new-argument-error "Vector arg to map conj must be a pair")))
+      :else
+        (loop [s (seq o)]
+          (if s
+            (let [entry (first s)]
+              (-assoc! this (key entry) (val entry))
+              (recur (next s)))
+            this))))
+
+  (-persistent [this]
+    (ensure-editable -edit)
+    (ref-set! -edit nil)
+    (new-hash-map nil -count -root -has-nil? -nil-value))
+
+  ITransientMap
+  (-dissoc! [this k]
+    (ensure-editable -edit)
+    (cond
+      (nil? k)
+        (do
+          (when -has-nil?
+            (set! -has-nil? false)
+            (set! -nil-value nil)
+            (set! -count (dec -count)))
+          this)
+      (nil? -root)
+        this
+      :else
+        (do
+          (set-value! -leaf-flag nil)
+          (let [node (node-dissoc -root ZERO (hash k) k)]
+            (when (not= node -root)
+              (set! -root node))
+            (when (not (nil? (get-value -leaf-flag)))
+              (set! -count (dec -count))))
+          this)))
+
+  )
+
+(defn make-transient-hash-map [root count has-nil? nil-value]
+  (TransientHashMap. (new-atomic-ref (thread-reference)) root count has-nil? nil-value (BoxedValue. nil)))
+
 (defmap PersistentHashMap [-meta -count -root -has-nil? -nil-value]
   IAssociative
   (-assoc [this key val]
@@ -465,6 +571,10 @@
       (node-find -root ZERO (->bitnum (hash key)) key not-found)
       :else
       not-found))
+
+  IEditableCollection
+  (-as-transient [this]
+    (make-transient-hash-map -root -count -has-nil? -nil-value))
 
   IMeta
   (-meta [this] -meta)
