@@ -33,9 +33,9 @@
       (assoc! t :c 3)
       (let [p (persistent! t)]
         (is (= 3 (count p)))
-        (is (= :a (key (first p))))
-        (is (= :b (key (first (rest p)))))
-        (is (= :c (key (first (rest (rest p)))))))))
+        (is (= 1 (get p :a)))
+        (is (= 2 (get p :b)))
+        (is (= 3 (get p :c))))))
 
   (testing "assoc! to an existing key val pair"
     (let [t (transient (constructor :a 1))]

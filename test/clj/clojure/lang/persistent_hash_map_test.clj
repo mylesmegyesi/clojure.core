@@ -1,10 +1,10 @@
 (ns clojure.lang.persistent-hash-map-test
   (:refer-clojure :only [let defn- loop])
-  (:require [clojure.test                     :refer :all]
-            [clojure.lang.persistent-map-test :refer [map-test]]
-            [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
-            [clojure.lang.persistent-set      :refer [union]]
-            [clojure.next                     :refer :all]))
+  (:require [clojure.test                         :refer :all]
+            [clojure.lang.persistent-map-test     :refer [map-test]]
+            [clojure.lang.persistent-list         :refer [EMPTY-LIST]]
+            [clojure.lang.transient-map-test      :refer [transient-map-test]]
+            [clojure.next                         :refer :all]))
 
 (deftest hash-map-test
   (map-test "PersistentHashMap" hash-map))
@@ -47,3 +47,6 @@
       (is (= 3 (count m3-seq)))
       (is (= 2 (count m4-seq)))
       (is (= 1 (count m5-seq))))))
+
+(deftest transient-hash-map-test
+  (transient-map-test hash-map))

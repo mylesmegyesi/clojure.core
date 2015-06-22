@@ -22,7 +22,7 @@
          make-transient-array-map)
 
 (defn- ensure-editable [owner]
-  (if (nil? owner)
+  (when (nil? owner)
     (throw (new-illegal-access-error "Transient used after persistent! call"))))
 
 (defn- index-of [arr size value]
