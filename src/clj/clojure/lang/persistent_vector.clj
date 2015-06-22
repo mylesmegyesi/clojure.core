@@ -6,7 +6,7 @@
             [clojure.lang.numbers    :refer [->int platform-long platform-big-int platform-big-integer]]
             [clojure.lang.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang.protocols  :refer [-as-transient -assoc-n -assoc-n!
-                                             -conj! -persistent -lookup -nth
+                                             -conj! -count -persistent -lookup -nth
                                              IAssociative ICounted IEditableCollection IMeta IObj ILookup
                                              IPersistentCollection IPersistentVector IPersistentStack
                                              ITransientAssociative ITransientCollection ITransientVector
@@ -180,7 +180,7 @@
       (aget node (bit-and (->bitnum n) (->bitnum 0x01f)))))
 
   (-nth [this n not-found]
-    (if (and (>= n 0) (< n -length))
+    (if (and (>= n 0) (< n (-count this)))
       (-nth this n)
       not-found))
 

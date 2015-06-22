@@ -169,13 +169,10 @@
       (persistent! t)
       (illegal-access-error-is-thrown?
         #"Transient used after persistent! call"
-        (nth t 0))))
-
-  ; I'm pretty sure this is a bug in clojure
-  (testing "nth returns the default value after being made persistent"
-    (let [t (transient (vector))]
-      (persistent! t)
-      (is (= :foo (nth t 0 :foo)))))
+        (nth t 0))
+      (illegal-access-error-is-thrown?
+        #"Transient used after persistent! call"
+        (nth t 0 :foo))))
 
   (testing "conj! onto a transient"
     (let [t (transient (vector))]
