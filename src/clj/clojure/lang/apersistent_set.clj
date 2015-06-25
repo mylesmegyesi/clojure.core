@@ -1,14 +1,18 @@
 (ns clojure.lang.apersistent-set
-  (:refer-clojure :only [apply assoc cons defmacro defn defn- dissoc empty? every? fn flatten first keys let list list* loop map reduce repeat rest take ->])
+  (:refer-clojure :only [apply defmacro defn defn- fn flatten let list list* loop map ->])
   (:require [clojure.lang.deftype     :refer [expand-methods]]
             [clojure.lang.equivalence :refer [platform-equals-method]]
             [clojure.lang.hash        :refer [platform-hash-method]]
             [clojure.lang.protocols]
-            [clojure.next             :refer :all :exclude [assoc cons dissoc empty? every?
-                                                            first keys reduce repeat rest take]]))
+            [clojure.next             :refer :all]))
 
 (defn make-pairs [xs]
-  (flatten (map #(take 2 (repeat %)) xs)))
+  (loop [pairs xs
+         acc []]
+    (if (empty? pairs)
+      acc
+      (let [p (first pairs)]
+        (recur (rest pairs) (clojure.core/conj acc p p))))))
 
 (defn- sets-reduce [accumulator-fn -map sets]
   (loop [remaining-sets sets
@@ -19,23 +23,24 @@
              (accumulator-fn new-map (seq (first remaining-sets)))))))
 
 (defn set-difference [-map sets]
-  (sets-reduce #(apply dissoc (cons %1 %2)) -map sets))
+  (sets-reduce #(reduce dissoc %1 %2) -map sets))
 
 (defn set-union [-map sets]
-  (sets-reduce #(apply assoc (cons %1 (make-pairs %2))) -map sets))
+  (sets-reduce #(apply assoc (clojure.core/cons %1 (make-pairs %2))) -map sets))
 
 (defn set-intersection [-map sets]
-  (reduce
-    (fn [-acc-map k]
-      (if (every? #(contains? % k) sets)
-        -acc-map
-        (dissoc -acc-map k)))
-    -map (keys -map)))
+  (loop [m -map
+         ks (keys -map)]
+    (if (empty? ks)
+      m
+      (let [k (first ks)]
+        (if (every? #(contains? % k) sets)
+          (recur m (rest ks))
+          (recur (dissoc m k) (rest ks)))))))
 
 (defn set-equals? [-map other-set]
-  (if (= (clojure.core/count -map) (count other-set))
-    (let [ks (keys -map)]
-      (every? #(contains? other-set %) ks))
+  (if (= (count -map) (count other-set))
+    (every? #(contains? other-set %) (keys -map))
     false))
 
 (defn set-hash [items-seq]
@@ -61,22 +66,22 @@
 
     'clojure.lang.protocols/ICounted
     (list '-count ['this]
-      (list 'clojure.core/count (list 'clojure.core/keys '-map)))
+      (list 'clojure.next/count '-map))
 
     'clojure.lang.protocols/ILookup
     (list '-lookup ['this 'x 'default]
-      (list 'clojure.core/get '-map 'x 'default))
+      (list 'clojure.next/get '-map 'x 'default))
 
     'clojure.lang.protocols/IPersistentSet
     (list '-contains? ['this 'x]
-      (list 'clojure.core/contains? '-map 'x))
+      (list 'clojure.next/contains? '-map 'x))
 
     (list '-difference ['this 'sets]
       (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-difference '-map 'sets)]
         (list gen-next 'next-map)))
 
     (list '-disj ['this 'xs]
-      (list 'clojure.core/let ['next-map (list 'clojure.core/apply 'clojure.core/dissoc '-map 'xs)]
+      (list 'clojure.core/let ['next-map (list 'clojure.core/apply 'clojure.next/dissoc '-map 'xs)]
         (list gen-next 'next-map)))
 
     (list '-intersection ['this 'sets]
@@ -89,14 +94,14 @@
 
     'clojure.lang.protocols/IPersistentCollection
     (list '-cons ['this 'x]
-      (list 'clojure.core/let ['next-map (list 'clojure.core/assoc '-map 'x 'x)]
+      (list 'clojure.core/let ['next-map (list 'clojure.next/assoc '-map 'x 'x)]
         (list gen-next 'next-map)))
 
     (list '-empty ['this]
-      (list gen-next (list 'clojure.core/empty '-map)))
+      (list gen-next (list 'clojure.next/empty '-map)))
 
     'clojure.lang.protocols/ISeqable
     (list '-seq ['this]
-      (list 'clojure.core/seq (list 'clojure.core/keys '-map)))
+      (list 'clojure.next/seq (list 'clojure.next/keys '-map)))
 
     clojure.lang.apersistent-set/platform-set-methods))

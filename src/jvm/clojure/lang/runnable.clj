@@ -1,6 +1,6 @@
 (ns clojure.lang.runnable
-  (:refer-clojure :only [defmacro fn extend-type let reduce remove])
-  (:require [clojure.next :refer :all :except [reduce]]))
+  (:refer-clojure :only [defmacro fn extend-type let remove])
+  (:require [clojure.next :refer :all]))
 
 (defmacro defrunnable [type & body]
   (let [run-fn (reduce
@@ -15,6 +15,6 @@
        (run ~@(rest run-fn)))))
 
 (defmacro invoke-execute
-  ([executor] `(.execute ~executor))
-  ([executor arg] `(.execute ~executor ~arg)))
+  ([executor] `(.execute ^Runnable ~executor))
+  ([executor arg] `(.execute ^Runnable ~executor ~arg)))
 
