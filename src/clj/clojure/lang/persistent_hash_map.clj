@@ -1,6 +1,6 @@
 (ns clojure.lang.persistent-hash-map
   (:refer-clojure :only [defn defn- declare defprotocol deftype -> let if-let when even? loop format cond >= <])
-  (:require [clojure.lang.apersistent-map :refer [defmap]]
+  (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.key-value       :refer [platform-map-entry-type]]
             [clojure.lang.atomic-ref      :refer [new-atomic-ref ref-get ref-set!]]
@@ -12,7 +12,8 @@
                                                   + inc * - dec]]
             [clojure.lang.thread          :refer [thread-reference]]
             [clojure.lang.protocols       :refer [IAssociative ICounted ILookup
-                                                  IMeta IObj IPersistentMap ISeqable ISeq
+                                                  IMeta IObj IPersistentCollection IPersistentMap
+                                                  ISeqable ISeq
                                                   IEditableCollection ITransientAssociative ITransientCollection ITransientMap
                                                   -assoc!]]
             [clojure.next                 :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right + inc * - dec]]))
@@ -534,6 +535,8 @@
 (defn make-transient-hash-map [root count has-nil? nil-value]
   (TransientHashMap. (new-atomic-ref (thread-reference)) root count has-nil? nil-value (BoxedValue. nil)))
 
+(declare EMPTY-HASH-MAP)
+
 (defmap PersistentHashMap [-meta -count -root -has-nil? -nil-value]
   IAssociative
   (-assoc [this key val]
@@ -582,6 +585,13 @@
   IObj
   (-with-meta [this new-meta]
     (new-hash-map new-meta count -root -has-nil? -nil-value))
+
+  IPersistentCollection
+  (-cons [this o]
+    (map-cons this o))
+
+  (-empty [this]
+    (with-meta EMPTY-HASH-MAP -meta))
 
   IPersistentMap
   (-dissoc [this key]

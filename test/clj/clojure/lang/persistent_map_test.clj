@@ -42,6 +42,20 @@
     (let [msg (re-pattern (str class-name " can only be created with even number of arguments: 3 arguments given"))]
       (argument-error-is-thrown? msg (constructor :k1 1 :k2)))))
 
+(defn map-empty-test [constructor]
+  (testing "an empty map is empty"
+    (is (empty? (empty (constructor :k :v)))))
+
+  (testing "an empty map preserves type"
+    (is (=
+          (type (empty (constructor :k :v)))
+          (type (constructor :k :v)))))
+
+  (testing "empty preserves meta"
+    (is (=
+          {:so :meta}
+          (meta (empty (with-meta (constructor) {:so :meta})))))))
+
 (defn map-assoc-test [constructor]
   (testing "associates a key to a value"
     (let [m1 (constructor)
@@ -131,6 +145,26 @@
           (recur m1 (inc i) max)))))
 
   )
+
+(defn map-conj-test [constructor]
+  (testing "conj a vector tuple"
+    (let [tuple (vector :k :v)
+          m (conj (constructor) tuple)]
+      (is (= 1 (count m)))
+      (is (= :k (key (first m))))
+      (is (= :v (val (first m))))))
+
+  (testing "conj a vector tuple to an existing key"
+    (let [tuple (vector :k :v)
+          m (conj (constructor :k :not-v) tuple)]
+      (is (= 1 (count m)))
+      (is (= :k (key (first m))))
+      (is (= :v (val (first m))))))
+
+  (testing "an argument error is raised when conj! is invoked with a vector tuple not of size 2"
+    (argument-error-is-thrown?
+      #"Vector arg to map conj must be a pair"
+      (conj (constructor) (vector :k)))))
 
 (defn map-dissoc-test [constructor]
   (testing "dissociating zero keys from a map will return the same map"
@@ -329,7 +363,9 @@
 
 (defn map-test [class-name constructor]
   (map-creation-test class-name constructor)
+  (map-empty-test constructor)
   (map-assoc-test constructor)
+  (map-conj-test constructor)
   (map-dissoc-test constructor)
   (map-contains?-test constructor)
   (map-equivalence-test constructor)

@@ -1,10 +1,12 @@
 (ns clojure.lang.apersistent-map
-  (:refer-clojure :only [bit-and defmacro defn let loop + list list* concat ->])
+  (:refer-clojure :only [cond concat defmacro defn let loop list list* ->])
   (:require [clojure.lang.deftype     :refer [expand-methods]]
             [clojure.lang.enumerable  :refer [platform-enumerable-method]]
             [clojure.lang.equivalence :refer [platform-equals-method]]
+            [clojure.lang.exceptions  :refer [new-argument-error]]
             [clojure.lang.hash        :refer [platform-hash-method]]
-            [clojure.next             :refer :all :exclude [+ bit-and]]))
+            [clojure.lang.key-value   :refer [platform-map-entry-type]]
+            [clojure.next             :refer :all]))
 
 (defn map-hash [m]
   (loop [entries (seq m)
@@ -30,6 +32,22 @@
             false))
         true))
     false))
+
+(defn map-cons [m o]
+  (cond
+    (instance? platform-map-entry-type o)
+      (assoc m (key o) (val o))
+    (vector? o)
+      (if (= (count o) 2)
+        (assoc m (nth o 0) (nth o 1))
+        (throw (new-argument-error "Vector arg to map conj must be a pair")))
+    :else
+      (loop [mp m
+             s (seq o)]
+        (if s
+          (let [entry (first s)]
+            (recur (assoc mp (key entry) (val entry)) (next s)))
+          mp))))
 
 (defmacro defmap [type bindings & body]
   (concat

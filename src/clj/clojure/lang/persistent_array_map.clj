@@ -1,13 +1,14 @@
 (ns clojure.lang.persistent-array-map
   (:refer-clojure :only [cond declare defn defn- deftype let loop max when if-let even? format >= <])
-  (:require [clojure.lang.apersistent-map :refer [defmap]]
+  (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
             [clojure.lang.array           :refer [array-copy]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.map-entry       :refer [new-map-entry]]
             [clojure.lang.exceptions      :refer [new-argument-error new-illegal-access-error]]
             [clojure.lang.key-value       :refer [platform-map-entry-type]]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [ICounted ILookup IAssociative IPersistentMap
+            [clojure.lang.protocols       :refer [ICounted ILookup IAssociative
+                                                  IPersistentCollection IPersistentMap
                                                   IMeta IObj ISeq ISeqable
                                                   IEditableCollection ITransientCollection
                                                   ITransientAssociative ITransientMap
@@ -19,7 +20,8 @@
 
 (declare new-array-map
          new-array-map-seq
-         make-transient-array-map)
+         make-transient-array-map
+         EMPTY-ARRAY-MAP)
 
 (defn- ensure-editable [owner]
   (when (nil? owner)
@@ -173,6 +175,13 @@
       (acopy -arr 0 new-arr 0 -size)
       (new-array-map new-arr -size -count m)))
 
+  IPersistentCollection
+  (-cons [this o]
+    (map-cons this o))
+
+  (-empty [this]
+    (with-meta EMPTY-ARRAY-MAP -meta))
+
   IPersistentMap
   (-dissoc [this k]
     (if-let [idx (index-of -arr -size k)] ; key exists
@@ -189,3 +198,5 @@
 
 (defn new-array-map [arr size count meta]
   (PersistentArrayMap. arr size count meta))
+
+(def EMPTY-ARRAY-MAP (new-array-map (into-array EMPTY-LIST) 0 0 nil))

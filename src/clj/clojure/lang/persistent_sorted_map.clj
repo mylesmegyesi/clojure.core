@@ -1,12 +1,13 @@
 (ns clojure.lang.persistent-sorted-map
   (:refer-clojure :only [cond count declare defn defn- defprotocol deftype empty? even? format if-let let loop > < ->])
-  (:require [clojure.lang.apersistent-map :refer [defmap]]
+  (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.map-entry       :refer [new-map-entry]]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.exceptions      :refer [new-argument-error new-unsupported-error]]
             [clojure.lang.protocols       :refer [ICounted ILookup IMeta IObj
-                                                  IAssociative IPersistentMap ISeqable ISeq]]
+                                                  IAssociative IPersistentCollection IPersistentMap
+                                                  ISeqable ISeq]]
             [clojure.next                 :refer :all :exclude [empty? count]]))
 
 (declare red-node?)
@@ -395,6 +396,8 @@
     nil
     (PersistentSortedMapSeq. stack cnt)))
 
+(declare EMPTY-SORTED-MAP)
+
 (defmap PersistentTreeMap [-root -count -comparator -meta] ; PersistentTreeMap is the clojure class name
   IAssociative
   (-assoc [this k v]
@@ -420,6 +423,13 @@
   (-with-meta [this m]
     (new-sorted-map -root -count -comparator m))
 
+  IPersistentCollection
+  (-cons [this o]
+    (map-cons this o))
+
+  (-empty [this]
+    (with-meta EMPTY-SORTED-MAP -meta))
+
   IPersistentMap
   (-dissoc [this k]
     (let [[tree cnt] (sorted-map-dissoc -root -comparator k)]
@@ -433,6 +443,8 @@
 
 (defn- new-sorted-map [root cnt compare-fn mta]
   (PersistentTreeMap. root cnt compare-fn mta))
+
+(def EMPTY-SORTED-MAP (new-sorted-map nil 0 compare nil))
 
 (defn make-sorted-map [compare-fn args]
   (let [arg-count (count args)]
