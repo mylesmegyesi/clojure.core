@@ -38,6 +38,10 @@
    (double val) ; java.lang.Double
    ])
 
+(deftest number?-test
+  (testing "any Number returns true"
+    (is (number? (FallBackNumber. 1)))))
+
 (deftest =-test
 
   ; integer types

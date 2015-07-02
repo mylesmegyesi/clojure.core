@@ -28,6 +28,9 @@
 (def platform-float       Float)
 (def platform-double      Double)
 
+(defmacro is-number? [x]
+  `(instance? Number ~x))
+
 (defmacro bnot [x]
   `(. BitOps (numberBitNot ~x)))
 
