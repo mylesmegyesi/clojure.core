@@ -1,5 +1,5 @@
 (ns clojure.lang.satisfies-test
-  (:refer-clojure :only [deftype])
+  (:refer-clojure :only [deftype doseq list])
   (:require [clojure.test           :refer :all]
             [clojure.next           :refer :all]
             [clojure.lang.protocols :refer :all]))
@@ -86,3 +86,9 @@
 
   (testing "returns false otherwise"
     (is (not (rational? (TestFloat.))))))
+
+(deftest number?-test
+  (doseq [number (list (byte 1) (short 1) (int 1) 1.1 (float 1.1) (biginteger 1) 1N 1.1M)]
+    (testing (str number " is a number")
+      (is (number? number)))))
+

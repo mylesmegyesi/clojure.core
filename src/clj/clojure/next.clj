@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding class cond declare defmacro defmulti defmethod defn defn-
-                         even? extend-type fn if-let let neg? pos? number? require satisfies?
+                         even? extend-type fn if-let let neg? pos? require satisfies?
                          doseq list list* load loop format pr-str into < butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
@@ -77,8 +77,11 @@
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'incrementp 'decrement 'decrementp
                                         'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
-                                        'is-zero?
+                                        'is-number? 'is-zero?
                                         '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec]])
+
+(defn number? [x]
+  (is-number? x))
 
 (defmacro when-not-nil [x y & body]
   ^:private
