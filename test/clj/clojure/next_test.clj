@@ -26,6 +26,13 @@
   (testing "return the value if the test returns not true"
     (is (= :bar (when-not (= 1 2) :bar)))))
 
+(deftest associative?-test
+  (testing "returns true when associative"
+    (is (associative? (reify IAssociative))))
+
+  (testing "returns false otherwise"
+    (is (not (associative? "foo")))))
+
 (deftest identity-test
   (testing "identity returns the provided argument"
     (is (= :foo (identity :foo)))))

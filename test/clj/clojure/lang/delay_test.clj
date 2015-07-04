@@ -44,4 +44,10 @@
 
   (testing "force returns the object if it is not a delay"
     (is (= 10 (force 10))))
+
+  (testing "delay? returns true for a delay"
+    (is (delay? (delay "foo"))))
+
+  (testing "delay? retrusn false when not a delay"
+    (is (not (delay? "foo"))))
 )
