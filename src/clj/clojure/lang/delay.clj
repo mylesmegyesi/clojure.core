@@ -15,8 +15,10 @@
   IPending
   (-is-realized? [this]
     (locking this
-      (nil? -fn)))
-)
+      (nil? -fn))))
+
+(defn is-delay? [d]
+  (instance? Delay d))
 
 (defn -force [obj]
   (if (instance? Delay obj)

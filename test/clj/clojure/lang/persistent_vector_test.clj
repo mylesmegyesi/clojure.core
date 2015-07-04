@@ -136,6 +136,13 @@
       (is (= :a (first (seq v-seq))))))
 )
 
+(deftest chunked-seq-test?
+  (testing "is true for a chunked seq"
+    (is (chunked-seq? (seq (vector 1)))))
+
+  (testing "is false otherwise"
+    (is (not (chunked-seq? 1)))))
+
 (deftest transient-vector-test
   (testing "returns the count"
     (let [size3-transient (transient (vector 3 2 1))

@@ -71,6 +71,9 @@
 (defn rational? [x]
   (or (integer? x) (ratio? x) (decimal? x)))
 
+(defn associative? [x]
+  (satisfies? IAssociative x))
+
 (declare bigint)
 (require ['clojure.lang.numbers :as 'platform-numbers
                                 :refer ['numbers-equal? 'numbers-equivalent?
@@ -260,10 +263,13 @@
 
 (defn identity [x] x)
 
-(require ['clojure.lang.delay :refer ['new-delay '-force]])
+(require ['clojure.lang.delay :refer ['new-delay '-force 'is-delay?]])
 
 (defmacro delay [& body]
   (list 'clojure.lang.delay/new-delay (list* 'clojure.core/fn [] body)))
+
+(defn delay? [d]
+  (is-delay? d))
 
 (defn deref
   ([obj] (-deref obj))
@@ -600,7 +606,7 @@
 (defn list? [l]
   (satisfies? IPersistentList l))
 
-(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR]])
+(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq?]])
 
 (defn vector [& args]
   (let [arg-seq (seq args)
@@ -611,6 +617,9 @@
           (recur (next xs) (-conj! v (first xs)))
           (-persistent v)))
       (-persistent empty-transient))))
+
+(defn chunked-seq? [cs]
+  (is-chunked-seq? cs))
 
 (require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
 

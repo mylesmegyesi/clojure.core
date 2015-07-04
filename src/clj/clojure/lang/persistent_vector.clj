@@ -36,6 +36,9 @@
   ISeqable
   (-seq [this] this))
 
+(defn is-chunked-seq? [cs]
+  (instance? ChunkedSeq cs))
+
 (defn- make-vector-seq [arr length position]
   (when (not= 0 length)
     (ChunkedSeq. (aget arr position) arr length position)))
