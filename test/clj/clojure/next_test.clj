@@ -10,6 +10,11 @@
   (testing "current clojure version as a string"
     (is (= "1.6.0" (clojure-version)))))
 
+(deftest type-test
+  (testing "will use the :type meta value"
+    (let [foo-typed (with-meta (vector) (array-map :type "foo"))]
+      (is (= "foo" (type foo-typed))))))
+
 (deftest constantly-test
   (testing "returns the return value"
     (is (= :val ((constantly :val)))))

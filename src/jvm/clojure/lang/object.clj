@@ -15,5 +15,5 @@
 (defmacro identical? [x y]
   `(Identity/areIdentical ~x ~y))
 
-(defmacro type [x]
-  `(if-let [x# ~x] (.getClass x#)))
+(defn class [^Object x]
+  (if-let [cx x] (.getClass cx)))
