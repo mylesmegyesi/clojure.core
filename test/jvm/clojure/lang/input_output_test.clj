@@ -1,5 +1,5 @@
 (ns clojure.lang.input-output-test
-  (:refer-clojure :only [binding class fn let reify])
+  (:refer-clojure :only [binding fn let reify])
   (:require [clojure.test :refer :all]
             [clojure.next :refer :all])
   (:import  [clojure.lang.platform FallBackNumber]))

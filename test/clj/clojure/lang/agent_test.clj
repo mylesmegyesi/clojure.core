@@ -1,5 +1,5 @@
 (ns clojure.lang.agent-test
-  (:refer-clojure :only [class defmacro fn let])
+  (:refer-clojure :only [defmacro fn let])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.lang.thread                  :refer [sleep]]

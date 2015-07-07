@@ -1,5 +1,5 @@
 (ns clojure.lang.input-output
-  (:refer-clojure :only [class defmacro defmethod let])
+  (:refer-clojure :only [defmacro defmethod let])
   (:require [clojure.next :refer :all])
   (:import [java.io Writer OutputStreamWriter StringWriter]
            [clojure.next]))

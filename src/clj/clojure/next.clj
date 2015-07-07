@@ -1,6 +1,6 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
-                         apply binding class cond declare defmacro defmulti defmethod defn defn-
+                         apply binding cond declare defmacro defmulti defmethod defn defn-
                          even? extend-type fn if-let let neg? pos? require satisfies?
                          doseq list list* load loop format pr-str into < butlast when when-let])
   (:require [clojure.lang.equivalence]
@@ -27,8 +27,8 @@
 (defn identical? [x y]
   (platform-object/identical? x y))
 
-(defn type [x]
-  (platform-object/type x))
+(defn class [x]
+  (platform-object/class x))
 
 (defn class? [c]
   (instance? platform-object/base-class c))
@@ -312,6 +312,9 @@
 
 (defn vary-meta [m f & args]
   (with-meta m (apply f (meta m) args)))
+
+(defn type [x]
+  (or (get (meta x) :type) (class x)))
 
 (defn name [named]
   (-name named))
