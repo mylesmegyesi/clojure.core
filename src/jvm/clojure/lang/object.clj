@@ -3,6 +3,8 @@
   (:import [clojure.lang.platform Identity]))
 
 (def base-object Object)
+(def base-class Class)
+(def platform-string String)
 
 (defmacro new-base-object []
   `(Object.))

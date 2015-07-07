@@ -1,12 +1,20 @@
 (ns clojure.lang.seq-test
-  (:refer-clojure :only [defmacro fn let list list* >])
+  (:refer-clojure :only [defmacro fn let list list* reify >])
   (:require [clojure.test             :refer :all]
             [clojure.next             :refer :all]
             [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
+            [clojure.lang.protocols   :refer [ISeq]]
             [clojure.support.test-seq :refer [test-seq test-seqable]]))
 
 (defmacro out-of-bounds-exception-thrown? [& body]
   (list 'is (list* 'thrown? out-of-bounds-exception body)))
+
+(deftest seq?-test
+  (testing "returns true for a seq"
+    (is (seq? (reify ISeq))))
+
+  (testing "returns false otherwise"
+    (is (not (seq? :foo)))))
 
 (deftest second-test
   (testing "second of nil is nil"

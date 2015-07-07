@@ -111,6 +111,13 @@
   (testing "returns false for not a list"
     (is (not (list? 1)))))
 
+(deftest string?-test
+  (testing "returns true for a String"
+    (is (string? "foo")))
+
+  (testing "returns false otherwise"
+    (is (not (string? :foo)))))
+
 (deftest contains?-test
   (testing "returns false for nil"
     (is (false? (contains? nil :anything))))
