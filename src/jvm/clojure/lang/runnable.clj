@@ -1,11 +1,11 @@
 (ns clojure.lang.runnable
-  (:refer-clojure :only [defmacro fn extend-type let reduce remove seq?])
+  (:refer-clojure :only [defmacro fn extend-type let reduce remove])
   (:require [clojure.next :refer :all :except [reduce]]))
 
 (defmacro defrunnable [type & body]
   (let [run-fn (reduce
                  (fn [acc item]
-                   (if (and (seq? item) (= (first item) '-run))
+                   (if (and (clojure.core/seq? item) (= (first item) '-run))
                      item
                      acc)) body)
         bdy (remove #(= %1 run-fn) body)]

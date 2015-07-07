@@ -30,6 +30,9 @@
 (defn type [x]
   (platform-object/type x))
 
+(defn class? [c]
+  (instance? platform-object/base-class c))
+
 (defn nil? [n]
   (identical? n nil))
 
@@ -319,6 +322,9 @@
 (defn seq [s]
   (-seq s))
 
+(defn seq? [s]
+  (satisfies? ISeq s))
+
 (defn sequential? [s]
   (satisfies? ISequential s))
 
@@ -606,6 +612,9 @@
 (defn list? [l]
   (satisfies? IPersistentList l))
 
+(defn string? [s]
+  (instance? platform-object/platform-string s))
+
 (require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq?]])
 
 (defn vector [& args]
@@ -815,7 +824,7 @@
     (agent-restart agnt new-state opts)))
 
 (defmacro io! [& body]
-  (let [message (when (clojure.core/string? (first body)) (first body))
+  (let [message (when (string? (first body)) (first body))
         body (if message (next body) body)]
     ; TODO stop relying on LockingTransaction
     `(if (clojure.lang.LockingTransaction/isRunning)
