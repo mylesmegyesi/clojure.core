@@ -4,7 +4,8 @@
             [clojure.next                         :refer :all]
             [clojure.lang.protocols               :refer :all]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?
-                                                          assertion-error-is-thrown?]]))
+                                                          assertion-error-is-thrown?]]
+            [clojure.support.test-seq             :refer [test-seq]]))
 
 (deftest clojure-version-test
   (testing "current clojure version as a string"
@@ -123,12 +124,28 @@
   (testing "returns false otherwise"
     (is (not (string? :foo)))))
 
+(deftest counted?-test
+  (testing "returns true for a ICounted"
+    (let [c (reify ICounted)]
+      (is (counted? c))))
+
+  (testing "returns false otherwise"
+    (is (not (counted? :anything)))))
+
 (deftest contains?-test
   (testing "returns false for nil"
     (is (false? (contains? nil :anything))))
 
   (testing "throws an argument-error for an unhandlable type"
     (argument-error-is-thrown? #"contains\? not supported on type" (contains? :anything :anything))))
+
+(deftest count-test
+  (testing "count a persistent collection that does not implement ICounted"
+    (let [coll (reify
+                 IPersistentCollection
+                 ISeqable
+                 (-seq [this] (test-seq '(1 2 3))))]
+      (is (= 3 (count coll))))))
 
 (deftest while-test
   (testing "while completes if the test is falsy"

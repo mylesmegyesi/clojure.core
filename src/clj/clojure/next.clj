@@ -260,10 +260,65 @@
 (defn zero? [i]
   (is-zero? i))
 
+(defn seq [s]
+  (-seq s))
+
+(defn seq? [s]
+  (satisfies? ISeq s))
+
+(defn sequential? [s]
+  (satisfies? ISequential s))
+
+(defn counted? [c]
+  (satisfies? ICounted c))
+
+(defn first [s]
+  (-first (seq s)))
+
+(defn ffirst [s]
+  (first (first s)))
+
+(defn next [s]
+  (-next (seq s)))
+
+(defn nfirst [s]
+  (next (first s)))
+
+(defn nnext [s]
+  (next (next s)))
+
+(defn fnext [s]
+  (first (next s)))
+
+(defn rest [s]
+  (-more (seq s)))
+
+(defn last [s]
+  (if (next s)
+    (recur (next s))
+    (first s)))
+
+(defn second [s]
+  (first (next s)))
+
+(require ['clojure.lang.size :refer ['platform-count]])
+
 (defn count [obj]
-  (if obj
-    (-count obj)
-    0))
+  (cond
+    (counted? obj)
+      (-count obj)
+    (nil? obj)
+      0
+    (satisfies? IPersistentCollection obj)
+      (loop [s (seq obj)
+             cnt 0]
+        (if s
+          (if (counted? s)
+            (recur (next s) (+ cnt (count s)))
+            (recur (next s) (inc cnt)))
+          cnt))
+    :else
+      (platform-count obj)))
 
 (defn identity [x] x)
 
@@ -322,15 +377,6 @@
 
 (defn namespace [named]
   (-namespace named))
-
-(defn seq [s]
-  (-seq s))
-
-(defn seq? [s]
-  (satisfies? ISeq s))
-
-(defn sequential? [s]
-  (satisfies? ISequential s))
 
 (defn empty? [seqable]
   (not (seq seqable)))
@@ -1164,8 +1210,6 @@
 (require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
 
 (extend-type nil
-  ICounted
-  (-count [this] 0)
   ISeqable
   (-seq [this] nil)
   ISeq

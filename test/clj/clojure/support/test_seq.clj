@@ -1,12 +1,10 @@
 (ns clojure.support.test-seq
   (:refer-clojure :only [conj count defn deftype first loop])
-  (:require [clojure.lang.protocols :refer [ICounted ISeq ISeqable ISequential]]
+  (:require [clojure.lang.protocols :refer [IPersistentCollection ISeq ISeqable ISequential]]
             [clojure.next           :refer :all :exclude [first count conj]]))
 
 (deftype TestSeq [-list]
-  ICounted
-  (-count [this]
-    (count -list))
+  IPersistentCollection
 
   ISeqable
   (-seq [this]
