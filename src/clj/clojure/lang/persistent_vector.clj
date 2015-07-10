@@ -1,47 +1,46 @@
 (ns clojure.lang.persistent-vector
   (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop when ->])
-  (:require [clojure.next            :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.exceptions :refer [new-argument-error new-out-of-bounds-exception
-                                             new-illegal-access-error new-illegal-state-error]]
-            [clojure.lang.numbers    :refer [->int platform-long platform-big-int platform-big-integer]]
-            [clojure.lang.hash-map   :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.protocols  :refer [-as-transient -assoc-n -assoc-n!
+  (:require [clojure.next             :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
+            [clojure.lang.array-chunk :refer [make-array-chunk]]
+            [clojure.lang.aseq        :refer [defseq]]
+            [clojure.lang.exceptions  :refer [new-argument-error new-out-of-bounds-exception
+                                              new-illegal-access-error new-illegal-state-error]]
+            [clojure.lang.numbers     :refer [->int platform-long platform-big-int platform-big-integer]]
+            [clojure.lang.hash-map    :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
+            [clojure.lang.protocols   :refer [-as-transient -assoc-n -assoc-n!
                                              -conj! -count -persistent -lookup -nth
                                              IAssociative ICounted IEditableCollection IMeta IObj ILookup
                                              IPersistentCollection IPersistentVector IPersistentStack
                                              ITransientAssociative ITransientCollection ITransientVector
-                                             ISeq ISeqable ISequential IIndexed]]
-            [clojure.lang.thread     :refer [thread-reference]]))
+                                             IChunkedSeq ISeq ISeqable ISequential IIndexed]]
+            [clojure.lang.thread      :refer [thread-reference]]))
 
-(declare make-vector-seq)
+(declare make-chunked-seq)
 
 (declare EMPTY-VECTOR)
 (declare EMPTY-NODE)
 
-(deftype ^:private ChunkedSeq [-first -arr -length -position]
+(defseq ChunkedSeq [-vec -node -i -offset -meta]
+  IChunkedSeq
+  (-chunked-first [this]
+    (make-array-chunk -node -offset))
+
+  (-chunked-next [this]
+    (when (< (+ -i (alength -node)) (count -vec))
+
+    ))
+
   ICounted
-  (-count [this] -length)
+  (-count [this]
+    (- (count -vec) (+ -i -offset)))
 
-  ISequential
-
-  ISeq
-  (-first [this] -first)
-
-  (-next [this]
-    (make-vector-seq -arr (dec -length) (inc -position)))
-
-  (-more [this]
-    (make-vector-seq -arr (dec -length) (inc -position)))
-
-  ISeqable
-  (-seq [this] this))
+  )
 
 (defn is-chunked-seq? [cs]
   (instance? ChunkedSeq cs))
 
-(defn- make-vector-seq [arr length position]
-  (when (not= 0 length)
-    (ChunkedSeq. (aget arr position) arr length position)))
+(defn- make-chunked-seq [vc node i offset mta]
+  (ChunkedSeq. vc node i offset mta))
 
 (defprotocol ^:private INode
   (get-array [this])
@@ -279,7 +278,7 @@
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))
 
-(deftype PersistentVector [-meta -length -shift -root -tail -seq]
+(deftype PersistentVector [-meta -length -shift -root -tail]
   IPersistentCollection
   (-cons [this x]
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
@@ -369,7 +368,11 @@
     (make-vector new-meta -length -shift -root -tail))
 
   ISeqable
-  (-seq [this] -seq)
+  (-seq [this]
+    (if (zero? (count this))
+      nil
+      (let [arr-for (array-for 0 -length -tail -root -shift)]
+        (make-chunked-seq this arr-for 0 0 nil))))
 
   IIndexed
   (-nth [this n]
@@ -378,11 +381,10 @@
   (-nth [this n not-found]
     (if (n-in-range? n -length)
       (nth this n)
-      not-found))
-)
+      not-found)))
 
 (defn- make-vector [meta length shift root arr]
-  (PersistentVector. meta length shift root arr (make-vector-seq arr length 0)))
+  (PersistentVector. meta length shift root arr))
 
 (def ^:private EMPTY-NODE (make-node nil (make-array 32)))
 
