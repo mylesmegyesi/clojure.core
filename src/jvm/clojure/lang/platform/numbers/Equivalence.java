@@ -39,8 +39,8 @@ public final class Equivalence {
   }
 
   public static boolean ratioEquivalent(Ratio x, Ratio y) {
-    return (x.getNumerator().equals(y.getNumerator())) &&
-              (x.getDenominator().equals(y.getDenominator()));
+    return x.getNumerator().equals(y.getNumerator()) &&
+           x.getDenominator().equals(y.getDenominator());
   }
 
   public static boolean bigDecimalEquivalent(BigDecimal x, BigDecimal y) {

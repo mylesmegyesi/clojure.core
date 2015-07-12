@@ -11,7 +11,7 @@ public final class Zero {
     if ((x instanceof Double) || (x instanceof Float)) {
       return x.doubleValue() == 0;
     } else if (x instanceof Ratio) {
-      return ((BigInteger) (((Ratio) x).getNumerator())).signum() == 0;
+      return (((Ratio) x).getNumerator()).signum() == 0;
     } else if (x instanceof BigDecimal) {
       return ((BigDecimal) x).signum() == 0;
     } else if ((x instanceof BigInt) || (x instanceof BigInteger)) {

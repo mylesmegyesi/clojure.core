@@ -1,5 +1,5 @@
 (ns clojure.lang.comparison-test
-  (:refer-clojure :only [deftype let <])
+  (:refer-clojure :only [deftype let])
   (:require [clojure.test            :refer :all]
             [clojure.lang.protocols  :refer [IComparable]]
             [clojure.next            :refer :all]))

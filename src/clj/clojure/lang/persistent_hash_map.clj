@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-hash-map
-  (:refer-clojure :only [defn defn- declare defprotocol deftype -> let if-let when even? loop format cond >= <])
+  (:refer-clojure :only [defn defn- declare defprotocol deftype -> let if-let when even? loop format cond >=])
   (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
             [clojure.lang.aseq            :refer [defseq]]
             [clojure.lang.key-value       :refer [platform-map-entry-type]]

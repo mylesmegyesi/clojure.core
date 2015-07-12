@@ -13,11 +13,11 @@ public final class Ratio extends Number {
     denominator = _denominator;
   }
 
-  public Number getNumerator() {
+  public BigInteger getNumerator() {
     return numerator;
   }
 
-  public Number getDenominator() {
+  public BigInteger getDenominator() {
     return denominator;
   }
 

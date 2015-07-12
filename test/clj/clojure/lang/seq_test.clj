@@ -1,5 +1,5 @@
 (ns clojure.lang.seq-test
-  (:refer-clojure :only [defmacro fn let list list* reify >])
+  (:refer-clojure :only [defmacro fn let list list* reify])
   (:require [clojure.test             :refer :all]
             [clojure.next             :refer :all]
             [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
