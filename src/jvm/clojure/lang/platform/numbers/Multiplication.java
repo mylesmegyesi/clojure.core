@@ -45,8 +45,8 @@ public final class Multiplication {
   }
 
   public static Number ratioMultiply(Ratio x, Ratio y) {
-    BigInteger ynXxn = ((BigInteger) y.getNumerator()).multiply((BigInteger) x.getNumerator());
-    BigInteger ydXxd = ((BigInteger) y.getDenominator()).multiply((BigInteger) x.getDenominator());
+    BigInteger ynXxn = y.getNumerator().multiply(x.getNumerator());
+    BigInteger ydXxd = y.getDenominator().multiply(x.getDenominator());
     return Division.bigIntegerDivide(ynXxn, ydXxd);
   }
 

@@ -1,6 +1,5 @@
 (ns clojure.lang.numbers-test
-  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let if-not when
-                         < >])
+  (:refer-clojure :only [defmacro let loop doseq defn- deftype if-let if-not when])
   (:require [clojure.test            :refer [deftest is testing]]
             [clojure.lang.numbers    :refer :all]
             [clojure.next            :refer :all])

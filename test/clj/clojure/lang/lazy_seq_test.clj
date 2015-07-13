@@ -1,5 +1,5 @@
 (ns clojure.lang.lazy-seq-test
-  (:refer-clojure :only [defn fn let > >=])
+  (:refer-clojure :only [defn fn let >=])
   (:require [clojure.test                 :refer :all]
             [clojure.next                 :refer :all]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]

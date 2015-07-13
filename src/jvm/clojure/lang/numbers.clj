@@ -17,6 +17,7 @@
            [clojure.lang.platform.numbers Decrement]
            [clojure.lang.platform.numbers Division]
            [clojure.lang.platform.numbers Negation]
+           [clojure.lang.platform.numbers Comparison]
            [clojure.lang.platform.numbers Zero]))
 
 (def platform-byte        Byte)
@@ -161,6 +162,9 @@
        (instance? BigInteger x#) (BigDecimal. ^BigInteger x#)
        (clojure.core/number? x#) (BigDecimal/valueOf (->long x#))
        :else (BigDecimal. x#))))
+
+(defmacro lt [x y]
+  `(. Comparison (lessThan ~x ~y)))
 
 (extend-type Ratio
   IRatio

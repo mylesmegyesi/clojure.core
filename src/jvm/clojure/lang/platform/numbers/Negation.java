@@ -36,7 +36,7 @@ public final class Negation {
   }
 
   public static final Number ratioNegate(Ratio x) {
-    Ratio r = new Ratio(((BigInteger) x.getNumerator()).negate(), ((BigInteger) x.getDenominator()));
+    Ratio r = new Ratio(x.getNumerator().negate(), x.getDenominator());
     return (Number) r;
   }
 

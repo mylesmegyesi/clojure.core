@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-sorted-map-test
-  (:refer-clojure :only [conj defn- distinct let loop rand-nth remove reduce repeatedly sort >])
+  (:refer-clojure :only [conj defn- distinct let loop rand-nth remove reduce repeatedly sort])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-list       :refer [EMPTY-LIST]]

@@ -2,7 +2,7 @@
   (:refer-clojure :only [*assert*
                          apply binding cond declare defmacro defmulti defmethod defn defn-
                          even? extend-type fn if-let let neg? pos? require satisfies?
-                         doseq list list* load loop format pr-str into < butlast when when-let])
+                         doseq list list* load loop format pr-str into butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
             [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception new-out-of-bounds-exception]]
@@ -84,7 +84,8 @@
                                         'increment 'incrementp 'decrement 'decrementp
                                         'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
                                         'is-number? 'is-zero?
-                                        '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec]])
+                                        '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec
+                                        'lt]])
 
 (defn number? [x]
   (is-number? x))
@@ -392,6 +393,26 @@
 
 (defn second [s]
   (first (next s)))
+
+(defn <
+  ([a] true)
+  ([a b] (lt a b))
+  ([a b & more]
+    (if (< a b)
+      (if (next more)
+        (recur b (first more) (next more))
+        (< b (first more)))
+      false)))
+
+(defn >
+  ([a] true)
+  ([a b] (lt b a))
+  ([a b & more]
+    (if (> a b)
+      (if (next more)
+        (recur b (first more) (next more))
+        (> b (first more)))
+      false)))
 
 (declare atom)
 (declare reset!)

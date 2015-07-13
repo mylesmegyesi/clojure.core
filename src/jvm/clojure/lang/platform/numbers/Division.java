@@ -77,8 +77,8 @@ public final class Division {
   }
 
   public static Number ratioDivide(Ratio x, Ratio y) {
-    return (Number) bigIntegerDivide(((BigInteger) y.getDenominator()).multiply(((BigInteger) x.getNumerator())),
-                                     ((BigInteger) y.getNumerator()).multiply(((BigInteger) x.getDenominator())));
+    return (Number) bigIntegerDivide(y.getDenominator().multiply(x.getNumerator()),
+                                     y.getNumerator().multiply(x.getDenominator()));
   }
 
   public static Number bigDecimalDivide(BigDecimal x, BigDecimal y) {

@@ -45,10 +45,10 @@ public final class Addition {
   }
 
   public static Number ratioAdd(Ratio x, Ratio y) {
-    BigInteger ynXxd = ((BigInteger) y.getNumerator()).multiply((BigInteger) x.getDenominator());
-    BigInteger xnXyd = ((BigInteger) x.getNumerator()).multiply((BigInteger) y.getDenominator());
-    BigInteger ydXxd = ((BigInteger) y.getDenominator()).multiply((BigInteger) x.getDenominator());
-    return (Number) Division.bigIntegerDivide((BigInteger) ynXxd.add(xnXyd), (BigInteger) ydXxd);
+    BigInteger ynXxd = y.getNumerator().multiply(x.getDenominator());
+    BigInteger xnXyd = x.getNumerator().multiply(y.getDenominator());
+    BigInteger ydXxd = y.getDenominator().multiply(x.getDenominator());
+    return (Number) Division.bigIntegerDivide(ynXxd.add(xnXyd), ydXxd);
   }
 
   public static Number bigDecimalAdd(BigDecimal x, BigDecimal y) {

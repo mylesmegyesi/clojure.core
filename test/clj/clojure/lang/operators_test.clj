@@ -1,5 +1,5 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [apply defmacro defn reify let list list* remove resolve])
+  (:refer-clojure :only [apply defmacro defn doseq reify let list list* remove resolve])
   (:require [clojure.test            :refer :all]
             [clojure.lang.exceptions :refer [class-cast-exception argument-error]]
             [clojure.lang.protocols  :refer [IEquivalence]]
@@ -490,12 +490,54 @@
 
 (deftest zero-test
   (testing "determines if a number is zero"
-    (is (zero? 0)))
+    (is (zero? (byte 0)))
 
   (testing "raises an error without a number argument"
-    (class-cast-exception-thrown? (zero? "Foo")))
+    (class-cast-exception-thrown? (zero? "Foo")))))
 
-  )
+(def types [byte short int long double float bigint biginteger bigdec])
+
+(deftest <-test
+  (testing "< with one argument returns true"
+    (is (< nil)))
+
+  (doseq [x types
+          y types]
+    (testing (str x " is able to be less than " y)
+      (is (< (x 1) (y 2))))
+
+    (testing (str x " is able to be not less than " y)
+      (is (not (< (x 2) (y 1)))))
+
+    (testing (str x " is not less than " y " when they are equal")
+      (is (not (< (x 1) (y 1))))))
+
+  (testing "many numbers are less than eachother"
+    (is (< 1 2 3 4 5)))
+
+  (testing "many numbers are not less than eachother"
+    (is (not (< 1 2 5 4 3)))))
+
+(deftest >-test
+  (testing "> with one argument returns true"
+    (is (> nil)))
+
+  (doseq [x types
+          y types]
+    (testing (str x " is able to be greater than " y)
+      (is (> (x 2) (y 1))))
+
+    (testing (str x " is able to be not greater than " y)
+      (is (not (> (x 1) (y 2)))))
+
+    (testing (str x " is not greater than " y " when they are equal")
+      (is (not (> (x 1) (y 1))))))
+
+  (testing "many numbers are greater than eachother"
+    (is (> 5 4 3 2 1)))
+
+  (testing "many numbers not greater than eachother"
+    (is (not (> 5 4 1 2 3)))))
 
 (defn conversion-test [test conversion]
   (let [test-without-question-mark (apply str (remove #(= \? %) (str test)))]
