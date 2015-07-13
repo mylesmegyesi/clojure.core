@@ -488,14 +488,15 @@
 
   )
 
+(def types [byte short int long double float bigint biginteger bigdec])
+
 (deftest zero-test
-  (testing "determines if a number is zero"
-    (is (zero? (byte 0)))
+  (doseq [x types]
+    (testing (str x " with a zero value is zero?")
+      (is (zero? (x 0)))))
 
   (testing "raises an error without a number argument"
-    (class-cast-exception-thrown? (zero? "Foo")))))
-
-(def types [byte short int long double float bigint biginteger bigdec])
+    (class-cast-exception-thrown? (zero? "Foo"))))
 
 (deftest <-test
   (testing "< with one argument returns true"
@@ -538,6 +539,48 @@
 
   (testing "many numbers not greater than eachother"
     (is (not (> 5 4 1 2 3)))))
+
+(deftest <=-test
+  (testing "<= with one argument returns true"
+    (is (<= nil)))
+
+  (doseq [x types
+          y types]
+    (testing (str x " is able to be less than " y)
+      (is (<= (x 1) (y 2))))
+
+    (testing (str x " is able to be not less than " y)
+      (is (not (<= (x 2) (y 1)))))
+
+    (testing (str x " can be equal to " y)
+      (is (<= (x 1) (y 1)))))
+
+  (testing "many numbers are less than or equal to eachother"
+    (is (<= 1 2 3 3 4 5)))
+
+  (testing "many numbers are not less than or equal to eachother"
+    (is (not (<= 1 2 3 3 5 4)))))
+
+(deftest >=-test
+  (testing ">= with one argument returns true"
+    (is (>= nil)))
+
+  (doseq [x types
+          y types]
+    (testing (str x " is able to be greater than " y)
+      (is (>= (x 2) (y 1))))
+
+    (testing (str x " is able to be not greater than " y)
+      (is (not (>= (x 1) (y 2)))))
+
+    (testing (str x " can be equal to " y)
+      (is (>= (x 1) (y 1)))))
+
+  (testing "many numbers are greater than or equal to eachother"
+    (is (>= 5 4 3 3 2 1)))
+
+  (testing "many numbers are not greater than or equal to eachother"
+    (is (not (>= 5 4 3 3 1 2)))))
 
 (defn conversion-test [test conversion]
   (let [test-without-question-mark (apply str (remove #(= \? %) (str test)))]

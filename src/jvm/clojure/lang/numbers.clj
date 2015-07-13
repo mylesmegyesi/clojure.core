@@ -166,6 +166,9 @@
 (defmacro lt [x y]
   `(. Comparison (lessThan ~x ~y)))
 
+(defmacro lte [x y]
+  `(. Comparison (lessThanEqualTo ~x ~y)))
+
 (extend-type Ratio
   IRatio
   (-numerator [this] (.getNumerator this))

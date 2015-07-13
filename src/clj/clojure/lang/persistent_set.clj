@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-set
-  (:refer-clojure :only [apply cons defn every? fn <= >=])
+  (:refer-clojure :only [apply cons defn every? fn])
   (:require [clojure.lang.protocols :refer [-conj -difference -disj -intersection -union]]
             [clojure.next           :refer :all :exclude [cons every? conj]]))
 
