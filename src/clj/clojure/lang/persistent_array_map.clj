@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [cond declare defn defn- deftype let loop max when if-let even? format >=])
+  (:refer-clojure :only [cond declare defn defn- deftype let loop max when if-let even? format])
   (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
             [clojure.lang.array           :refer [array-copy]]
             [clojure.lang.aseq            :refer [defseq]]
