@@ -14,7 +14,9 @@
    :minor       6
    :incremental 0})
 
-(declare str)
+(declare cons
+         str
+         seq first next)
 
 (defn clojure-version []
   (str (:major *clojure-version*) "."
@@ -260,8 +262,45 @@
 (defn zero? [i]
   (is-zero? i))
 
-(defn seq [s]
-  (-seq s))
+(defn <
+  ([a] true)
+  ([a b] (lt a b))
+  ([a b & more]
+    (if (< a b)
+      (if (next more)
+        (recur b (first more) (next more))
+        (< b (first more)))
+      false)))
+
+(defn <=
+  ([a] true)
+  ([a b] (lte a b))
+  ([a b & more]
+    (if (<= a b)
+      (if (next more)
+        (recur b (first more) (next more))
+        (<= b (first more)))
+      false)))
+
+(defn >
+  ([a] true)
+  ([a b] (lt b a))
+  ([a b & more]
+    (if (> a b)
+      (if (next more)
+        (recur b (first more) (next more))
+        (> b (first more)))
+      false)))
+
+(defn >=
+  ([a] true)
+  ([a b] (lte b a))
+  ([a b & more]
+    (if (>= a b)
+      (if (next more)
+        (recur b (first more) (next more))
+        (>= b (first more)))
+      false)))
 
 (defn seq? [s]
   (satisfies? ISeq s))
@@ -269,8 +308,27 @@
 (defn sequential? [s]
   (satisfies? ISequential s))
 
-(defn counted? [c]
-  (satisfies? ICounted c))
+(defn empty [coll]
+  (-empty coll))
+
+(defn empty? [seqable]
+  (not (seq seqable)))
+
+(defn alter-meta! [m f & args]
+  (-alter-meta! m f args))
+
+(defn meta [m]
+  (if (satisfies? IMeta m)
+    (-meta m)))
+
+(defn reset-meta! [m new-meta]
+  (-reset-meta! m new-meta))
+
+(defn with-meta [m new-meta]
+  (-with-meta m new-meta))
+
+(defn vary-meta [m f & args]
+  (with-meta m (apply f (meta m) args)))
 
 (defn first [s]
   (-first (seq s)))
@@ -300,6 +358,20 @@
 
 (defn second [s]
   (first (next s)))
+
+(require ['clojure.lang.sequence :refer ['platform-seq]])
+
+(defn seq [s]
+  (cond
+    (satisfies? ISeqable s)
+      (-seq s)
+    (nil? s)
+      nil
+    :else
+      (platform-seq s)))
+
+(defn counted? [c]
+  (satisfies? ICounted c))
 
 (require ['clojure.lang.size :refer ['platform-count]])
 
@@ -353,22 +425,6 @@
 (defn denominator [ratio]
   (-denominator ratio))
 
-(defn alter-meta! [m f & args]
-  (-alter-meta! m f args))
-
-(defn meta [m]
-  (if (satisfies? IMeta m)
-    (-meta m)))
-
-(defn reset-meta! [m new-meta]
-  (-reset-meta! m new-meta))
-
-(defn with-meta [m new-meta]
-  (-with-meta m new-meta))
-
-(defn vary-meta [m f & args]
-  (with-meta m (apply f (meta m) args)))
-
 (defn type [x]
   (or (get (meta x) :type) (class x)))
 
@@ -377,12 +433,6 @@
 
 (defn namespace [named]
   (-namespace named))
-
-(defn empty? [seqable]
-  (not (seq seqable)))
-
-(defn empty [coll]
-  (-empty coll))
 
 (defn peek [coll]
   (when coll
@@ -439,46 +489,6 @@
 
 (defn second [s]
   (first (next s)))
-
-(defn <
-  ([a] true)
-  ([a b] (lt a b))
-  ([a b & more]
-    (if (< a b)
-      (if (next more)
-        (recur b (first more) (next more))
-        (< b (first more)))
-      false)))
-
-(defn <=
-  ([a] true)
-  ([a b] (lte a b))
-  ([a b & more]
-    (if (<= a b)
-      (if (next more)
-        (recur b (first more) (next more))
-        (<= b (first more)))
-      false)))
-
-(defn >
-  ([a] true)
-  ([a b] (lt b a))
-  ([a b & more]
-    (if (> a b)
-      (if (next more)
-        (recur b (first more) (next more))
-        (> b (first more)))
-      false)))
-
-(defn >=
-  ([a] true)
-  ([a b] (lte b a))
-  ([a b & more]
-    (if (>= a b)
-      (if (next more)
-        (recur b (first more) (next more))
-        (>= b (first more)))
-      false)))
 
 (declare atom)
 (declare reset!)

@@ -56,6 +56,9 @@
 (defprotocol IIndexed
   (-nth [this n] [this n not-found]))
 
+(defprotocol IIndexedSeq
+  (-index [this]))
+
 (defprotocol IInteger)
 
 (defprotocol ILazySeq
