@@ -5,9 +5,55 @@
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.protocols       :refer [IIndexedSeq IPersistentCollection
                                                   ICounted IObj IMeta
-                                                  ISeq]]))
+                                                  ISeq]])
+  (:import [java.lang.reflect Array]))
 
-(declare make-string-seq)
+(declare make-array-seq
+         make-string-seq)
+
+(defseq ^:private ArraySeq [-arr -i -meta]
+  ICounted
+  (-count [this]
+    (if -arr
+      (- (Array/getLength -arr) -i)
+      0))
+
+  IIndexedSeq
+  (-index [this] -i)
+
+  IMeta
+  (-meta [this] -meta)
+
+  IObj
+  (-with-meta [this m]
+    (if (= m -meta)
+      this
+      (make-array-seq -arr -i m)))
+
+  IPersistentCollection
+  (-cons [this x]
+    (cons x this))
+
+  (-empty [this] EMPTY-LIST)
+
+  ISeq
+  (-first [this]
+    (if -arr
+      (Array/get -arr -i)
+      nil))
+
+  (-next [this]
+    (if (and -arr (< (inc -i) (Array/getLength -arr)))
+      (make-array-seq -arr (inc -i) -meta)))
+
+  (-more [this]
+    (if-let [s (next this)] s EMPTY-LIST)))
+
+(defn- make-array-seq
+  ([arr]
+    (make-array-seq arr 0 nil))
+  ([arr i mta]
+    (ArraySeq. arr i mta)))
 
 (defseq ^:private StringSeq [-string -i -meta]
   ICounted
@@ -43,10 +89,7 @@
       nil))
 
   (-more [this]
-    (if-let [s (next this)] s EMPTY-LIST))
-
-
-  )
+    (if-let [s (next this)] s EMPTY-LIST)))
 
 (defn- make-string-seq
   ([s]
@@ -58,6 +101,8 @@
 
 (defn platform-seq [s]
   (cond
+    (.isArray (class s))
+      (make-array-seq s)
     (instance? CharSequence s)
       (make-string-seq s)
     :else
