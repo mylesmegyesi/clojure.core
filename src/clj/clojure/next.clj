@@ -359,17 +359,6 @@
 (defn second [s]
   (first (next s)))
 
-(require ['clojure.lang.sequence :refer ['platform-seq]])
-
-(defn seq [s]
-  (cond
-    (satisfies? ISeqable s)
-      (-seq s)
-    (nil? s)
-      nil
-    :else
-      (platform-seq s)))
-
 (defn counted? [c]
   (satisfies? ICounted c))
 
@@ -391,6 +380,17 @@
           cnt))
     :else
       (platform-count obj)))
+
+(require ['clojure.lang.sequence :refer ['platform-seq]])
+
+(defn seq [s]
+  (cond
+    (satisfies? ISeqable s)
+      (-seq s)
+    (nil? s)
+      nil
+    :else
+      (platform-seq s)))
 
 (defn identity [x] x)
 

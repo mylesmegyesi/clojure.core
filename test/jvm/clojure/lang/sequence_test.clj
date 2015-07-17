@@ -5,11 +5,68 @@
             [clojure.lang.persistent-list         :refer [EMPTY-LIST]]
             [clojure.lang.protocols               :refer [-index]]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?]]
-            [clojure.support.test-seq             :refer [test-seq]]))
+            [clojure.support.test-seq             :refer [test-seq]])
+  (:import [java.util ArrayList HashMap]))
 
 (deftest platform-seq-test
   (testing "an argument error is thrown without a seqable type"
     (argument-error-is-thrown? #"Don't know how to create ISeq from: java.lang.Long" (seq 1))))
+
+(def iter-seq (let [arr-list (ArrayList.)]
+                (.add arr-list 1)
+                (.add arr-list 2)
+                (.add arr-list 3)
+                (seq arr-list)))
+
+(deftest iterator-seq-test
+  (testing "count of an iterator seq"
+    (let [s1 iter-seq
+          s2 (next s1)
+          s3 (next s2)]
+      (is (= 3 (count s1)))
+      (is (= 2 (count s2)))
+      (is (= 1 (count s3)))))
+
+  (testing "first of an iterator is the first element"
+    (is (= 1 (first iter-seq))))
+
+  (testing "next returns a seq with the rest of the iterator"
+    (let [s (next iter-seq)]
+      (is (= 2 (count s)))
+      (is (= 2 (first s)))))
+
+  (testing "next returns nil when there is no rest"
+    (let [s (next (seq (ArrayList.)))]
+      (is (nil? s))))
+
+  (testing "rest returns a seq with the rest of the iterator"
+    (let [s (rest iter-seq)]
+      (is (= 2 (count s)))
+      (is (= 2 (first s)))))
+
+  (testing "rest returns the empty list when there is no rest"
+    (let [s (rest (seq (ArrayList.)))]
+      (is (= EMPTY-LIST s))))
+
+  (testing "conj an element"
+    (let [c (conj iter-seq 4)]
+      (is (= 4 (first c)))
+      (is (= 1 (second c)))))
+
+  (testing "empty of an iterator seq is an empty list"
+    (let [e (empty iter-seq)]
+      (is (= EMPTY-LIST e))))
+
+  (testing "iterator seq holds a meta value"
+    (let [w-meta (with-meta iter-seq (array-map :so :meta))]
+      (is (= (array-map :so :meta) (meta w-meta))))))
+
+(deftest map-entry-set-iterator-seq-test
+  (testing "a map's seq is an iterator seq"
+    (let [hm (HashMap.)]
+      (.put hm 1 1)
+      (is (seq? (seq hm)))
+      (is (= 1 (count hm))))))
 
 (def arr-seq (seq (into-array (test-seq '(1 2 3)))))
 
