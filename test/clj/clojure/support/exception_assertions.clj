@@ -9,6 +9,9 @@
 (defmacro assertion-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
 
+(defmacro class-cast-exception-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? class-cast-exception msg body)))
+
 (defmacro illegal-access-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? illegal-access-error msg body)))
 

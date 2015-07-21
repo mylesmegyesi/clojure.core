@@ -1,13 +1,11 @@
 (ns clojure.lang.seq-test
   (:refer-clojure :only [defmacro fn let list list* reify])
-  (:require [clojure.test             :refer :all]
-            [clojure.next             :refer :all]
-            [clojure.lang.exceptions  :refer [out-of-bounds-exception]]
-            [clojure.lang.protocols   :refer [ISeq]]
-            [clojure.support.test-seq :refer [test-seq test-seqable]]))
-
-(defmacro out-of-bounds-exception-thrown? [& body]
-  (list 'is (list* 'thrown? out-of-bounds-exception body)))
+  (:require [clojure.test                         :refer :all]
+            [clojure.next                         :refer :all]
+            [clojure.lang.protocols               :refer [ISeq]]
+            [clojure.support.exception-assertions :refer [class-cast-exception-is-thrown?
+                                                          out-of-bounds-exception-is-thrown?]]
+            [clojure.support.test-seq             :refer [test-seq test-seqable]]))
 
 (deftest seq?-test
   (testing "returns true for a seq"
@@ -123,7 +121,7 @@
 
   (testing "raise an out of bounds exception when finding the nth larger than seq size"
     (let [s (test-seqable '(1 2 3))]
-      (out-of-bounds-exception-thrown? (nth s 42))))
+      (out-of-bounds-exception-is-thrown? #".*" (nth s 42))))
 
   (testing "find the nth of a seq with a default"
     (let [s (test-seqable '(1 2 3))]
@@ -132,4 +130,8 @@
   (testing "return default when finding the nth larger than seq size"
     (let [s (test-seqable '(1 2 3))]
       (is (= "not found" (nth s 42 "not found"))))))
+
+(deftest iterator-seq-test
+  (testing "throws an exception when not given an iterator"
+    (class-cast-exception-is-thrown? #".*" (iterator-seq "foo"))))
 
