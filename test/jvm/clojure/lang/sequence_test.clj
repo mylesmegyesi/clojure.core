@@ -59,7 +59,15 @@
 
   (testing "iterator seq holds a meta value"
     (let [w-meta (with-meta iter-seq (array-map :so :meta))]
-      (is (= (array-map :so :meta) (meta w-meta))))))
+      (is (= (array-map :so :meta) (meta w-meta)))))
+
+  (testing "iterator-seq can be invoked directly"
+    (let [arr-list (ArrayList.)]
+      (.add arr-list 1)
+      (.add arr-list 2)
+      (.add arr-list 3)
+      (let [s (iterator-seq (.iterator ^Iterable arr-list))]
+        (is (= 3 (count s)))))))
 
 (deftest map-entry-set-iterator-seq-test
   (testing "a map's seq is an iterator seq"

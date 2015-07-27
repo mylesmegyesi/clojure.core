@@ -62,13 +62,13 @@
   (-more [this]
     (if-let [s (next this)] s EMPTY-LIST)))
 
-(defn- make-iterator-seq
-  ([iter]
+(defn make-iterator-seq
+  ([^Iterator iter]
    (let [state-obj (Object.)]
      (if (.hasNext iter)
        (make-iterator-seq iter state-obj state-obj state-obj nil)
        nil)))
-  ([^Iterator iter v r state-obj mta]
+  ([iter v r state-obj mta]
     (IteratorSeq. iter v r state-obj mta)))
 
 (defseq ^:private ArraySeq [-arr -i -meta]
@@ -162,7 +162,7 @@
 (defn platform-seq [s]
   (cond
     (instance? Iterable s)
-      (make-iterator-seq (.iterator ^Iterator s))
+      (make-iterator-seq (.iterator ^Iterable s))
     (.isArray ^Class (class s))
       (make-array-seq s)
     (instance? CharSequence s)

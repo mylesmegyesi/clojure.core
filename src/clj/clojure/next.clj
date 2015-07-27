@@ -381,7 +381,7 @@
     :else
       (platform-count obj)))
 
-(require ['clojure.lang.sequence :refer ['platform-seq]])
+(require ['clojure.lang.sequence :refer ['platform-seq 'make-iterator-seq]])
 
 (defn seq [s]
   (cond
@@ -391,6 +391,9 @@
       nil
     :else
       (platform-seq s)))
+
+(defn iterator-seq [iter]
+  (make-iterator-seq iter))
 
 (defn identity [x] x)
 
