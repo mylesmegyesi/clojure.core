@@ -1092,15 +1092,37 @@
 (def ^:dynamic *print-level* nil)
 (def ^:dynamic *print-length* nil)
 (def ^:dynamic *flush-on-newline* true)
-(declare pr)
+(declare pr print-ctor)
+
+(def char-escape-string
+  (array-map
+    \newline   "\\n"
+    \tab       "\\t"
+    \return    "\\r"
+    \"         "\\\""
+    \\         "\\\\"
+    \formfeed  "\\f"
+    \backspace "\\b"))
+
+(def char-name-string
+  (array-map
+    \newline "newline"
+    \tab "tab"
+    \space "space"
+    \backspace "backspace"
+    \formfeed "formfeed"
+    \return "return"))
 
 (defmulti print-method (fn [obj writer]
-                         (let [t (get (meta obj) :type)]
+                         (let [t (get (meta obj) (keyword "type"))]
                            (if (keyword? t) t (class obj)))))
+
+(defmulti print-dup (fn [obj writer] (class obj)))
 
 (require ['clojure.lang.input-output :refer ['default-out 'platform-out-str 'platform-append-space
                                              'platform-print-constructor
-                                             'platform-newline 'platform-flush 'platform-write]])
+                                             'platform-newline 'platform-flush 'platform-write
+                                             'print-map 'print-meta 'print-sequential]])
 (def ^:dynamic *out* (default-out))
 
 (defn newline []
@@ -1114,61 +1136,9 @@
 (defn print-ctor [obj print-args wrtr]
   (platform-print-constructor obj print-args wrtr))
 
-(defn- print-meta [o w]
-  (when-let [m (meta o)]
-    (when (and (pos? (count m))
-            (or *print-dup*
-              (and *print-meta* *print-readably*)))
-      (platform-write w "^")
-      (if (and (= (count m) 1) (:tag m))
-          (print-method (:tag m) w)
-          (print-method m w))
-      (platform-write w " "))))
-
 (defn print-simple [obj wrtr]
   (print-meta obj wrtr)
   (platform-write wrtr (str obj)))
-
-(defn- print-sequential [begin print-one sep end sequence wrtr]
-  (binding [*print-level* (and (not *print-dup*) *print-level* (dec *print-level*))]
-    (if (and *print-level* (neg? *print-level*))
-      (platform-write wrtr "#")
-      (do
-        (platform-write wrtr begin)
-        (when-let [xs (seq sequence)]
-          (if (and (not *print-dup*) *print-length*)
-            ; TODO: switch to [[x & xs] xs] once
-            ; it is using clojure.core/nth
-            (loop [rxs xs
-                   print-length *print-length*]
-              (let [x (first rxs)
-                    xs (next rxs)]
-                (if (zero? print-length)
-                  (platform-write wrtr "...")
-                  (do
-                    (print-one x wrtr)
-                    (when xs
-                      (platform-write wrtr sep)
-                      (recur xs (dec print-length)))))))
-            ; TODO: switch to [[x & xs] xs] once
-            ; it is using clojure.core/nth
-            (loop [rxs xs]
-              (let [x (first rxs)
-                    xs (next rxs)]
-                (print-one x wrtr)
-                (when xs
-                  (platform-write wrtr sep)
-                  (recur xs))))))
-        (platform-write wrtr end)))))
-
-(defn- print-map [m pr-on wrtr]
-  (print-sequential "{"
-    (fn [e wrtr]
-      (do
-        (pr-on (key e) wrtr)
-        (platform-append-space wrtr)
-        (pr-on (val e) wrtr)))
-    "," "}" (seq m) wrtr))
 
 (defmethod print-method :default [obj wrtr]
   (print-simple obj wrtr))
@@ -1198,10 +1168,31 @@
   (print-meta obj wrtr)
   (print-sequential "#{" print-method " " "}" obj wrtr))
 
+(defmethod print-dup nil [obj wrtr]
+  (print-method obj wrtr))
+
+(defmethod print-dup clojure.lang.keyword.Keyword [obj wrtr]
+  (print-method obj wrtr))
+
+(defmethod print-dup clojure.lang.symbol.Symbol [obj wrtr]
+  (print-method obj wrtr))
+
+(defmethod print-dup clojure.lang.protocols.ISeq [obj wrtr]
+  (print-method obj wrtr))
+
+(defmethod print-dup clojure.lang.protocols.IPersistentList [obj wrtr]
+  (print-method obj wrtr))
+
+(defn pr-on [o w]
+  (if *print-dup*
+    (print-dup o w)
+    (print-method o w))
+  nil)
+
 (defn pr
   ([] nil)
   ([obj]
-    (print-method obj *out*))
+    (pr-on obj *out*))
   ([x & more]
     (pr x)
     (platform-append-space *out*)

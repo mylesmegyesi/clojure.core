@@ -46,7 +46,7 @@
   (testing "pr for a :default meta type that is not an IObj"
     (let [obj (reify
                 IMeta
-                (-meta [_] (array-map :type :default)))]
+                (-meta [_] (array-map (keyword "type") (keyword "default"))))]
       (is (=
             (with-out-str (pr obj))
             (str obj)))))
@@ -56,19 +56,37 @@
           (with-out-str (pr nil))
           "nil")))
 
+  (testing "pr for nil with print-dup is the string 'nil'"
+    (binding [*print-dup* true]
+      (is (=
+            (with-out-str (pr nil))
+            "nil"))))
+
   (testing "pr for a keyword"
     (is (=
           (with-out-str (pr (keyword "test")))
           ":test")))
+
+  (testing "pr for a keyword with print-dup"
+    (binding [*print-dup* true]
+      (is (=
+            (with-out-str (pr (keyword "test")))
+            ":test"))))
 
   (testing "pr for a symbol"
     (is (=
           (with-out-str (pr (symbol "test")))
           "test")))
 
+  (testing "pr for a symbol with print-dup"
+    (binding [*print-dup* true]
+      (is (=
+            (with-out-str (pr (symbol "test")))
+            "test"))))
+
   (testing "pr for a map"
     (is (=
-          (with-out-str (pr (array-map :hello :world)))
+          (with-out-str (pr (array-map (keyword "hello") (keyword "world"))))
           "{:hello :world}")))
 
   (testing "pr for a vector"
@@ -86,6 +104,11 @@
           (with-out-str (pr (test-seq '(1 2 3))))
           "(1 2 3)")))
 
+  (testing "pr for a seq with print-dup"
+    (is (=
+          (with-out-str (pr (test-seq '(1 2 3))))
+          "(1 2 3)")))
+
   (testing "pr for a seq with meta"
     (binding [*print-meta* true
               *print-readably* true]
@@ -97,7 +120,7 @@
                             ISeqable
                             (-seq [this] this)
                             IMeta
-                            (-meta [this] (array-map :so :meta)))]
+                            (-meta [this] (array-map (keyword "so") (keyword "meta"))))]
         (is (= "^{:so :meta} (1)"
               (with-out-str (pr seq-with-meta)))))))
 
@@ -119,7 +142,7 @@
 (deftest prn-test
   (testing "prn adds a newline to a pr statement"
     (is (=
-          (str "foo" (with-out-str (newline)))
+          (str "\"foo\"" (with-out-str (newline)))
           (with-out-str (prn "foo"))))))
 
 (deftest newline-test

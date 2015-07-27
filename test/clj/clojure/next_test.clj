@@ -162,7 +162,7 @@
 (deftest time-test
   (testing "displaying time elapsed with evaluating an expression in milliseconds"
     (let [out-str (with-out-str (time (+ 1 1)))]
-      (is (= (subs out-str 0 13) "Elapsed time:"))))
+      (is (= (subs out-str 1 14) "Elapsed time:"))))
 
   (testing "time returns the result of the expression"
     (with-out-str
