@@ -608,6 +608,20 @@
   ([m k & ks]
    (dissoc-seq (-dissoc m k) (seq ks))))
 
+(defn reduce
+  ([f coll]
+   (if-let [s (seq coll)]
+     (reduce f (first s) (next s))
+     (f)))
+  ([f v coll]
+    (loop [s coll
+           acc v]
+      (if (nil? s)
+        acc
+        (let [next-s (seq s)
+              next-acc (f acc (first next-s))]
+          (recur (next next-s) next-acc))))))
+
 (require ['clojure.lang.array :as 'arr])
 
 (defn aset [arr i val]
@@ -764,10 +778,10 @@
 (require ['clojure.lang.persistent-hash-set :refer ['make-hash-set]])
 
 (defn hash-set
-  ([] (make-hash-set (clojure.core/hash-map)))
+  ([] (make-hash-set (hash-map)))
   ([& xs]
     (make-hash-set
-      (apply clojure.core/hash-map (make-pairs xs)))))
+      (apply hash-map (make-pairs xs)))))
 
 (defn comparator [predicate]
   (fn [x y]
@@ -806,11 +820,11 @@
 
 (defn sorted-set [& ks]
   (make-sorted-set
-    (apply clojure.core/sorted-map (make-pairs ks))))
+    (apply sorted-map (make-pairs ks))))
 
 (defn sorted-set-by [compare-fn & ks]
   (make-sorted-set
-    (apply clojure.core/sorted-map-by (clojure.core/cons compare-fn (make-pairs ks)))))
+    (apply sorted-map-by (clojure.core/cons compare-fn (make-pairs ks)))))
 
 (defn transient [coll]
   (-as-transient coll))
@@ -970,7 +984,7 @@
   ([state & args]
     (let [config (apply array-map args)]
       (setup-reference
-        (new-atom (new-atomic-ref state) nil nil {})
+        (new-atom (new-atomic-ref state) nil nil (array-map))
         config))))
 
 (defn memoize [f]
@@ -1055,20 +1069,6 @@
    (let [sym (symbol ns name)
          hash-code (hash (clojure.core/+ (hash sym) 0x9e3779b9))]
      (kwd/new-keyword ns name (str ":" sym) hash-code {} sym))))
-
-(defn reduce
-  ([f coll]
-   (if-let [s (seq coll)]
-     (reduce f (first s) (next s))
-     (f)))
-  ([f v coll]
-    (loop [s coll
-           acc v]
-      (if (nil? s)
-        acc
-        (let [next-s (seq s)
-              next-acc (f acc (first next-s))]
-          (recur (next next-s) next-acc))))))
 
 (defmacro when-not [test & body]
   (list 'if test nil (clojure.core/cons 'do body)))
