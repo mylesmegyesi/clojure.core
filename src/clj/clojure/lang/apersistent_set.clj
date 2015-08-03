@@ -80,8 +80,8 @@
       (list 'clojure.core/let ['next-map (list 'clojure.lang.apersistent-set/set-difference '-map 'sets)]
         (list gen-next 'next-map)))
 
-    (list '-disj ['this 'xs]
-      (list 'clojure.core/let ['next-map (list 'clojure.core/apply 'clojure.next/dissoc '-map 'xs)]
+    (list '-disj ['this 'x]
+      (list 'clojure.core/let ['next-map (list 'clojure.next/dissoc '-map 'x)]
         (list gen-next 'next-map)))
 
     (list '-intersection ['this 'sets]

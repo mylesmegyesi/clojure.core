@@ -1,7 +1,7 @@
 (ns clojure.lang.persistent-sorted-set-test
   (:refer-clojure :only [deftype let])
   (:require [clojure.test                       :refer :all]
-            [clojure.lang.persistent-set        :refer [difference disj intersection subset? superset? union]]
+            [clojure.lang.persistent-set        :refer [difference intersection subset? superset? union]]
             [clojure.lang.protocols             :refer [IHash]]
             [clojure.next                       :refer :all]))
 

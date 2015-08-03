@@ -1,17 +1,12 @@
 (ns clojure.lang.persistent-set
   (:refer-clojure :only [apply defn fn])
-  (:require [clojure.lang.protocols :refer [-conj -difference -disj -intersection -union]]
+  (:require [clojure.lang.protocols :refer [-conj -difference -intersection -union]]
             [clojure.next           :refer :all]))
 
 (defn difference
   ([this] this)
   ([this s] (-difference this (vector s)))
   ([this s & sets] (-difference this (cons s sets))))
-
-(defn disj
-  ([this] this)
-  ([this x] (-disj this [x]))
-  ([this x & xs] (-disj this (clojure.core/cons x xs))))
 
 (defn intersection
   ([this s] (-intersection this (vector s)))

@@ -532,6 +532,18 @@
      (recur (conj coll x) (first xs) (next xs))
      (conj coll x))))
 
+(defn disj
+  ([s] s)
+  ([s x]
+    (when s
+      (-disj s x)))
+  ([s x & xs]
+    (when s
+      (let [ret (-disj s x)]
+        (if xs
+          (recur ret (first xs) (next xs))
+          ret)))))
+
 (defn every? [pred s]
   (let [sq (seq s)]
     (cond
