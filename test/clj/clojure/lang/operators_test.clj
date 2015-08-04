@@ -506,11 +506,33 @@
       (is (or (= 1.0 (quot (x 1) (y 1)))
               (= 1M (quot (x 1) (y 1)))))))
 
-  (testing "quot throw an exception if dividing by 0"
+  (testing "quot throws an exception if dividing by 0"
     (doseq [x types
             y types]
-      (testing (str x " divided by zero of " y " throws an exception")
-        (arithmetic-exception-is-thrown? #".* by zero" (quot (x 1) (y 0)))))))
+      (arithmetic-exception-is-thrown? #"Divide by zero" (quot (x 1) (y 0))))))
+
+(deftest rem-test
+  (doseq [x int-types
+          y int-types]
+    (testing (str x " rem with " y)
+      (is (= 1 (rem (x 3) (y 2))))))
+
+  (doseq [x float-types
+          y float-types]
+    (testing (str x " rem with " y)
+      (is (or (= 1.0 (rem (x 3) (y 2)))
+              (= 1M (rem (x 3) (y 2)))))))
+
+  (doseq [x int-types
+          y float-types]
+    (testing (str x " rem with " y)
+      (is (or (= 1.0 (rem (x 3) (y 2)))
+              (= 1M (rem (x 3) (y 2)))))))
+
+  (testing "rem throws an exception if dividing by 0"
+    (doseq [x types
+            y types]
+      (arithmetic-exception-is-thrown? #"Divide by zero" (rem (x 1) (y 0))))))
 
 (deftest zero-test
   (doseq [x types]

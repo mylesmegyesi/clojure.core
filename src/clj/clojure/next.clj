@@ -84,7 +84,7 @@
                                 :refer ['numbers-equal? 'numbers-equivalent?
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'incrementp 'decrement 'decrementp
-                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide 'quotient
+                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide 'quotient 'remainder
                                         'is-number? 'is-zero?
                                         '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec
                                         'lt 'lte]])
@@ -249,6 +249,9 @@
 
 (defn quot [n div]
   (quotient n div))
+
+(defn rem [n div]
+  (remainder n div))
 
 (defn inc [i]
   (increment i))

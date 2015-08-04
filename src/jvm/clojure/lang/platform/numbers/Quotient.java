@@ -8,6 +8,10 @@ import clojure.lang.platform.Ratio;
 public final class Quotient {
 
   public static Number numberQuotient(Number x, Number y) {
+    if (Zero.numberIsZero(y)) {
+      throw new ArithmeticException("Divide by zero");
+    }
+
     Ops type = OpType.findOpType(x, y);
     if (type == Ops.DOUBLE) {
       return Quotient.doubleQuotient(Coercion.toDouble(x), Coercion.toDouble(y));
@@ -41,10 +45,6 @@ public final class Quotient {
   }
 
   public static Number doubleQuotient(double x, double y) {
-    if (y == 0) {
-      throw new ArithmeticException("Divide by zero");
-    }
-
     double q = x / y;
     if (q <= Long.MAX_VALUE && q >= Long.MIN_VALUE) {
       return (double)(long) q;
