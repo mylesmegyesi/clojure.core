@@ -534,6 +534,19 @@
             y types]
       (arithmetic-exception-is-thrown? #"Divide by zero" (rem (x 1) (y 0))))))
 
+(deftest mod-test
+  (testing "modulus is returned as zero if zero"
+    (is (zero? (mod 1 1))))
+
+  (testing "modulus is returned if both arguments are positive"
+    (is (= 1 (mod 3 2))))
+
+  (testing "modulus is returned if both arguments are negative"
+    (is (= -1 (mod -3 -2))))
+
+  (testing "modulus is added to the second arguments if the signs do not match"
+    (is (= -1 (mod 3 -2)))))
+
 (deftest zero-test
   (doseq [x types]
     (testing (str x " with a zero value is zero?")

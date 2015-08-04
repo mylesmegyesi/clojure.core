@@ -7,20 +7,11 @@
            [java.math BigInteger BigDecimal]
            [clojure.lang BigInt]
            [clojure.lang.platform Ratio]
-           [clojure.lang.platform.numbers Cast]
-           [clojure.lang.platform.numbers Equivalence]
-           [clojure.lang.platform.numbers BitOps]
-           [clojure.lang.platform.numbers Addition]
-           [clojure.lang.platform.numbers Increment]
-           [clojure.lang.platform.numbers Multiplication]
-           [clojure.lang.platform.numbers Subtraction]
-           [clojure.lang.platform.numbers Decrement]
-           [clojure.lang.platform.numbers Division]
-           [clojure.lang.platform.numbers Quotient]
-           [clojure.lang.platform.numbers Remainder]
-           [clojure.lang.platform.numbers Negation]
-           [clojure.lang.platform.numbers Comparison]
-           [clojure.lang.platform.numbers Zero]))
+           [clojure.lang.platform.numbers Addition BitOps Cast Comparison
+                                          Decrement Division Equivalence
+                                          Increment Multiplication Negation
+                                          Quotient Remainder Subtraction
+                                          Zero]))
 
 (def platform-byte        Byte)
 (def platform-short       Short)

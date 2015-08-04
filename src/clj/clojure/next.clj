@@ -247,11 +247,20 @@
   ([x y] (divide x y))
   ([x y & more] (clojure.core/reduce / (/ x y) more)))
 
+(defn zero? [i]
+  (is-zero? i))
+
 (defn quot [n div]
   (quotient n div))
 
 (defn rem [n div]
   (remainder n div))
+
+(defn mod [n div]
+  (let [modulus (rem n div)]
+    (if (or (zero? modulus) (= (pos? n) (pos? div)))
+      modulus
+      (+ modulus div))))
 
 (defn inc [i]
   (increment i))
@@ -264,9 +273,6 @@
 
 (defn dec' [i]
   (decrementp i))
-
-(defn zero? [i]
-  (is-zero? i))
 
 (defn <
   ([a] true)
