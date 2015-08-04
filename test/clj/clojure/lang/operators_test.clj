@@ -1,15 +1,11 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [apply defmacro defn doseq reify let list list* remove resolve])
-  (:require [clojure.test            :refer :all]
-            [clojure.lang.exceptions :refer [class-cast-exception argument-error]]
-            [clojure.lang.protocols  :refer [IEquivalence]]
-            [clojure.next            :refer :all]))
-
-(defmacro class-cast-exception-thrown? [& body]
-  (list 'is (list* 'thrown? class-cast-exception body)))
-
-(defmacro argument-error-thrown? [& body]
-  (list 'is (list* 'thrown? argument-error body)))
+  (:refer-clojure :only [apply concat defmacro defn doseq reify let list list* remove resolve])
+  (:require [clojure.test                         :refer :all]
+            [clojure.lang.protocols               :refer [IEquivalence]]
+            [clojure.support.exception-assertions :refer [argument-error-is-thrown?
+                                                          arithmetic-exception-is-thrown?
+                                                          class-cast-exception-is-thrown?]]
+            [clojure.next                         :refer :all]))
 
 (deftest and-test
   (testing "returns true with zero arguments"
@@ -73,7 +69,7 @@
 
 (deftest ==-test
   (testing  "raises an error when arguments are not numbers"
-    (class-cast-exception-thrown? (== :a :a)))
+    (class-cast-exception-is-thrown? #"" (== :a :a)))
 
   (testing "true if only one item is given"
     (is (== :something)))
@@ -93,44 +89,44 @@
 (deftest byte-test
   (testing "raises an error when cast from less than min byte"
     (is (= -128 (byte -128)))
-    (argument-error-thrown? (byte -129)))
+    (argument-error-is-thrown? #"" (byte -129)))
 
   (testing "raises an error when cast from greater than max byte"
     (is (= 127 (byte 127)))
-    (argument-error-thrown? (byte 128)))
+    (argument-error-is-thrown? #"" (byte 128)))
 
   )
 
 (deftest short-test
   (testing "raises an error when cast from less than min short"
     (is (= -32768 (short -32768)))
-    (argument-error-thrown? (short -32769)))
+    (argument-error-is-thrown? #"" (short -32769)))
 
   (testing "raises an error when cast from greater than max short"
     (is (= 32767 (short 32767)))
-    (argument-error-thrown? (short 32768)))
+    (argument-error-is-thrown? #"" (short 32768)))
 
   )
 
 (deftest int-test
   (testing "raises an error when cast from less than min int"
     (is (= -2147483648 (int -2147483648)))
-    (argument-error-thrown? (int -2147483649)))
+    (argument-error-is-thrown? #"" (int -2147483649)))
 
   (testing "raises an error when cast from greater than max int"
     (is (= 2147483647 (int 2147483647)))
-    (argument-error-thrown? (int 2147483648)))
+    (argument-error-is-thrown? #"" (int 2147483648)))
 
   )
 
 (deftest long-test
   (testing "raises an error when cast from less than min long"
     (is (= -9223372036854775808 (long -9223372036854775808)))
-    (argument-error-thrown? (long -9223372036854775809)))
+    (argument-error-is-thrown? #"" (long -9223372036854775809)))
 
   (testing "raises an error when cast from greater than max long"
     (is (= 9223372036854775807 (long 9223372036854775807)))
-    (argument-error-thrown? (long 9223372036854775808)))
+    (argument-error-is-thrown? #"" (long 9223372036854775808)))
 
   )
 
@@ -139,13 +135,13 @@
     (is (= 1 (bit-shift-right 3 1))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-shift-right (bigint 1) 1))
-    (argument-error-thrown? (bit-shift-right (double 0.1) 1))
-    (argument-error-thrown? (bit-shift-right (float 0.1) 1))
-    (argument-error-thrown? (bit-shift-right (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-shift-right (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-shift-right (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-shift-right (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-shift-right (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-shift-right "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-shift-right "foo" 1)))
 
   )
 
@@ -154,13 +150,13 @@
     (is (= 1 (unsigned-bit-shift-right 3 1))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (unsigned-bit-shift-right (bigint 1) 1))
-    (argument-error-thrown? (unsigned-bit-shift-right (double 0.1) 1))
-    (argument-error-thrown? (unsigned-bit-shift-right (float 0.1) 1))
-    (argument-error-thrown? (unsigned-bit-shift-right (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (unsigned-bit-shift-right (bigint 1) 1))
+    (argument-error-is-thrown? #"" (unsigned-bit-shift-right (double 0.1) 1))
+    (argument-error-is-thrown? #"" (unsigned-bit-shift-right (float 0.1) 1))
+    (argument-error-is-thrown? #"" (unsigned-bit-shift-right (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (unsigned-bit-shift-right "foo" 1)))
+    (argument-error-is-thrown? #"" (unsigned-bit-shift-right "foo" 1)))
 
   )
 
@@ -169,13 +165,13 @@
     (is (= 41 (bit-not -42))))
 
   (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-not (bigint 1)))
-    (argument-error-thrown? (bit-not (double 0.1)))
-    (argument-error-thrown? (bit-not (float 0.1)))
-    (argument-error-thrown? (bit-not (bigdec 0.1))))
+    (argument-error-is-thrown? #"" (bit-not (bigint 1)))
+    (argument-error-is-thrown? #"" (bit-not (double 0.1)))
+    (argument-error-is-thrown? #"" (bit-not (float 0.1)))
+    (argument-error-is-thrown? #"" (bit-not (bigdec 0.1))))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-not "foo")))
+    (argument-error-is-thrown? #"" (bit-not "foo")))
 
   )
 
@@ -187,13 +183,13 @@
     (is (= 1 (bit-and 1 1 1))))
 
   (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-and (bigint 1) 1))
-    (argument-error-thrown? (bit-and (double 0.1) 1))
-    (argument-error-thrown? (bit-and (float 0.1) 1))
-    (argument-error-thrown? (bit-and (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-and (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-and (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-and (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-and (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-and "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-and "foo" 1)))
 
   )
 
@@ -205,13 +201,13 @@
     (is (= 0 (bit-and-not 1 1 1))))
 
   (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-and-not (bigint 1) 1))
-    (argument-error-thrown? (bit-and-not (double 0.1) 1))
-    (argument-error-thrown? (bit-and-not (float 0.1) 1))
-    (argument-error-thrown? (bit-and-not (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-and-not (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-and-not (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-and-not (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-and-not (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-and-not "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-and-not "foo" 1)))
 
   )
 
@@ -223,13 +219,13 @@
     (is (= 1 (bit-or 1 1 1))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-or (bigint 1) 1))
-    (argument-error-thrown? (bit-or (double 0.1) 1))
-    (argument-error-thrown? (bit-or (float 0.1) 1))
-    (argument-error-thrown? (bit-or (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-or (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-or (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-or (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-or (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-or "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-or "foo" 1)))
 
   )
 
@@ -241,13 +237,13 @@
     (is (= 1 (bit-xor 1 1 1))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-xor (bigint 1) 1))
-    (argument-error-thrown? (bit-xor (double 0.1) 1))
-    (argument-error-thrown? (bit-xor (float 0.1) 1))
-    (argument-error-thrown? (bit-xor (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-xor (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-xor (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-xor (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-xor (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-xor "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-xor "foo" 1)))
 
   )
 
@@ -256,13 +252,13 @@
     (is (= 0 (bit-clear 1 0))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-clear (bigint 1) 1))
-    (argument-error-thrown? (bit-clear (double 0.1) 1))
-    (argument-error-thrown? (bit-clear (float 0.1) 1))
-    (argument-error-thrown? (bit-clear (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-clear (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-clear (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-clear (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-clear (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-clear "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-clear "foo" 1)))
 
   )
 
@@ -271,13 +267,13 @@
     (is (= 1 (bit-set 1 0))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-set (bigint 1) 1))
-    (argument-error-thrown? (bit-set (double 0.1) 1))
-    (argument-error-thrown? (bit-set (float 0.1) 1))
-    (argument-error-thrown? (bit-set (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-set (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-set (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-set (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-set (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-set "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-set "foo" 1)))
 
   )
 
@@ -286,13 +282,13 @@
     (is (= 5 (bit-flip 1 2))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-flip (bigint 1) 1))
-    (argument-error-thrown? (bit-flip (double 0.1) 1))
-    (argument-error-thrown? (bit-flip (float 0.1) 1))
-    (argument-error-thrown? (bit-flip (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-flip (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-flip (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-flip (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-flip (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-flip "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-flip "foo" 1)))
 
   )
 
@@ -301,13 +297,13 @@
     (is (= false (bit-test 1 2))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-test (bigint 1) 1))
-    (argument-error-thrown? (bit-test (double 0.1) 1))
-    (argument-error-thrown? (bit-test (float 0.1) 1))
-    (argument-error-thrown? (bit-test (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-test (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-test (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-test (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-test (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-test "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-test "foo" 1)))
 
   )
 
@@ -316,13 +312,13 @@
     (is (= 2 (bit-shift-left 1 1))))
 
  (testing "raises an error with big numbers and decimals"
-    (argument-error-thrown? (bit-shift-left (bigint 1) 1))
-    (argument-error-thrown? (bit-shift-left (double 0.1) 1))
-    (argument-error-thrown? (bit-shift-left (float 0.1) 1))
-    (argument-error-thrown? (bit-shift-left (bigdec 0.1) 1)))
+    (argument-error-is-thrown? #"" (bit-shift-left (bigint 1) 1))
+    (argument-error-is-thrown? #"" (bit-shift-left (double 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-shift-left (float 0.1) 1))
+    (argument-error-is-thrown? #"" (bit-shift-left (bigdec 0.1) 1)))
 
   (testing "raises an error without a number type"
-    (argument-error-thrown? (bit-shift-left "foo" 1)))
+    (argument-error-is-thrown? #"" (bit-shift-left "foo" 1)))
 
   )
 
@@ -340,8 +336,8 @@
     (is (= 42 (+ 1 1 40))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (+ "Foo"))
-    (class-cast-exception-thrown? (+ 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (+ "Foo"))
+    (class-cast-exception-is-thrown? #"" (+ 1 "Foo")))
 
   )
 
@@ -359,8 +355,8 @@
     (is (= 42 (+' 1 1 40))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (+' "Foo"))
-    (class-cast-exception-thrown? (+' 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (+' "Foo"))
+    (class-cast-exception-is-thrown? #"" (+' 1 "Foo")))
 
   )
 
@@ -369,7 +365,7 @@
     (is (= 2 (inc 1))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (inc "Foo")))
+    (class-cast-exception-is-thrown? #"" (inc "Foo")))
 
   )
 
@@ -378,7 +374,7 @@
     (is (= 2 (inc 1))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (inc "Foo")))
+    (class-cast-exception-is-thrown? #"" (inc "Foo")))
 
   )
 
@@ -396,8 +392,8 @@
     (is (= 42 (* 1 2 21))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (* "Foo"))
-    (class-cast-exception-thrown? (* 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (* "Foo"))
+    (class-cast-exception-is-thrown? #"" (* 1 "Foo")))
 
   )
 
@@ -415,8 +411,8 @@
     (is (= 42 (*' 1 2 21))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (*' "Foo"))
-    (class-cast-exception-thrown? (*' 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (*' "Foo"))
+    (class-cast-exception-is-thrown? #"" (*' 1 "Foo")))
 
   )
 
@@ -431,8 +427,8 @@
     (is (= 1 (- 5 3 1))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (- "Foo"))
-    (class-cast-exception-thrown? (- 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (- "Foo"))
+    (class-cast-exception-is-thrown? #"" (- 1 "Foo")))
 
   )
 
@@ -447,8 +443,8 @@
     (is (= 1 (-' 5 3 1))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (-' "Foo"))
-    (class-cast-exception-thrown? (-' 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (-' "Foo"))
+    (class-cast-exception-is-thrown? #"" (-' 1 "Foo")))
 
   )
 
@@ -457,7 +453,7 @@
     (is (= 1 (dec 2))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (dec "Foo")))
+    (class-cast-exception-is-thrown? #"" (dec "Foo")))
 
   )
 
@@ -466,7 +462,7 @@
     (is (= 1 (dec 2))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (dec "Foo")))
+    (class-cast-exception-is-thrown? #"" (dec "Foo")))
 
   )
 
@@ -483,12 +479,73 @@
     (is 2 (/ 12 2 3)))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-thrown? (/ "Foo"))
-    (class-cast-exception-thrown? (/ 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (/ "Foo"))
+    (class-cast-exception-is-thrown? #"" (/ 1 "Foo")))
 
   )
 
-(def types [byte short int long double float bigint biginteger bigdec])
+(def int-types [byte short int long bigint biginteger])
+(def float-types [double float bigdec])
+(def types (concat int-types float-types))
+
+(deftest quot-test
+  (doseq [x int-types
+          y int-types]
+    (testing (str x " quot with " y)
+      (is (= 1 (quot (x 1) (y 1))))))
+
+  (doseq [x float-types
+          y float-types]
+    (testing (str x " quot with " y)
+      (is (or (= 1.0 (quot (x 1) (y 1)))
+              (= 1M (quot (x 1) (y 1)))))))
+
+  (doseq [x int-types
+          y float-types]
+    (testing (str x " quot with " y)
+      (is (or (= 1.0 (quot (x 1) (y 1)))
+              (= 1M (quot (x 1) (y 1)))))))
+
+  (testing "quot throws an exception if dividing by 0"
+    (doseq [x types
+            y types]
+      (arithmetic-exception-is-thrown? #"Divide by zero" (quot (x 1) (y 0))))))
+
+(deftest rem-test
+  (doseq [x int-types
+          y int-types]
+    (testing (str x " rem with " y)
+      (is (= 1 (rem (x 3) (y 2))))))
+
+  (doseq [x float-types
+          y float-types]
+    (testing (str x " rem with " y)
+      (is (or (= 1.0 (rem (x 3) (y 2)))
+              (= 1M (rem (x 3) (y 2)))))))
+
+  (doseq [x int-types
+          y float-types]
+    (testing (str x " rem with " y)
+      (is (or (= 1.0 (rem (x 3) (y 2)))
+              (= 1M (rem (x 3) (y 2)))))))
+
+  (testing "rem throws an exception if dividing by 0"
+    (doseq [x types
+            y types]
+      (arithmetic-exception-is-thrown? #"Divide by zero" (rem (x 1) (y 0))))))
+
+(deftest mod-test
+  (testing "modulus is returned as zero if zero"
+    (is (zero? (mod 1 1))))
+
+  (testing "modulus is returned if both arguments are positive"
+    (is (= 1 (mod 3 2))))
+
+  (testing "modulus is returned if both arguments are negative"
+    (is (= -1 (mod -3 -2))))
+
+  (testing "modulus is added to the second arguments if the signs do not match"
+    (is (= -1 (mod 3 -2)))))
 
 (deftest zero-test
   (doseq [x types]
@@ -496,7 +553,7 @@
       (is (zero? (x 0)))))
 
   (testing "raises an error without a number argument"
-    (class-cast-exception-thrown? (zero? "Foo"))))
+    (class-cast-exception-is-thrown? #"" (zero? "Foo"))))
 
 (deftest <-test
   (testing "< with one argument returns true"

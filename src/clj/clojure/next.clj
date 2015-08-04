@@ -84,7 +84,7 @@
                                 :refer ['numbers-equal? 'numbers-equivalent?
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'incrementp 'decrement 'decrementp
-                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
+                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide 'quotient 'remainder
                                         'is-number? 'is-zero?
                                         '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec
                                         'lt 'lte]])
@@ -247,6 +247,21 @@
   ([x y] (divide x y))
   ([x y & more] (clojure.core/reduce / (/ x y) more)))
 
+(defn zero? [i]
+  (is-zero? i))
+
+(defn quot [n div]
+  (quotient n div))
+
+(defn rem [n div]
+  (remainder n div))
+
+(defn mod [n div]
+  (let [modulus (rem n div)]
+    (if (or (zero? modulus) (= (pos? n) (pos? div)))
+      modulus
+      (+ modulus div))))
+
 (defn inc [i]
   (increment i))
 
@@ -258,9 +273,6 @@
 
 (defn dec' [i]
   (decrementp i))
-
-(defn zero? [i]
-  (is-zero? i))
 
 (defn <
   ([a] true)
