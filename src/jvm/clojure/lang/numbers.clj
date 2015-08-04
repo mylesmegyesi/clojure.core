@@ -16,6 +16,7 @@
            [clojure.lang.platform.numbers Subtraction]
            [clojure.lang.platform.numbers Decrement]
            [clojure.lang.platform.numbers Division]
+           [clojure.lang.platform.numbers Quotient]
            [clojure.lang.platform.numbers Negation]
            [clojure.lang.platform.numbers Comparison]
            [clojure.lang.platform.numbers Zero]))
@@ -102,6 +103,9 @@
 
 (defmacro divide [x y]
   `(. Division (numberDivide ~x ~y)))
+
+(defmacro quotient [x y]
+  `(. Quotient (numberQuotient ~x ~y)))
 
 (defmacro numbers-equal? [x y]
   `(. Equivalence (numberEqual ~x ~y)))

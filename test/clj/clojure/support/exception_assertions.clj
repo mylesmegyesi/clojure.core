@@ -6,6 +6,9 @@
 (defmacro argument-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? argument-error msg body)))
 
+(defmacro arithmetic-exception-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? arithmetic-exception msg body)))
+
 (defmacro assertion-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
 

@@ -84,7 +84,7 @@
                                 :refer ['numbers-equal? 'numbers-equivalent?
                                         'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
                                         'increment 'incrementp 'decrement 'decrementp
-                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide
+                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide 'quotient
                                         'is-number? 'is-zero?
                                         '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec
                                         'lt 'lte]])
@@ -246,6 +246,9 @@
   ([x] (/ 1 x))
   ([x y] (divide x y))
   ([x y & more] (clojure.core/reduce / (/ x y) more)))
+
+(defn quot [n div]
+  (quotient n div))
 
 (defn inc [i]
   (increment i))

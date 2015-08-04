@@ -5,6 +5,11 @@
 (defmacro new-argument-error [& args]
   (list* 'new argument-error args))
 
+(def arithmetic-exception ArithmeticException)
+
+(defmacro new-arithmetic-exception [& args]
+  (list* 'new arithmetic-exception args))
+
 (def assertion-error AssertionError)
 
 (defmacro new-assertion-error [& args]
