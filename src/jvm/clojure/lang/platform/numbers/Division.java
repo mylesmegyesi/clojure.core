@@ -33,6 +33,10 @@ public final class Division {
 
   private final static long LONG_ZERO = Long.valueOf(0);
   public static Number longDivide(long x, long y) {
+    if (y == LONG_ZERO) {
+      throw new ArithmeticException("Divide by zero");
+    }
+
     long gcd = gcd(x, y);
     if (gcd == 0) {
       return LONG_ZERO;
@@ -77,16 +81,20 @@ public final class Division {
   }
 
   public static Number ratioDivide(Ratio x, Ratio y) {
-    return (Number) bigIntegerDivide(y.getDenominator().multiply(x.getNumerator()),
-                                     y.getNumerator().multiply(x.getDenominator()));
+    return bigIntegerDivide(y.getDenominator().multiply(x.getNumerator()),
+                            y.getNumerator().multiply(x.getDenominator()));
   }
 
   public static Number bigDecimalDivide(BigDecimal x, BigDecimal y) {
-    return (Number) x.divide(y);
+    if (y.signum() == 0) {
+      throw new ArithmeticException("Divide by zero");
+    }
+
+    return x.divide(y);
   }
 
   public static Number doubleDivide(double x, double y) {
-    return (Number) Double.valueOf(x / y);
+    return Double.valueOf(x / y);
   }
 
 }
