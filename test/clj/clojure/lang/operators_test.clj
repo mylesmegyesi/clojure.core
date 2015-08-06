@@ -86,6 +86,10 @@
 
   )
 
+(def int-types [byte short int long bigint biginteger])
+(def float-types [double float bigdec])
+(def types (concat int-types float-types))
+
 (deftest byte-test
   (testing "raises an error when cast from less than min byte"
     (is (= -128 (byte -128)))
@@ -482,11 +486,18 @@
     (class-cast-exception-is-thrown? #"" (/ "Foo"))
     (class-cast-exception-is-thrown? #"" (/ 1 "Foo")))
 
-  )
+  (testing "int types raise an error when dividing by zero"
+    (doseq [t int-types]
+      (arithmetic-exception-is-thrown? #"Divide by zero" (/ (t 1) (t 0)))))
 
-(def int-types [byte short int long bigint biginteger])
-(def float-types [double float bigdec])
-(def types (concat int-types float-types))
+  (testing "bigdec types raise an error when diving by zero"
+    (arithmetic-exception-is-thrown? #"Divide by zero" (/ 1M 0M)))
+
+  (testing "floats and doubles return INFINITY when dividing by zero"
+    (doseq [t [float double]]
+      (is (= "Infinity" (str (/ (t 1) (t 0)))))))
+
+  )
 
 (deftest quot-test
   (doseq [x int-types
