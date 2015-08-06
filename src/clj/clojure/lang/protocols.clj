@@ -104,7 +104,7 @@
   (-contains?    [this x])
   (-conj         [this xs])
   (-difference   [this sets])
-  (-disj         [this xs])
+  (-disj         [this x])
   (-intersection [this sets])
   (-union        [this sets]))
 
