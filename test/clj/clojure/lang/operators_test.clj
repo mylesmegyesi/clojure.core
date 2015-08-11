@@ -470,6 +470,19 @@
 
   )
 
+(deftest max-test
+  (testing "max with one argument is identity"
+    (is (= 1 (max 1)))
+    (is (= :foo (max :foo))))
+
+  (doseq [x types
+          y types]
+    (testing (str (type x) " can be the max over " (type y))
+      (is (= (y 2) (max (x 1) (y 2))))))
+
+  (testing "max can handle an arbitrary number of arguments"
+    (is (= 5 (max 4 5 2 3 1)))))
+
 (deftest divide-test ; / is not a valid character
   (testing "ratio creation with a single argument"
     (let [ratio (/ 2)]

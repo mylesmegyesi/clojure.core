@@ -93,6 +93,9 @@
 (defmacro decrementp [x]
   `(. Decrement (numberPrecisionDecrement ~x)))
 
+(defmacro maximum [x y]
+  `(. Comparison (numberMaximum ~x ~y)))
+
 (defmacro divide [x y]
   `(. Division (numberDivide ~x ~y)))
 

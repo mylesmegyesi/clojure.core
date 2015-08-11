@@ -7,7 +7,103 @@ import clojure.lang.platform.Ratio;
 
 public final class Comparison {
 
-  public static final boolean lessThan(Number x, Number y) {
+  public static Number numberMaximum(double x, double y) {
+    return Math.max(x, y);
+  }
+
+  public static Number numberMaximum(double x, long y) {
+    if (Double.isNaN(x)) {
+      return x;
+    } else {
+      if (x > y) {
+        return x;
+      } else {
+        return y;
+      }
+    }
+  }
+
+  public static Number numberMaximum(long x, double y) {
+    if (Double.isNaN(y)) {
+      return y;
+    } else {
+      if (x > y) {
+        return x;
+      } else {
+        return y;
+      }
+    }
+  }
+
+  public static Object numberMaximum(double x, Object y) {
+    if (Double.isNaN(x)) {
+      return x;
+    } else if (isNaN(y)) {
+      return y;
+    } else {
+      if (x > ((Number)y).doubleValue()) {
+        return x;
+      } else {
+        return y;
+      }
+    }
+  }
+
+  public static Object numberMaximum(Object x, double y) {
+    if (isNaN(x)) {
+      return x;
+    } else if (Double.isNaN(y)) {
+      return y;
+    } else {
+      if (y > ((Number)x).doubleValue()) {
+        return y;
+      } else {
+        return x;
+      }
+    }
+  }
+
+  public static Number numberMaximum(long x, long y) {
+    if (x > y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMaximum(long x, Object y) {
+    if (isNaN(y)) {
+      return y;
+    } else if (lessThan((Number) y, x)) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMaximum(Object x, long y) {
+    if (isNaN(x)) {
+      return y;
+    } else if (lessThan(y, (Number) x)) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMaximum(Object x, Object y) {
+    if (isNaN(x)) {
+      return x;
+    } else if (isNaN(y)) {
+      return y;
+    } else if (lessThan((Number) y, (Number) x)) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static boolean lessThan(Number x, Number y) {
     Ops type = OpType.findOpType(x, y);
     if (type == Ops.DOUBLE) {
       return Comparison.doubleLessThan(Coercion.toDouble(x), Coercion.toDouble(y));
@@ -35,6 +131,11 @@ public final class Comparison {
     } else {
       return Comparison.longLessThanEqualTo(Coercion.toLong(x), Coercion.toLong(y));
     }
+  }
+
+  private static boolean isNaN(Object x) {
+    return (x instanceof Double) && ((Double)x).isNaN()
+      || (x instanceof Float) && ((Float)x).isNaN();
   }
 
   private static boolean doubleLessThan(double x, double y) {
