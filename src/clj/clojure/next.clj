@@ -87,7 +87,7 @@
                                         'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide 'quotient 'remainder
                                         'is-number? 'is-zero?
                                         '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec
-                                        'lt 'lte]])
+                                        'maximum 'lt 'lte]])
 
 (defn number? [x]
   (is-number? x))
@@ -273,6 +273,12 @@
 
 (defn dec' [i]
   (decrementp i))
+
+(defn max
+  ([x] x)
+  ([x y] (maximum x y))
+  ([x y & more]
+    (clojure.core/reduce max (max x y) more)))
 
 (defn <
   ([a] true)

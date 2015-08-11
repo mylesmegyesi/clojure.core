@@ -1055,6 +1055,13 @@
       (is (= Long (type (divide t1 t2))))
       (is (= 2 (divide t1 t2))))))
 
+(deftest max-fallback-number-test
+  (testing "max can handle arbitrary number types"
+    (let [t1 (number 5)
+          t2 (number 6)]
+      (is (= FallBackNumber (type (max t1 t2))))
+      (is (= 6 (.longValue (max t1 t2)))))))
+
 (deftest integer-zero-test
   (is (is-zero? (int 0)))
   (is (not (is-zero? (int 1))))
