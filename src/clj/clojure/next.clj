@@ -652,6 +652,24 @@
               next-acc (f acc (first next-s))]
           (recur (next next-s) next-acc))))))
 
+(defn transient [coll]
+  (-as-transient coll))
+
+(defn persistent! [coll]
+  (-persistent coll))
+
+(defn conj! [coll x]
+  (-conj! coll x))
+
+(defn assoc! [coll index x]
+  (-assoc! coll index x))
+
+(defn dissoc! [coll index]
+  (-dissoc! coll index))
+
+(defn pop! [coll]
+  (-pop! coll))
+
 (require ['clojure.lang.array :as 'arr])
 
 (defn aset [arr i val]
@@ -777,17 +795,6 @@
 (defn chunked-seq? [cs]
   (is-chunked-seq? cs))
 
-(require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
-
-(defn array-map [& args]
-  (let [sargs (seq args)
-        size (count sargs)]
-    (if (even? size)
-      (new-array-map (into-array sargs) size (/ size 2) nil)
-      (throw (new-argument-error
-               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
-                       size))))))
-
 (require ['clojure.lang.persistent-hash-map :refer ['new-hash-map 'EMPTY-HASH-MAP]])
 
 (defn hash-map [& kvs]
@@ -803,6 +810,17 @@
                    (format "PersistentHashMap can only be created with even number of arguments: %s arguments given"
                            size)))))
       EMPTY-HASH-MAP)))
+
+(require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
+
+(defn array-map [& args]
+  (let [sargs (seq args)
+        size (count sargs)]
+    (if (even? size)
+      (new-array-map (into-array sargs) size (/ size 2) nil)
+      (throw (new-argument-error
+               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
+                       size))))))
 
 (require ['clojure.lang.apersistent-set :refer ['make-pairs]])
 (require ['clojure.lang.persistent-hash-set :refer ['make-hash-set]])
@@ -855,24 +873,6 @@
 (defn sorted-set-by [compare-fn & ks]
   (make-sorted-set
     (apply sorted-map-by (clojure.core/cons compare-fn (make-pairs ks)))))
-
-(defn transient [coll]
-  (-as-transient coll))
-
-(defn persistent! [coll]
-  (-persistent coll))
-
-(defn conj! [coll x]
-  (-conj! coll x))
-
-(defn assoc! [coll index x]
-  (-assoc! coll index x))
-
-(defn dissoc! [coll index]
-  (-dissoc! coll index))
-
-(defn pop! [coll]
-  (-pop! coll))
 
 (defn contains? [coll k]
   (cond
