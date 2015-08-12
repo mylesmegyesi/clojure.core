@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [cond declare defn defn- deftype let loop max when if-let even? format])
+  (:refer-clojure :only [apply cond declare defn defn- deftype let loop when if-let even? format ->])
   (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
             [clojure.lang.array           :refer [array-copy]]
             [clojure.lang.aseq            :refer [defseq]]
@@ -60,13 +60,14 @@
             (aset -arr (inc idx) v))
           this)
         (do
-          (when (>= -length (alength -arr))
-            ;TODO: Become HashMap Transient
-            )
-          (aset -arr -length k)
-          (aset -arr (inc -length) v)
-          (set! -length (+ -length 2))
-          this))))
+          (if (>= -length (alength -arr))
+            (-> (transient (apply hash-map -arr))
+              (assoc! k v))
+            (do
+              (aset -arr -length k)
+              (aset -arr (inc -length) v)
+              (set! -length (+ -length 2))
+              this))))))
 
   ITransientCollection
   (-conj! [this o]

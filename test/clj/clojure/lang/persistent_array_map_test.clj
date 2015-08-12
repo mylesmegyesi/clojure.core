@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-array-map-test
-  (:refer-clojure :only [defmacro deftype let list list*])
+  (:refer-clojure :only [defmacro deftype for let list range re-matches])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.persistent-map-test :refer [map-test]]
             [clojure.lang.protocols           :refer [ISeqable ISequential]]
@@ -105,4 +105,12 @@
       (is (= s1 (FixedSequential. s2))))))
 
 (deftest transient-array-map
-  (transient-map-test array-map))
+  (transient-map-test array-map)
+
+  (testing "transient array-map becomes a transient hash-map when hashtable-threshold is crossed"
+    (let [t (transient (array-map))
+          ts (for [n (range 0 9)]
+               (assoc! t n n))]
+      (is (re-matches #".*TransientArrayMap" (str (type (clojure.core/nth ts 7)))))
+      (is (re-matches #".*TransientHashMap" (str (type (clojure.core/nth ts 8))))))))
+
