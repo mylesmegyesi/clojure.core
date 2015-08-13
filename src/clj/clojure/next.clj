@@ -1152,11 +1152,12 @@
 
 (defmulti print-dup (fn [obj writer] (class obj)))
 
-(require ['clojure.lang.input-output :refer ['default-out 'platform-out-str 'platform-append-space
-                                             'platform-print-constructor
-                                             'platform-newline 'platform-flush 'platform-write
-                                             'print-map 'print-meta 'print-sequential]])
+(require ['clojure.lang.input-output :refer :all])
 (def ^:dynamic *out* (default-out))
+
+(defn line-seq [rdr]
+  (when-let [line (platform-read-line rdr)]
+    (cons line (lazy-seq (line-seq rdr)))))
 
 (defn newline []
   (platform-newline)

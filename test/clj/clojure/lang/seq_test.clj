@@ -135,3 +135,7 @@
   (testing "throws an exception when not given an iterator"
     (class-cast-exception-is-thrown? #".*" (iterator-seq "foo"))))
 
+(deftest line-seq-test
+  (testing "throws an exception when not given a reader"
+    (class-cast-exception-is-thrown? #".*" (line-seq "foo"))))
+
