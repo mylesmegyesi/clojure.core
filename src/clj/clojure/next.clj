@@ -14,9 +14,7 @@
    :minor       6
    :incremental 0})
 
-(declare cons
-         str
-         seq first next)
+(declare cons str seq first next reduce)
 
 (defn clojure-version []
   (str (:major *clojure-version*) "."
@@ -87,7 +85,7 @@
                                         'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide 'quotient 'remainder
                                         'is-number? 'is-zero?
                                         '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec
-                                        'maximum 'lt 'lte]])
+                                        'maximum 'minimum 'lt 'lte]])
 
 (defn number? [x]
   (is-number? x))
@@ -182,19 +180,19 @@
 
 (defn bit-and
   ([n other] (band n other))
-  ([n other & more] (clojure.core/reduce bit-and (bit-and n other) more)))
+  ([n other & more] (reduce bit-and (bit-and n other) more)))
 
 (defn bit-and-not
   ([n other] (band-not n other))
-  ([n other & more] (clojure.core/reduce bit-and-not (bit-and-not n other) more)))
+  ([n other & more] (reduce bit-and-not (bit-and-not n other) more)))
 
 (defn bit-or
   ([n other] (bor n other))
-  ([n other & more] (clojure.core/reduce bit-or (bit-or n other) more)))
+  ([n other & more] (reduce bit-or (bit-or n other) more)))
 
 (defn bit-xor
   ([n other] (bxor n other))
-  ([n other & more] (clojure.core/reduce bit-xor (bit-xor n other) more)))
+  ([n other & more] (reduce bit-xor (bit-xor n other) more)))
 
 (defn bit-clear [x location]
   (bclear x location))
@@ -212,40 +210,40 @@
   ([] 0)
   ([x] (add x 0))
   ([x y] (add x y))
-  ([x y & more] (clojure.core/reduce + (+ x y) more)))
+  ([x y & more] (reduce + (+ x y) more)))
 
 (defn +'
   ([] 0)
   ([x] (addp x 0))
   ([x y] (addp x y))
-  ([x y & more] (clojure.core/reduce +' (+' x y) more)))
+  ([x y & more] (reduce +' (+' x y) more)))
 
 (defn -
   ([x] (subtract x))
   ([x y] (subtract x y))
-  ([x y & more] (clojure.core/reduce - (- x y) more)))
+  ([x y & more] (reduce - (- x y) more)))
 
 (defn -'
   ([x] (subtractp x))
   ([x y] (subtractp x y))
-  ([x y & more] (clojure.core/reduce -' (-' x y) more)))
+  ([x y & more] (reduce -' (-' x y) more)))
 
 (defn *
   ([] 1)
   ([x] (multiply x 1))
   ([x y] (multiply x y))
-  ([x y & more] (clojure.core/reduce * (* x y) more)))
+  ([x y & more] (reduce * (* x y) more)))
 
 (defn *'
   ([] 1)
   ([x] (multiplyp x 1))
   ([x y] (multiplyp x y))
-  ([x y & more] (clojure.core/reduce *' (*' x y) more)))
+  ([x y & more] (reduce *' (*' x y) more)))
 
 (defn /
   ([x] (/ 1 x))
   ([x y] (divide x y))
-  ([x y & more] (clojure.core/reduce / (/ x y) more)))
+  ([x y & more] (reduce / (/ x y) more)))
 
 (defn zero? [i]
   (is-zero? i))
@@ -278,7 +276,13 @@
   ([x] x)
   ([x y] (maximum x y))
   ([x y & more]
-    (clojure.core/reduce max (max x y) more)))
+    (reduce max (max x y) more)))
+
+(defn min
+  ([x] x)
+  ([x y] (minimum x y))
+  ([x y & more]
+    (reduce min (min x y) more)))
 
 (defn <
   ([a] true)

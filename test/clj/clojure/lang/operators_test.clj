@@ -483,6 +483,19 @@
   (testing "max can handle an arbitrary number of arguments"
     (is (= 5 (max 4 5 2 3 1)))))
 
+(deftest min-test
+  (testing "min with one argument is identity"
+    (is (= 1 (min 1)))
+    (is (= :foo (min :foo))))
+
+  (doseq [x types
+          y types]
+    (testing (str (type x) " can be the min under " (type y))
+      (is (= (y 1) (min (x 2) (y 1))))))
+
+  (testing "min can handle an arbitrary number of arguments"
+    (is (= 1 (min 4 5 1 3 2)))))
+
 (deftest divide-test ; / is not a valid character
   (testing "ratio creation with a single argument"
     (let [ratio (/ 2)]

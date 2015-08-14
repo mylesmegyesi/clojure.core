@@ -14,24 +14,20 @@ public final class Comparison {
   public static Number numberMaximum(double x, long y) {
     if (Double.isNaN(x)) {
       return x;
+    } else if (x > y) {
+      return x;
     } else {
-      if (x > y) {
-        return x;
-      } else {
-        return y;
-      }
+      return y;
     }
   }
 
   public static Number numberMaximum(long x, double y) {
     if (Double.isNaN(y)) {
       return y;
+    } else if (x > y) {
+      return x;
     } else {
-      if (x > y) {
-        return x;
-      } else {
-        return y;
-      }
+      return y;
     }
   }
 
@@ -40,12 +36,10 @@ public final class Comparison {
       return x;
     } else if (isNaN(y)) {
       return y;
+    } else if (x > ((Number)y).doubleValue()) {
+      return x;
     } else {
-      if (x > ((Number)y).doubleValue()) {
-        return x;
-      } else {
-        return y;
-      }
+      return y;
     }
   }
 
@@ -54,12 +48,10 @@ public final class Comparison {
       return x;
     } else if (Double.isNaN(y)) {
       return y;
+    } else if (y > ((Number)x).doubleValue()) {
+      return y;
     } else {
-      if (y > ((Number)x).doubleValue()) {
-        return y;
-      } else {
-        return x;
-      }
+      return x;
     }
   }
 
@@ -97,6 +89,94 @@ public final class Comparison {
     } else if (isNaN(y)) {
       return y;
     } else if (lessThan((Number) y, (Number) x)) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Number numberMinimum(double x, double y) {
+    return Math.min(x, y);
+  }
+
+  public static Number numberMinimum(double x, long y) {
+    if (Double.isNaN(x)) {
+      return x;
+    } else if (x < y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Number numberMinimum(long x, double y) {
+    if (Double.isNaN(y)) {
+      return y;
+    } else if (x < y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMinimum(double x, Object y) {
+    if (Double.isNaN(x)) {
+      return x;
+    } else if (isNaN(y)) {
+      return y;
+    } else if (x < ((Number) y).doubleValue()) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMinimum(Object x, double y) {
+    if (isNaN(x)) {
+      return x;
+    } else if (Double.isNaN(y)) {
+      return y;
+    } else if (((Number) x).doubleValue() < y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Number numberMinimum(long x, long y) {
+    if (x < y) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMinimum(long x, Object y) {
+    if (isNaN(y)) {
+      return y;
+    } else if (lessThan(x, (Number) y)) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMinimum(Object x, long y) {
+    if (isNaN(x)) {
+      return x;
+    } else if (lessThan((Number) x, y)) {
+      return x;
+    } else {
+      return y;
+    }
+  }
+
+  public static Object numberMinimum(Object x, Object y) {
+    if (isNaN(x)) {
+      return x;
+    } else if (isNaN(y)) {
+      return y;
+    } else if (lessThan((Number) x, (Number) y)) {
       return x;
     } else {
       return y;
@@ -179,4 +259,5 @@ public final class Comparison {
   private static boolean longLessThanEqualTo(long x, long y) {
     return x <= y;
   }
+
 }

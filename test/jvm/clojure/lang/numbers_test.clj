@@ -1062,6 +1062,21 @@
       (is (= FallBackNumber (type (max t1 t2))))
       (is (= 6 (.longValue (max t1 t2)))))))
 
+(deftest max-NaN-test
+  (testing "max will always return NaN if present"
+    (is (. Double isNaN (max 1 Double/NaN 2)))))
+
+(deftest min-fallback-number-test
+  (testing "min can handle arbitrary number types"
+    (let [t1 (number 5)
+          t2 (number 6)]
+      (is (= FallBackNumber (type (min t1 t2))))
+      (is (= 5 (.longValue (min t1 t2)))))))
+
+(deftest min-NaN-test
+  (testing "min will always return NaN if presesnt"
+    (is (. Double isNaN (min 1 Double/NaN 2)))))
+
 (deftest integer-zero-test
   (is (is-zero? (int 0)))
   (is (not (is-zero? (int 1))))

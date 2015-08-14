@@ -96,6 +96,9 @@
 (defmacro maximum [x y]
   `(. Comparison (numberMaximum ~x ~y)))
 
+(defmacro minimum [x y]
+  `(. Comparison (numberMinimum ~x ~y)))
+
 (defmacro divide [x y]
   `(. Division (numberDivide ~x ~y)))
 
