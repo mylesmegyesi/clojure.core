@@ -5,6 +5,9 @@
   (:import [java.io Writer OutputStreamWriter StringWriter]
            [clojure.next]))
 
+(defn platform-read-line [^java.io.BufferedReader rdr]
+  (.readLine rdr))
+
 (defn platform-print-constructor [obj print-args ^Writer wrtr]
   (.write wrtr "#=(")
   (.write wrtr (.getName ^Class (class obj)))

@@ -6,7 +6,8 @@
             [clojure.lang.protocols               :refer [-index]]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?]]
             [clojure.support.test-seq             :refer [test-seq]])
-  (:import [java.util ArrayList HashMap]))
+  (:import [java.util ArrayList HashMap]
+           [java.io BufferedReader StringReader]))
 
 (deftest platform-seq-test
   (testing "an argument error is thrown without a seqable type"
@@ -179,4 +180,13 @@
   (testing "string seq holds a meta value"
     (let [w-meta (with-meta (seq "foo") (array-map :so :meta))]
       (is (= (array-map :so :meta) (meta w-meta))))))
+
+(deftest line-seq-test
+  (let [srdr (StringReader. "foo\nbar\nbaz")
+        rdr (BufferedReader. srdr)
+        s (line-seq rdr)]
+    (is (= 3 (count s)))
+    (is (= "foo" (nth s 0)))
+    (is (= "bar" (nth s 1)))
+    (is (= "baz" (nth s 2)))))
 
