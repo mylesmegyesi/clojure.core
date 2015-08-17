@@ -78,17 +78,10 @@
   (satisfies? IAssociative x))
 
 (declare bigint)
-(require ['clojure.lang.numbers :as 'platform-numbers
-                                :refer ['numbers-equal? 'numbers-equivalent?
-                                        'bshift-right 'bunsigned-shift-right 'bshift-left 'bnot 'band 'band-not 'bor 'bxor 'bclear 'bset 'bflip 'btest
-                                        'increment 'incrementp 'decrement 'decrementp
-                                        'add 'addp 'multiply 'multiplyp 'subtract 'subtractp 'divide 'quotient 'remainder
-                                        'is-number? 'is-zero?
-                                        '->short '->byte '->int '->long '->double '->float '->bigint '->biginteger '->bigdec
-                                        'maximum 'minimum 'lt 'lte]])
+(require '[clojure.lang.numbers :as platform-numbers])
 
 (defn number? [x]
-  (is-number? x))
+  (platform-numbers/number? x))
 
 (defmacro when-not-nil [x y & body]
   ^:private
@@ -105,7 +98,7 @@
 (defn- equal? [x y]
   (when-not-nil x y
     (if (and (number? x) (number? y))
-      (numbers-equal? x y)
+      (platform-numbers/equal? x y)
       (-equal? x y))))
 
 (defn =
@@ -117,7 +110,7 @@
 (defn ==
   "Equivalence. Calls the platform numbers-equivalent? function with the arguments"
   ([x] true)
-  ([x y] (numbers-equivalent? x y))
+  ([x y] (platform-numbers/equivalent? x y))
   ([x y & more] (and (== x y) (apply == y more))))
 
 (defn not
@@ -141,118 +134,118 @@
   (not (apply == args)))
 
 (defn byte [x]
-  (->byte x))
+  (platform-numbers/->byte x))
 
 (defn short [x]
-  (->short x))
+  (platform-numbers/->short x))
 
 (defn int [x]
-  (->int x))
+  (platform-numbers/->int x))
 
 (defn long [x]
-  (->long x))
+  (platform-numbers/->long x))
 
 (defn double [x]
-  (->double x))
+  (platform-numbers/->double x))
 
 (defn float [x]
-  (->float x))
+  (platform-numbers/->float x))
 
 (defn bigint [x]
-  (->bigint x))
+  (platform-numbers/->bigint x))
 
 (defn biginteger [x]
-  (->biginteger x))
+  (platform-numbers/->biginteger x))
 
 (defn bigdec [x]
-  (->bigdec x))
+  (platform-numbers/->bigdec x))
 
 (defn bit-shift-right [n shift]
-  (bshift-right n shift))
+  (platform-numbers/bit-shift-right n shift))
 
 (defn unsigned-bit-shift-right [n shift]
-  (bunsigned-shift-right n shift))
+  (platform-numbers/unsigned-bit-shift-right n shift))
 
 (defn bit-shift-left [n shift]
-  (bshift-left n shift))
+  (platform-numbers/bit-shift-left n shift))
 
-(defn bit-not [x] (bnot x))
+(defn bit-not [x] (platform-numbers/bit-not x))
 
 (defn bit-and
-  ([n other] (band n other))
+  ([n other] (platform-numbers/bit-and n other))
   ([n other & more] (reduce bit-and (bit-and n other) more)))
 
 (defn bit-and-not
-  ([n other] (band-not n other))
+  ([n other] (platform-numbers/bit-and-not n other))
   ([n other & more] (reduce bit-and-not (bit-and-not n other) more)))
 
 (defn bit-or
-  ([n other] (bor n other))
+  ([n other] (platform-numbers/bit-or n other))
   ([n other & more] (reduce bit-or (bit-or n other) more)))
 
 (defn bit-xor
-  ([n other] (bxor n other))
+  ([n other] (platform-numbers/bit-xor n other))
   ([n other & more] (reduce bit-xor (bit-xor n other) more)))
 
 (defn bit-clear [x location]
-  (bclear x location))
+  (platform-numbers/bit-clear x location))
 
 (defn bit-set [x location]
-  (bset x location))
+  (platform-numbers/bit-set x location))
 
 (defn bit-flip [x location]
-  (bflip x location))
+  (platform-numbers/bit-flip x location))
 
 (defn bit-test [x location]
-  (btest x location))
+  (platform-numbers/bit-test x location))
 
 (defn +
   ([] 0)
-  ([x] (add x 0))
-  ([x y] (add x y))
+  ([x] (platform-numbers/+ x 0))
+  ([x y] (platform-numbers/+ x y))
   ([x y & more] (reduce + (+ x y) more)))
 
 (defn +'
   ([] 0)
-  ([x] (addp x 0))
-  ([x y] (addp x y))
+  ([x] (platform-numbers/+' x 0))
+  ([x y] (platform-numbers/+' x y))
   ([x y & more] (reduce +' (+' x y) more)))
 
 (defn -
-  ([x] (subtract x))
-  ([x y] (subtract x y))
+  ([x] (platform-numbers/- x))
+  ([x y] (platform-numbers/- x y))
   ([x y & more] (reduce - (- x y) more)))
 
 (defn -'
-  ([x] (subtractp x))
-  ([x y] (subtractp x y))
+  ([x] (platform-numbers/-' x))
+  ([x y] (platform-numbers/-' x y))
   ([x y & more] (reduce -' (-' x y) more)))
 
 (defn *
   ([] 1)
-  ([x] (multiply x 1))
-  ([x y] (multiply x y))
+  ([x] (platform-numbers/* x 1))
+  ([x y] (platform-numbers/* x y))
   ([x y & more] (reduce * (* x y) more)))
 
 (defn *'
   ([] 1)
-  ([x] (multiplyp x 1))
-  ([x y] (multiplyp x y))
+  ([x] (platform-numbers/*' x 1))
+  ([x y] (platform-numbers/*' x y))
   ([x y & more] (reduce *' (*' x y) more)))
 
 (defn /
   ([x] (/ 1 x))
-  ([x y] (divide x y))
+  ([x y] (platform-numbers// x y))
   ([x y & more] (reduce / (/ x y) more)))
 
 (defn zero? [i]
-  (is-zero? i))
+  (platform-numbers/zero? i))
 
 (defn quot [n div]
-  (quotient n div))
+  (platform-numbers/quot n div))
 
 (defn rem [n div]
-  (remainder n div))
+  (platform-numbers/rem n div))
 
 (defn mod [n div]
   (let [modulus (rem n div)]
@@ -261,32 +254,35 @@
       (+ modulus div))))
 
 (defn inc [i]
-  (increment i))
+  (platform-numbers/inc i))
 
 (defn inc' [i]
-  (incrementp i))
+  (platform-numbers/inc' i))
 
 (defn dec [i]
-  (decrement i))
+  (platform-numbers/dec i))
 
 (defn dec' [i]
-  (decrementp i))
+  (platform-numbers/dec' i))
 
 (defn max
   ([x] x)
-  ([x y] (maximum x y))
+  ([x y] (platform-numbers/max x y))
   ([x y & more]
     (reduce max (max x y) more)))
 
 (defn min
   ([x] x)
-  ([x y] (minimum x y))
+  ([x y] (platform-numbers/min x y))
   ([x y & more]
     (reduce min (min x y) more)))
 
+(defn rationalize [n]
+  (platform-numbers/rationalize n))
+
 (defn <
   ([a] true)
-  ([a b] (lt a b))
+  ([a b] (platform-numbers/< a b))
   ([a b & more]
     (if (< a b)
       (if (next more)
@@ -296,7 +292,7 @@
 
 (defn <=
   ([a] true)
-  ([a b] (lte a b))
+  ([a b] (platform-numbers/<= a b))
   ([a b & more]
     (if (<= a b)
       (if (next more)
@@ -306,7 +302,7 @@
 
 (defn >
   ([a] true)
-  ([a b] (lt b a))
+  ([a b] (platform-numbers/< b a))
   ([a b & more]
     (if (> a b)
       (if (next more)
@@ -316,7 +312,7 @@
 
 (defn >=
   ([a] true)
-  ([a b] (lte b a))
+  ([a b] (platform-numbers/<= b a))
   ([a b & more]
     (if (>= a b)
       (if (next more)

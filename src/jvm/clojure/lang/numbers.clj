@@ -10,8 +10,8 @@
            [clojure.lang.platform.numbers Addition BitOps Cast Comparison
                                           Decrement Division Equivalence
                                           Increment Multiplication Negation
-                                          Quotient Remainder Subtraction
-                                          Zero]))
+                                          Quotient Rationalize Remainder
+                                          Subtraction Zero]))
 
 (def platform-byte        Byte)
 (def platform-short       Short)
@@ -22,99 +22,102 @@
 (def platform-float       Float)
 (def platform-double      Double)
 
-(defmacro is-number? [x]
+(defmacro number? [x]
   `(instance? Number ~x))
 
-(defmacro bnot [x]
+(defmacro bit-not [x]
   `(. BitOps (numberBitNot ~x)))
 
-(defmacro band [x y]
+(defmacro bit-and [x y]
   `(. BitOps (numberBitAnd ~x ~y)))
 
-(defmacro band-not [x y]
+(defmacro bit-and-not [x y]
   `(. BitOps (numberBitAndNot ~x ~y)))
 
-(defmacro bor [x y]
+(defmacro bit-or [x y]
   `(. BitOps (numberBitOr ~x ~y)))
 
-(defmacro bxor [x y]
+(defmacro bit-xor [x y]
   `(. BitOps (numberBitXor ~x ~y)))
 
-(defmacro bclear [x y]
+(defmacro bit-clear [x y]
   `(. BitOps (numberBitClear ~x ~y)))
 
-(defmacro bset [x y]
+(defmacro bit-set [x y]
   `(. BitOps (numberBitSet ~x ~y)))
 
-(defmacro bflip [x y]
+(defmacro bit-flip [x y]
   `(. BitOps (numberBitFlip ~x ~y)))
 
-(defmacro btest [x y]
+(defmacro bit-test [x y]
   `(. BitOps (numberBitTest ~x ~y)))
 
-(defmacro bshift-left [x y]
+(defmacro bit-shift-left [x y]
   `(. BitOps (numberBitShiftLeft ~x ~y)))
 
-(defmacro bshift-right [x y]
+(defmacro bit-shift-right [x y]
   `(. BitOps (numberBitShiftRight ~x ~y)))
 
-(defmacro bunsigned-shift-right [x y]
+(defmacro unsigned-bit-shift-right [x y]
   `(. BitOps (numberUnsignedBitShiftRight ~x ~y)))
 
-(defmacro add [x y]
+(defmacro + [x y]
   `(. Addition (numberAdd ~x ~y)))
 
-(defmacro addp [x y]
+(defmacro +' [x y]
   `(. Addition (numberPrecisionAdd ~x ~y)))
 
-(defmacro increment [x]
+(defmacro inc [x]
   `(. Increment (numberIncrement ~x)))
 
-(defmacro incrementp [x]
+(defmacro inc' [x]
   `(. Increment (numberPrecisionIncrement ~x)))
 
-(defmacro multiply [x y]
+(defmacro * [x y]
   `(. Multiplication (numberMultiply ~x ~y)))
 
-(defmacro multiplyp [x y]
+(defmacro *' [x y]
   `(. Multiplication (numberPrecisionMultiply ~x ~y)))
 
-(defmacro subtract
+(defmacro -
   ([x] `(. Negation (numberNegate ~x)))
   ([x y] `(. Subtraction (numberSubtract ~x ~y))))
 
-(defmacro subtractp
+(defmacro -'
   ([x] `(. Negation (numberPrecisionNegate ~x)))
   ([x y] `(. Subtraction (numberPrecisionSubtract ~x ~y))))
 
-(defmacro decrement [x]
+(defmacro dec [x]
   `(. Decrement (numberDecrement ~x)))
 
-(defmacro decrementp [x]
+(defmacro dec' [x]
   `(. Decrement (numberPrecisionDecrement ~x)))
 
-(defmacro maximum [x y]
+(defmacro max [x y]
   `(. Comparison (numberMaximum ~x ~y)))
 
-(defmacro minimum [x y]
+(defmacro min [x y]
   `(. Comparison (numberMinimum ~x ~y)))
 
-(defmacro divide [x y]
+(defmacro / [x y]
   `(. Division (numberDivide ~x ~y)))
 
-(defmacro quotient [x y]
+(defmacro quot [x y]
   `(. Quotient (numberQuotient ~x ~y)))
 
-(defmacro remainder [x y]
+(defmacro rem [x y]
   `(. Remainder (numberRemainder ~x ~y)))
 
-(defmacro numbers-equal? [x y]
+(defmacro rationalize [x]
+  `(. Rationalize (numberRationalize ~x)))
+
+(defmacro equal? [x y]
   `(. Equivalence (numberEqual ~x ~y)))
 
-(defmacro numbers-equivalent? [x y]
+(defmacro equivalent? [x y]
   `(. Equivalence (numbersEquivalent ~x ~y)))
 
-(defmacro is-zero? [x]
+(defmacro zero? [x]
   `(. Zero (numberIsZero ~x)))
 
 (defmacro ->byte [x]
@@ -162,16 +165,16 @@
      (cond
        (decimal? x#) x#
        (float? x#) (. BigDecimal valueOf (->double x#))
-       (ratio? x#) (divide (BigDecimal. (.getNumerator ^Ratio x#)) (.getDenominator ^Ratio x#))
+       (ratio? x#) (/ (BigDecimal. (.getNumerator ^Ratio x#)) (.getDenominator ^Ratio x#))
        (instance? BigInt x#) (.toBigDecimal ^BigInt x#)
        (instance? BigInteger x#) (BigDecimal. ^BigInteger x#)
        (clojure.core/number? x#) (BigDecimal/valueOf (->long x#))
        :else (BigDecimal. x#))))
 
-(defmacro lt [x y]
+(defmacro < [x y]
   `(. Comparison (lessThan ~x ~y)))
 
-(defmacro lte [x y]
+(defmacro <= [x y]
   `(. Comparison (lessThanEqualTo ~x ~y)))
 
 (extend-type Ratio
@@ -180,16 +183,16 @@
   (-denominator [this] (.getDenominator this)))
 
 (defn- gcd [a b]
-  (if (is-zero? b)
+  (if (zero? b)
     a
     (recur b (mod a b))))
 
 (defn make-ratio [numerator denominator]
  (let [gcd (gcd numerator denominator)]
-    (if (is-zero? gcd)
+    (if (zero? gcd)
       (Ratio. (BigInteger. "0") (BigInteger. "1"))
-      (let [n (BigInteger. (.toString (divide numerator gcd)))
-            d (BigInteger. (.toString (divide denominator gcd)))]
+      (let [n (BigInteger. (.toString (/ numerator gcd)))
+            d (BigInteger. (.toString (/ denominator gcd)))]
         (Ratio. n d)))))
 
 (defn unsafe-cast-int [i]
@@ -197,9 +200,9 @@
 
 (defn- long-hash-code [lpart]
   (unsafe-cast-int
-    (bxor
+    (bit-xor
       lpart
-      (bunsigned-shift-right lpart 32))))
+      (unsigned-bit-shift-right lpart 32))))
 
 (extend-protocol IInteger
   Short Byte Integer Long BigInteger BigInt)
@@ -229,7 +232,7 @@
 
   BigDecimal
   (-hash [this]
-    (if (is-zero? this)
+    (if (zero? this)
       (.hashCode BigInteger/ZERO)
       (.hashCode (.stripTrailingZeros this))))
 

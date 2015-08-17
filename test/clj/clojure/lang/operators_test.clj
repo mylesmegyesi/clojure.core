@@ -496,6 +496,18 @@
   (testing "min can handle an arbitrary number of arguments"
     (is (= 1 (min 4 5 1 3 2)))))
 
+(deftest rationalize-test
+  (testing "rationalize an integer type returns the same type"
+    (doseq [t int-types]
+      (is (= (t 1) (rationalize (t 1))))))
+
+  (testing "rationalize a whole number floating type becomes a bigint"
+    (doseq [t float-types]
+      (is (= (bigint 1) (rationalize (t 1.0))))))
+
+  (testing "rationalize a non-whole number to a ratio"
+    (is (= (/ 314159 100000) (rationalize 3.14159)))))
+
 (deftest divide-test ; / is not a valid character
   (testing "ratio creation with a single argument"
     (let [ratio (/ 2)]
