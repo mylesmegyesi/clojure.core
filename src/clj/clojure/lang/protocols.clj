@@ -117,7 +117,9 @@
   (-union        [this sets]))
 
 (defprotocol IPersistentVector
-  (-assoc-n [this n x]))
+  (-assoc-n [this n x])
+  ; private method for internal use
+  (-array-for [this i]))
 
 (defprotocol IRatio
   (-numerator [this])

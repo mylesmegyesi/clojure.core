@@ -485,11 +485,17 @@
 (defn first [s]
   (-first (seq s)))
 
+(defn chunk-first [s]
+  (-chunked-first s))
+
 (defn ffirst [s]
   (first (first s)))
 
 (defn next [s]
   (-next (seq s)))
+
+(defn chunk-next [s]
+  (-chunked-next s))
 
 (defn nfirst [s]
   (next (first s)))
@@ -502,6 +508,9 @@
 
 (defn rest [s]
   (-more (seq s)))
+
+(defn chunk-rest [s]
+  (-chunked-more s))
 
 (defn last [s]
   (if (next s)

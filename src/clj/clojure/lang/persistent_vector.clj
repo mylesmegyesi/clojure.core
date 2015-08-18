@@ -1,19 +1,21 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [cond declare defn- defn defprotocol deftype let loop when ->])
-  (:require [clojure.next             :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.array-chunk :refer [make-array-chunk]]
-            [clojure.lang.aseq        :refer [defseq]]
-            [clojure.lang.exceptions  :refer [new-argument-error new-out-of-bounds-exception
-                                              new-illegal-access-error new-illegal-state-error]]
-            [clojure.lang.numbers     :refer [->int platform-long platform-big-int platform-big-integer]]
-            [clojure.lang.hash-map    :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.protocols   :refer [-as-transient -assoc-n -assoc-n!
-                                             -conj! -count -persistent -lookup -nth
-                                             IAssociative ICounted IEditableCollection IMeta IObj ILookup
-                                             IPersistentCollection IPersistentVector IPersistentStack
-                                             ITransientAssociative ITransientCollection ITransientVector
-                                             IChunkedSeq ISeq ISeqable ISequential IIndexed]]
-            [clojure.lang.thread      :refer [thread-reference]]))
+  (:refer-clojure :only [cond declare defn- defn defprotocol deftype if-let let loop when ->])
+  (:require [clojure.next                 :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
+            [clojure.lang.array-chunk     :refer [make-array-chunk]]
+            [clojure.lang.aseq            :refer [defseq]]
+            [clojure.lang.exceptions      :refer [new-argument-error new-out-of-bounds-exception
+                                                  new-illegal-access-error new-illegal-state-error]]
+            [clojure.lang.numbers         :refer [->int platform-long platform-big-int platform-big-integer]]
+            [clojure.lang.hash-map        :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
+            [clojure.lang.protocols       :refer [-as-transient -assoc-n -assoc-n! -array-for
+                                                  -conj! -count -persistent -lookup -nth
+                                                  -chunked-first -chunked-next -chunked-more
+                                                  IAssociative ICounted IEditableCollection IMeta IObj ILookup
+                                                  IPersistentCollection IPersistentVector IPersistentStack
+                                                  ITransientAssociative ITransientCollection ITransientVector
+                                                  IChunkedSeq ISeq ISeqable ISequential IIndexed]]
+            [clojure.lang.thread          :refer [thread-reference]]))
 
 (declare make-chunked-seq)
 
@@ -27,14 +29,46 @@
 
   (-chunked-next [this]
     (when (< (+ -i (alength -node)) (count -vec))
+      (let [next-i (+ -i (alength -node))]
+        (make-chunked-seq -vec (-array-for -vec next-i) next-i 0 nil))))
 
-    ))
+  (-chunked-more [this]
+    (if-let [s (-chunked-next this)]
+      s
+      EMPTY-LIST))
 
   ICounted
   (-count [this]
     (- (count -vec) (+ -i -offset)))
 
-  )
+  IMeta
+  (-meta [this] -meta)
+
+  IObj
+  (-with-meta [this mta]
+    (if (= mta -meta)
+      this
+      (make-chunked-seq -vec -node -i -offset mta)))
+
+  IPersistentCollection
+  (-cons [this x]
+    (cons x this))
+
+  (-empty [this] EMPTY-LIST)
+
+  ISeq
+  (-first [this]
+    (aget -node -offset))
+
+  (-next [this]
+    (if (< (inc -offset) (alength -node))
+      (make-chunked-seq -vec -node -i (inc -offset) nil)
+      (-chunked-next this)))
+
+  (-more [this]
+    (if-let [s (next this)]
+      s
+      EMPTY-LIST)))
 
 (defn is-chunked-seq? [cs]
   (instance? ChunkedSeq cs))
@@ -341,6 +375,10 @@
       (cons this x)
       :else
       (throw (new-out-of-bounds-exception ""))))
+
+  ; private method for internal use
+  (-array-for [this i]
+    (array-for i -length -tail -root -shift))
 
   IAssociative
   (-assoc [this k v]

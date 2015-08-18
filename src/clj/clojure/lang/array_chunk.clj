@@ -1,5 +1,5 @@
 (ns clojure.lang.array-chunk
-  (:refer-clojure :only [declare defn deftype let when >= <])
+  (:refer-clojure :only [declare defn deftype let when])
   (:require [clojure.next            :refer :all]
             [clojure.lang.exceptions :refer [new-illegal-state-error]]
             [clojure.lang.protocols  :refer [IChunk ICounted IIndexed]]))
