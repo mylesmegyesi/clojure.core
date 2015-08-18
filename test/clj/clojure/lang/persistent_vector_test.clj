@@ -97,13 +97,37 @@
   (testing "returns false otherwise"
     (is (not (vector? :foo)))))
 
-(deftest vector-seq-test
+(deftest chunked-seq-test
   (testing "seq returns nil when empty"
     (is (nil? (seq (vector)))))
 
   (testing "returns the first item"
     (let [v-seq (seq (vector 3 2 1))]
       (is (= 3 (first v-seq)))))
+
+  (testing "returns the chunk first"
+    (let [c-first (chunk-first (seq (vector 3 2 1)))]
+      (is (= 3 (count c-first)))
+      (is (= 3 (nth c-first 0)))))
+
+  (testing "returns the chunk next"
+    (let [v (apply vector (range 33))
+          c-next (chunk-next (seq v))]
+      (is (= 32 (nth c-next 0)))))
+
+  (testing "returns nil when there is no chunk next"
+    (let [c-next (chunk-next (seq (vector 3)))]
+      (is (nil? c-next))))
+
+  (testing "returns the chunk more"
+    (let [v (apply vector (range 33))
+          c-more (chunk-rest (seq v))]
+      (is (= 32 (nth c-more 0)))))
+
+  (testing "returns an empty list when there is no chunk more"
+    (let [c-more (chunk-rest (seq (vector 3)))]
+      (is (list? c-more))
+      (is (empty? c-more))))
 
   (testing "returns next until empty"
     (let [v1-seq (seq (vector 3 2 1))
@@ -134,7 +158,12 @@
   (testing "is seqable"
     (let [v-seq (seq (vector :a :b :c))]
       (is (= :a (first (seq v-seq))))))
-)
+
+  (testing "can hold a meta value"
+    (let [v-seq (seq (vector :a :b :C))
+          w-meta (with-meta v-seq {:so :meta})]
+      (is (= {:so :meta} (meta w-meta)))))
+  )
 
 (deftest chunked-seq-test?
   (testing "is true for a chunked seq"

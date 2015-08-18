@@ -21,6 +21,14 @@
   (-reset! [this new-state])
   (-swap! [this f args]))
 
+(defprotocol IChunk
+  (-drop-first [this]))
+
+(defprotocol IChunkedSeq
+  (-chunked-first [this])
+  (-chunked-next [this])
+  (-chunked-more [this]))
+
 (defprotocol IComparable
   "This protocol should not be directly used in a deftype. It should only
   be used to override an existing platform compare-to method."
@@ -109,7 +117,9 @@
   (-union        [this sets]))
 
 (defprotocol IPersistentVector
-  (-assoc-n [this n x]))
+  (-assoc-n [this n x])
+  ; private method for internal use
+  (-array-for [this i]))
 
 (defprotocol IRatio
   (-numerator [this])
