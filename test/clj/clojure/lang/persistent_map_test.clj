@@ -172,6 +172,11 @@
           m2 (dissoc m1)]
       (is (identical? m1 m2))))
 
+  (testing "dissociating keys from an empty map will return the same map"
+    (let [m1 (constructor)
+          m2 (dissoc m1 :k)]
+      (is (identical? m1 m2))))
+
   (testing "dissociates a key from a map with one item"
     (let [m1 (constructor :k1 1)
           m2 (dissoc m1 :k1)]
