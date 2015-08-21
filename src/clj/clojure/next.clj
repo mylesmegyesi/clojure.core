@@ -1,8 +1,8 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding cond declare defmacro defmulti defmethod defn defn-
-                         even? extend-type fn if-let let neg? pos? require satisfies?
-                         doseq list list* load loop format pr-str into butlast when when-let])
+                         even? extend-type fn if-let let neg? pos? require satisfies? range
+                         doseq for list list* load loop format pr-str into butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
             [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception new-out-of-bounds-exception]]
@@ -882,6 +882,43 @@
 (defn sorted-set-by [compare-fn & ks]
   (make-sorted-set
     (apply sorted-map-by (clojure.core/cons compare-fn (make-pairs ks)))))
+
+(require ['clojure.lang.persistent-struct-map :refer ['make-def 'make-struct-map]])
+
+(defn create-struct [& ks]
+  (make-def ks))
+
+(defmacro defstruct [n & ks]
+  `(def ~n (create-struct ~@ks)))
+
+(defn struct-map [d & inits]
+  (let [[vs ext] (loop [is inits
+                        vs (object-array (count (-get-keyslots d)))
+                        ext EMPTY-HASH-MAP]
+                   (if (empty? is)
+                     [vs ext]
+                     (if (< (count is) 2)
+                       (throw (new-argument-error (str "No value supplied for key: " (first is))))
+                       (let [k (first is)
+                             v (second is)
+                             e (get (-get-keyslots d) k)]
+                          (if e
+                            (do
+                              (aset vs (dec e) v)
+                              (recur (rest (rest is)) vs ext))
+                            (recur (rest (rest is)) vs (assoc ext k v)))))))]
+     (make-struct-map d vs ext nil)))
+
+(defn struct [d & vs]
+  (if (> (count vs) (count (-get-keyslots d)))
+    (throw (new-argument-error "Too many arguments to struct constructor"))
+    (let [v-arr (object-array (count (-get-keyslots d)))]
+      (loop [idx 0
+             v vs]
+        (when v
+          (aset v-arr idx (first v))
+          (recur (inc idx) (next v))))
+      (make-struct-map d v-arr EMPTY-HASH-MAP nil))))
 
 (defn contains? [coll k]
   (cond

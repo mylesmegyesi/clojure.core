@@ -39,6 +39,10 @@
 
 (defprotocol IDecimal)
 
+(defprotocol IDef
+  (-get-keys [this])
+  (-get-keyslots [this]))
+
 (defprotocol IDeref
   (-deref [this]))
 
