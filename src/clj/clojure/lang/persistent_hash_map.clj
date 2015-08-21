@@ -599,10 +599,12 @@
       (if -has-nil?
         (new-hash-map -meta (dec -count) -root false nil)
         this)
-      (let [new-root (node-dissoc -root ZERO (->bitnum (hash key)) key)]
-        (if (= -root new-root)
-          this
-          (new-hash-map -meta (dec -count) new-root -has-nil? -nil-value)))))
+      (if (nil? -root)
+        this
+        (let [new-root (node-dissoc -root ZERO (->bitnum (hash key)) key)]
+          (if (= -root new-root)
+            this
+            (new-hash-map -meta (dec -count) new-root -has-nil? -nil-value))))))
 
   ISeqable
   (-seq [this]
