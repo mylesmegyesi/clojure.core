@@ -320,6 +320,32 @@
         (>= b (first more)))
       false)))
 
+(require '[clojure.lang.primitive-array :refer :all])
+
+(defn booleans [arr]
+  (to-booleans arr))
+
+(defn bytes [arr]
+  (to-bytes arr))
+
+(defn chars [arr]
+  (to-chars arr))
+
+(defn shorts [arr]
+  (to-shorts arr))
+
+(defn floats [arr]
+  (to-floats arr))
+
+(defn doubles [arr]
+  (to-doubles arr))
+
+(defn ints [arr]
+  (to-ints arr))
+
+(defn longs [arr]
+  (to-longs arr))
+
 (defn seq? [s]
   (satisfies? ISeq s))
 
@@ -719,57 +745,68 @@
     (make-array platform-object/base-object seq-or-size)
     (into-array platform-object/base-object seq-or-size)))
 
-(defn- number-array
-  ([seq-or-size t]
+(defn- primitive-array
+  ([seq-or-size arr-fn]
     (if (number? seq-or-size)
-      (make-array t seq-or-size)
-      (into-array t seq-or-size)))
-  ([size init-val-or-seq t]
-    (if (instance? t init-val-or-seq)
-      (let [ret (make-array t size)]
-        (loop [remaining (dec size)]
+      (arr-fn seq-or-size)
+      (loop [i 0
+             arr (arr-fn (count seq-or-size))
+             sq (seq seq-or-size)]
+        (if sq
           (do
-            (aset ret remaining init-val-or-seq)
-            (if (zero? remaining)
-              ret
-              (recur (dec remaining))))))
-      (into-array t (take size init-val-or-seq)))))
+            (aset arr i (first sq))
+            (recur (inc i) arr (next sq)))
+          arr))))
+  ([size init-val-or-seq t arr-fn]
+    (let [arr (arr-fn size)]
+      (if (instance? t init-val-or-seq)
+        (do
+          (doseq [i (range 0 size)]
+            (aset arr i init-val-or-seq))
+          arr)
+        (loop [i 0
+               sq (seq init-val-or-seq)]
+          (if (or (>= i size) (nil? sq))
+            arr
+            (do
+              (aset arr i (first sq))
+              (recur (inc i) (next sq)))))))))
 
 (defn byte-array
   ([seq-or-size]
-    (number-array seq-or-size platform-numbers/platform-byte))
+    (primitive-array seq-or-size byte-array-for-size))
   ([size init-val-or-seq]
-    (number-array size init-val-or-seq platform-numbers/platform-byte)))
+    (primitive-array size init-val-or-seq platform-numbers/platform-byte byte-array-for-size)))
 
 (defn short-array
   ([seq-or-size]
-    (number-array seq-or-size platform-numbers/platform-short))
+    (primitive-array seq-or-size short-array-for-size))
   ([size init-val-or-seq]
-    (number-array size init-val-or-seq platform-numbers/platform-short)))
+    (primitive-array size init-val-or-seq platform-numbers/platform-short short-array-for-size)))
 
 (defn int-array
   ([seq-or-size]
-    (number-array seq-or-size platform-numbers/platform-int))
+    (primitive-array seq-or-size int-array-for-size))
   ([size init-val-or-seq]
-    (number-array size init-val-or-seq platform-numbers/platform-int)))
+    (primitive-array size init-val-or-seq platform-numbers/platform-int int-array-for-size)))
 
 (defn long-array
   ([seq-or-size]
-    (number-array seq-or-size platform-numbers/platform-long))
+    (primitive-array seq-or-size long-array-for-size))
   ([size init-val-or-seq]
-    (number-array size init-val-or-seq platform-numbers/platform-long)))
+    (primitive-array size init-val-or-seq platform-numbers/platform-long long-array-for-size)))
 
 (defn float-array
   ([seq-or-size]
-    (number-array seq-or-size platform-numbers/platform-float))
+    (primitive-array seq-or-size float-array-for-size))
   ([size init-val-or-seq]
-    (number-array size init-val-or-seq platform-numbers/platform-float)))
+    (primitive-array size init-val-or-seq platform-numbers/platform-float float-array-for-size)))
 
 (defn double-array
   ([seq-or-size]
-    (number-array seq-or-size platform-numbers/platform-double))
+    (primitive-array seq-or-size double-array-for-size))
   ([size init-val-or-seq]
-    (number-array size init-val-or-seq platform-numbers/platform-double)))
+    (primitive-array size init-val-or-seq platform-numbers/platform-double double-array-for-size)))
 
 (defn vector? [v]
   (satisfies? IPersistentVector v))

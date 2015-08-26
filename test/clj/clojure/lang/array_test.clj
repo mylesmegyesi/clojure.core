@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [defmacro defn- let map])
+  (:refer-clojure :only [boolean-array char-array defmacro defn- let map])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.support.exception-assertions :refer [out-of-bounds-exception-is-thrown?]]
@@ -93,10 +93,10 @@
       (is (= 3 (aget arr 2))))))
 
 (defn- number-array-test [array-fn type-fn]
-  (testing "returns an array of nils for a given size"
+  (testing (str "returns an array of " type-fn " the for a given size")
     (let [arr (array-fn 42)]
       (is (= 42 (alength arr)))
-      (is (nil? (aget arr 21)))))
+      (is (= (type-fn 0) (aget arr 21)))))
 
   (testing "returns an array from a given seq"
     (let [s (test-seq (map #(type-fn %) '(1 2 3)))
@@ -139,4 +139,52 @@
 
 (deftest double-array-test
   (number-array-test double-array double))
+
+(deftest booleans-test
+  (testing "type casting a boolean array to a boolean array"
+    (is (=
+          (type (booleans (boolean-array 0)))
+          (type (boolean-array 0))))))
+
+(deftest bytes-test
+  (testing "type casting a byte array to a byte array"
+    (is (=
+          (type (bytes (byte-array 0)))
+          (type (byte-array 0))))))
+
+(deftest chars-test
+  (testing "type casting a char array to a char array"
+    (is (=
+          (type (chars (char-array 0)))
+          (type (char-array 0))))))
+
+(deftest shorts-test
+  (testing "type casting a short array to a short array"
+    (is (=
+          (type (shorts (short-array 0)))
+          (type (short-array 0))))))
+
+(deftest floats-test
+  (testing "type casting a float array to a float array"
+    (is (=
+          (type (floats (float-array 0)))
+          (type (float-array 0))))))
+
+(deftest doubles-test
+  (testing "type casting a double array to a double array"
+    (is (=
+          (type (doubles (double-array 0)))
+          (type (double-array 0))))))
+
+(deftest ints-test
+  (testing "type casting an int array to an int array"
+    (is (=
+          (type (ints (int-array 0)))
+          (type (int-array 0))))))
+
+(deftest longs-test
+  (testing "type casting a long array to a long array"
+    (is (=
+          (type (longs (long-array 0)))
+          (type (long-array 0))))))
 
