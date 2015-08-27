@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [char-array defmacro defn- let map])
+  (:refer-clojure :only [char defmacro defn- let map])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.support.exception-assertions :refer [out-of-bounds-exception-is-thrown?]]
@@ -141,7 +141,7 @@
   (number-array-test double-array double))
 
 (deftest boolean-array-test
-  (testing (str "returns an array of booleans the for a given size filled with false values")
+  (testing "returns an array of booleans the for a given size filled with false values"
     (let [arr (boolean-array 42)]
       (is (= 42 (alength arr)))
       (is (= false (aget arr 21)))))
@@ -168,6 +168,35 @@
       (is (= true (aget arr 0)))
       (is (= false (aget arr 1)))
       (is (= true (aget arr 2))))))
+
+(deftest char-array-test
+  (testing "returns an array of chars the for a given size filled with the 0-ascii character"
+    (let [arr (char-array 42)]
+      (is (= 42 (alength arr)))
+      (is (= (char 0) (aget arr 21)))))
+
+  (testing "returns an array from a given seq"
+    (let [s (test-seq '(\b \a \r))
+          arr (char-array s)]
+      (is (= 3 (alength arr)))
+      (is (= \b (aget arr 0)))
+      (is (= \a (aget arr 1)))
+      (is (= \r (aget arr 2)))))
+
+  (testing "returns an array of a given size where all elements are the same"
+    (let [arr (char-array 3 \p)]
+      (is (= 3 (alength arr)))
+      (is (= \p (aget arr 0)))
+      (is (= \p (aget arr 1)))
+      (is (= \p (aget arr 2)))))
+
+  (testing "returns an array of a given size sourcing from a seq"
+    (let [s (test-seq '(\b \a \r \f \o \o))
+          arr (char-array 3 s)]
+      (is (= 3 (alength arr)))
+      (is (= \b (aget arr 0)))
+      (is (= \a (aget arr 1)))
+      (is (= \r (aget arr 2))))))
 
 (deftest booleans-test
   (testing "type casting a boolean array to a boolean array"

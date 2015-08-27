@@ -814,6 +814,12 @@
   ([size init-val-or-seq]
     (primitive-array size init-val-or-seq platform-boolean boolean-array-for-size)))
 
+(defn char-array
+  ([seq-or-size]
+    (primitive-array seq-or-size char-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-char char-array-for-size)))
+
 (defn vector? [v]
   (satisfies? IPersistentVector v))
 

@@ -62,4 +62,8 @@ public final class PrimitiveArray {
     return new boolean[size.intValue()];
   }
 
+  public static char[] charArrayForSize(Number size) {
+    return new char[size.intValue()];
+  }
+
 }

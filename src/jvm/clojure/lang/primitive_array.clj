@@ -5,6 +5,7 @@
   (:import  [clojure.lang.platform PrimitiveArray]))
 
 (def platform-boolean Boolean)
+(def platform-char    Character)
 
 (defmacro to-booleans [arr]
   `(PrimitiveArray/castToBooleans ~arr))
@@ -50,4 +51,7 @@
 
 (defn boolean-array-for-size [size]
   (PrimitiveArray/booleanArrayForSize ^Number size))
+
+(defn char-array-for-size [size]
+  (PrimitiveArray/charArrayForSize ^Number size))
 
