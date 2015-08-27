@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [boolean-array char-array defmacro defn- let map])
+  (:refer-clojure :only [char-array defmacro defn- let map])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.support.exception-assertions :refer [out-of-bounds-exception-is-thrown?]]
@@ -93,7 +93,7 @@
       (is (= 3 (aget arr 2))))))
 
 (defn- number-array-test [array-fn type-fn]
-  (testing (str "returns an array of " type-fn " the for a given size")
+  (testing (str "returns an array of " type-fn " the for a given size filled with zero values")
     (let [arr (array-fn 42)]
       (is (= 42 (alength arr)))
       (is (= (type-fn 0) (aget arr 21)))))
@@ -115,7 +115,7 @@
       (is (= n42 (aget arr 2)))))
 
   (testing "returns an array of a given size sourcing from a seq"
-    (let [s (test-seq (map #(type-fn %) '(1 2 3)))
+    (let [s (test-seq (map #(type-fn %) '(1 2 3 4 5)))
           arr (array-fn 3 s)]
       (is (= 3 (alength arr)))
       (is (= (type-fn 1) (aget arr 0)))
@@ -139,6 +139,35 @@
 
 (deftest double-array-test
   (number-array-test double-array double))
+
+(deftest boolean-array-test
+  (testing (str "returns an array of booleans the for a given size filled with false values")
+    (let [arr (boolean-array 42)]
+      (is (= 42 (alength arr)))
+      (is (= false (aget arr 21)))))
+
+  (testing "returns an array from a given seq"
+    (let [s (test-seq '(true false true))
+          arr (boolean-array s)]
+      (is (= 3 (alength arr)))
+      (is (= true (aget arr 0)))
+      (is (= false (aget arr 1)))
+      (is (= true (aget arr 2)))))
+
+  (testing "returns an array of a given size where all elements are the same"
+    (let [arr (boolean-array 3 true)]
+      (is (= 3 (alength arr)))
+      (is (= true (aget arr 0)))
+      (is (= true (aget arr 1)))
+      (is (= true (aget arr 2)))))
+
+  (testing "returns an array of a given size sourcing from a seq"
+    (let [s (test-seq '(true false true false true))
+          arr (boolean-array 3 s)]
+      (is (= 3 (alength arr)))
+      (is (= true (aget arr 0)))
+      (is (= false (aget arr 1)))
+      (is (= true (aget arr 2))))))
 
 (deftest booleans-test
   (testing "type casting a boolean array to a boolean array"

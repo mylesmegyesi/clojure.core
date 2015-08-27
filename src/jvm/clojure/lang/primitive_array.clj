@@ -4,6 +4,8 @@
             [clojure.lang.protocols :refer [ISeq]])
   (:import  [clojure.lang.platform PrimitiveArray]))
 
+(def platform-boolean Boolean)
+
 (defmacro to-booleans [arr]
   `(PrimitiveArray/castToBooleans ~arr))
 
@@ -45,4 +47,7 @@
 
 (defn double-array-for-size [size]
   (PrimitiveArray/doubleArrayForSize ^Number size))
+
+(defn boolean-array-for-size [size]
+  (PrimitiveArray/booleanArrayForSize ^Number size))
 

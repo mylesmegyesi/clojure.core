@@ -58,4 +58,8 @@ public final class PrimitiveArray {
     return new double[size.intValue()];
   }
 
+  public static boolean[] booleanArrayForSize(Number size) {
+    return new boolean[size.intValue()];
+  }
+
 }

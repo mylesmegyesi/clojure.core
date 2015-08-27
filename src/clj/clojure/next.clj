@@ -808,6 +808,12 @@
   ([size init-val-or-seq]
     (primitive-array size init-val-or-seq platform-numbers/platform-double double-array-for-size)))
 
+(defn boolean-array
+  ([seq-or-size]
+    (primitive-array seq-or-size boolean-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-boolean boolean-array-for-size)))
+
 (defn vector? [v]
   (satisfies? IPersistentVector v))
 
