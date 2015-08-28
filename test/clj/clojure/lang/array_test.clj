@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [defmacro defn- let map])
+  (:refer-clojure :only [char defmacro defn- let map])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.support.exception-assertions :refer [out-of-bounds-exception-is-thrown?]]
@@ -93,10 +93,10 @@
       (is (= 3 (aget arr 2))))))
 
 (defn- number-array-test [array-fn type-fn]
-  (testing "returns an array of nils for a given size"
+  (testing (str "returns an array of " type-fn " the for a given size filled with zero values")
     (let [arr (array-fn 42)]
       (is (= 42 (alength arr)))
-      (is (nil? (aget arr 21)))))
+      (is (= (type-fn 0) (aget arr 21)))))
 
   (testing "returns an array from a given seq"
     (let [s (test-seq (map #(type-fn %) '(1 2 3)))
@@ -115,7 +115,7 @@
       (is (= n42 (aget arr 2)))))
 
   (testing "returns an array of a given size sourcing from a seq"
-    (let [s (test-seq (map #(type-fn %) '(1 2 3)))
+    (let [s (test-seq (map #(type-fn %) '(1 2 3 4 5)))
           arr (array-fn 3 s)]
       (is (= 3 (alength arr)))
       (is (= (type-fn 1) (aget arr 0)))
@@ -139,4 +139,110 @@
 
 (deftest double-array-test
   (number-array-test double-array double))
+
+(deftest boolean-array-test
+  (testing "returns an array of booleans the for a given size filled with false values"
+    (let [arr (boolean-array 42)]
+      (is (= 42 (alength arr)))
+      (is (= false (aget arr 21)))))
+
+  (testing "returns an array from a given seq"
+    (let [s (test-seq '(true false true))
+          arr (boolean-array s)]
+      (is (= 3 (alength arr)))
+      (is (= true (aget arr 0)))
+      (is (= false (aget arr 1)))
+      (is (= true (aget arr 2)))))
+
+  (testing "returns an array of a given size where all elements are the same"
+    (let [arr (boolean-array 3 true)]
+      (is (= 3 (alength arr)))
+      (is (= true (aget arr 0)))
+      (is (= true (aget arr 1)))
+      (is (= true (aget arr 2)))))
+
+  (testing "returns an array of a given size sourcing from a seq"
+    (let [s (test-seq '(true false true false true))
+          arr (boolean-array 3 s)]
+      (is (= 3 (alength arr)))
+      (is (= true (aget arr 0)))
+      (is (= false (aget arr 1)))
+      (is (= true (aget arr 2))))))
+
+(deftest char-array-test
+  (testing "returns an array of chars the for a given size filled with the 0-ascii character"
+    (let [arr (char-array 42)]
+      (is (= 42 (alength arr)))
+      (is (= (char 0) (aget arr 21)))))
+
+  (testing "returns an array from a given seq"
+    (let [s (test-seq '(\b \a \r))
+          arr (char-array s)]
+      (is (= 3 (alength arr)))
+      (is (= \b (aget arr 0)))
+      (is (= \a (aget arr 1)))
+      (is (= \r (aget arr 2)))))
+
+  (testing "returns an array of a given size where all elements are the same"
+    (let [arr (char-array 3 \p)]
+      (is (= 3 (alength arr)))
+      (is (= \p (aget arr 0)))
+      (is (= \p (aget arr 1)))
+      (is (= \p (aget arr 2)))))
+
+  (testing "returns an array of a given size sourcing from a seq"
+    (let [s (test-seq '(\b \a \r \f \o \o))
+          arr (char-array 3 s)]
+      (is (= 3 (alength arr)))
+      (is (= \b (aget arr 0)))
+      (is (= \a (aget arr 1)))
+      (is (= \r (aget arr 2))))))
+
+(deftest booleans-test
+  (testing "type casting a boolean array to a boolean array"
+    (is (=
+          (type (booleans (boolean-array 0)))
+          (type (boolean-array 0))))))
+
+(deftest bytes-test
+  (testing "type casting a byte array to a byte array"
+    (is (=
+          (type (bytes (byte-array 0)))
+          (type (byte-array 0))))))
+
+(deftest chars-test
+  (testing "type casting a char array to a char array"
+    (is (=
+          (type (chars (char-array 0)))
+          (type (char-array 0))))))
+
+(deftest shorts-test
+  (testing "type casting a short array to a short array"
+    (is (=
+          (type (shorts (short-array 0)))
+          (type (short-array 0))))))
+
+(deftest floats-test
+  (testing "type casting a float array to a float array"
+    (is (=
+          (type (floats (float-array 0)))
+          (type (float-array 0))))))
+
+(deftest doubles-test
+  (testing "type casting a double array to a double array"
+    (is (=
+          (type (doubles (double-array 0)))
+          (type (double-array 0))))))
+
+(deftest ints-test
+  (testing "type casting an int array to an int array"
+    (is (=
+          (type (ints (int-array 0)))
+          (type (int-array 0))))))
+
+(deftest longs-test
+  (testing "type casting a long array to a long array"
+    (is (=
+          (type (longs (long-array 0)))
+          (type (long-array 0))))))
 
