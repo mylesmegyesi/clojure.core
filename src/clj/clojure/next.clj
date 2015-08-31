@@ -789,7 +789,7 @@
 (defn string? [s]
   (instance? platform-object/platform-string s))
 
-(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq?]])
+(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq? 'make-subvec]])
 
 (defn vector [& args]
   (let [arg-seq (seq args)
@@ -800,6 +800,18 @@
           (recur (next xs) (-conj! v (first xs)))
           (-persistent v)))
       (-persistent empty-transient))))
+
+(defn subvec
+  ([v start]
+    (subvec v start (count v)))
+  ([v start end]
+    (cond
+      (or (> start end) (< start 0) (> end (count v)))
+        (throw (new-out-of-bounds-exception))
+      (= start end)
+        EMPTY-VECTOR
+      :else
+        (make-subvec v start end nil))))
 
 (defn chunked-seq? [cs]
   (is-chunked-seq? cs))
