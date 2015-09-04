@@ -97,9 +97,18 @@
 
   (testing "raises an error when cast from greater than max byte"
     (is (= 127 (byte 127)))
-    (argument-error-is-thrown? #"" (byte 128)))
+    (argument-error-is-thrown? #"" (byte 128))))
 
-  )
+(deftest unchecked-byte-test
+  (doseq [t types]
+    (testing (str "can cast from " t " via unchecked-byte")
+      (is (= (byte 0) (unchecked-byte (t 0))))))
+
+  (testing "truncated when cast from less than min byte"
+    (is (= 127 (unchecked-byte -129))))
+
+  (testing "truncated when cast from greater than max byte"
+    (is (= -128 (unchecked-byte 128)))))
 
 (deftest short-test
   (testing "raises an error when cast from less than min short"
@@ -108,9 +117,18 @@
 
   (testing "raises an error when cast from greater than max short"
     (is (= 32767 (short 32767)))
-    (argument-error-is-thrown? #"" (short 32768)))
+    (argument-error-is-thrown? #"" (short 32768))))
 
-  )
+(deftest unchecked-short-test
+  (doseq [t types]
+    (testing (str "can cast from " t " via unchecked-short")
+      (is (= (short 0) (unchecked-short (t 0))))))
+
+  (testing "truncated when cast from less than min short"
+    (is (= 32767 (unchecked-short -32769))))
+
+  (testing "truncated when cast from greater than max short"
+    (is (= -32768 (unchecked-short 32768)))))
 
 (deftest int-test
   (testing "raises an error when cast from less than min int"
@@ -119,9 +137,18 @@
 
   (testing "raises an error when cast from greater than max int"
     (is (= 2147483647 (int 2147483647)))
-    (argument-error-is-thrown? #"" (int 2147483648)))
+    (argument-error-is-thrown? #"" (int 2147483648))))
 
-  )
+(deftest unchecked-int-test
+  (doseq [t types]
+    (testing (str "can cast from " t " via unchecked-int")
+      (is (= (int 0) (unchecked-int (t 0))))))
+
+  (testing "truncated when cast from less than mix int"
+    (is (= 2147483647 (unchecked-int -2147483649))))
+
+  (testing "truncated when cast from greater than max int"
+    (is (= -2147483648 (unchecked-int 2147483648)))))
 
 (deftest long-test
   (testing "raises an error when cast from less than min long"
@@ -130,7 +157,15 @@
 
   (testing "raises an error when cast from greater than max long"
     (is (= 9223372036854775807 (long 9223372036854775807)))
-    (argument-error-is-thrown? #"" (long 9223372036854775808)))
+    (argument-error-is-thrown? #"" (long 9223372036854775808))))
+
+(deftest unchecked-long-test
+  (doseq [t types]
+    (testing (str "can cast from " t " via unchecked-long")
+      (is (= (long 0) (unchecked-long 0)))))
+
+  (testing "truncated when cast from less than min int"
+    (is (= 9223372036854775807 (unchecked-long -9223372036854775809N))))
 
   )
 

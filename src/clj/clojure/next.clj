@@ -136,6 +136,18 @@
 (defn byte [x]
   (platform-numbers/->byte x))
 
+(defn unchecked-byte [x]
+  (platform-numbers/unchecked->byte x))
+
+(defn unchecked-short [x]
+  (platform-numbers/unchecked->short x))
+
+(defn unchecked-int [x]
+  (platform-numbers/unchecked->int x))
+
+(defn unchecked-long [x]
+  (platform-numbers/unchecked->long x))
+
 (defn short [x]
   (platform-numbers/->short x))
 
