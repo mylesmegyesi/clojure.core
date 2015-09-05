@@ -76,6 +76,120 @@
 (defn- make-chunked-seq [vc node i offset mta]
   (ChunkedSeq. vc node i offset mta))
 
+(defn n-in-range? [n length]
+  (and (>= (->bitnum n) 0) (< (->bitnum n) (->bitnum length))))
+
+(declare make-vector-seq)
+
+(defseq VectorSeq [-v -i -meta]
+  ICounted
+  (-count [this]
+    (- (count -v) -i))
+
+  IMeta
+  (-meta [this] -meta)
+
+  IObj
+  (-with-meta [this m]
+    (make-vector-seq -v -i m))
+
+  ISeq
+  (-first [this]
+    (nth -v -i))
+
+  (-next [this]
+    (if (< (inc -i) (count -v))
+      (make-vector-seq -v (inc -i) nil)
+      nil))
+
+  (-more [this]
+    (if (< (inc -i) (count -v))
+      (make-vector-seq -v (inc -i) nil)
+      EMPTY-LIST)))
+
+(defn make-vector-seq [v i mta]
+  (VectorSeq. v i mta))
+
+(declare make-subvec)
+
+(deftype SubVector [-v -start -end -meta]
+  IAssociative
+  (-assoc [this k v]
+    (if (integer? k)
+      (-assoc-n this k v)
+      (throw (new-argument-error "Key must be an integer"))))
+
+  (-contains-key? [this k]
+    (if (integer? k)
+      (n-in-range? k (count this))
+      false))
+
+  ICounted
+  (-count [this]
+    (- -end -start))
+
+  IIndexed
+  (-nth [this n]
+    (if (or (>= (+ -start n) -end) (< n 0))
+      (throw (new-out-of-bounds-exception))
+      (-nth -v (+ -start n))))
+
+  (-nth [this n not-found]
+    (if (or (>= (+ -start n) -end) (< n 0))
+      not-found
+      (-nth -v (+ -start n))))
+
+  IMeta
+  (-meta [this] -meta)
+
+  IObj
+  (-with-meta [this m]
+    (if (= m -meta)
+      this
+      (make-subvec -v -start -end m)))
+
+  IPersistentCollection
+  (-cons [this x]
+    (make-subvec (-assoc-n -v -end x) -start (inc -end) -meta))
+
+  (-empty [this]
+    (with-meta EMPTY-VECTOR -meta))
+
+  IPersistentStack
+  (-peek [this]
+    (if (> (count this) 0)
+      (nth this (dec (count this)))
+      nil))
+
+  (-pop [this]
+    (if (= -start (dec -end))
+      EMPTY-VECTOR
+      (make-subvec -v -start (dec -end) -meta)))
+
+  IPersistentVector
+  (-assoc-n [this n x]
+    (cond
+      (< -end (+ n -start))
+        (throw (new-out-of-bounds-exception))
+      (= -end (+ n -start))
+        (conj this x)
+      :else
+        (make-subvec (-assoc-n -v (+ -start n) x) -start (inc -end) -meta)))
+
+  ISeqable
+  (-seq [this]
+    (if (> (count this) 0)
+      (make-vector-seq this 0 nil)
+      nil)))
+
+(defn make-subvec [v start end mta]
+  (if (instance? SubVector v)
+    (let [v (.vector v)
+          s (+ start (.start v))
+          e (+ end (.end v))]
+      (SubVector. v s e mta))
+    (SubVector. v start end mta)))
+
 (defprotocol ^:private INode
   (get-array [this])
   (get-edit [this]))
@@ -305,9 +419,6 @@
   (let [new-arr (make-array 32)]
     (acopy tail 0 new-arr 0 (alength tail))
     new-arr))
-
-(defn n-in-range? [n length]
-  (and (>= (->bitnum n) 0) (< (->bitnum n) (->bitnum length))))
 
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))

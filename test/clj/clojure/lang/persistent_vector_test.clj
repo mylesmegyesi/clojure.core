@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-vector-test
-  (:refer-clojure :only [apply defn defmacro doseq fn for let range reify re-pattern])
+  (:refer-clojure :only [apply defn defmacro doseq fn for let range reify])
   (:require [clojure.test                         :refer :all]
             [clojure.lang.protocols               :refer [IPersistentVector]]
             [clojure.support.exception-assertions :refer :all]
@@ -53,12 +53,12 @@
 
   (testing "throws argument error if key is not an integer"
     (let [new-vec (vector 1 2 3)]
-      (argument-error-is-thrown? (re-pattern "Key must be an integer")
+      (argument-error-is-thrown? #"Key must be an integer"
         (assoc new-vec :a :b))))
 
   (testing "throws out of bounds exception if index is out of bounds"
     (let [new-vec (vector 1 2 3)]
-      (out-of-bounds-exception-is-thrown?
+      (out-of-bounds-exception-is-thrown? #""
         (assoc new-vec 5 :b))))
 
   (testing "contains?"
@@ -84,6 +84,82 @@
   (testing "popping many elements off of a vector"
     (let [fifty-foos (clojure.core/repeat 50 :foo)
           v (apply vector fifty-foos)]
+      (let [result (reduce (fn [acc _] (pop acc)) v fifty-foos)]
+        (is (empty? result))))))
+
+(deftest sub-vector-test
+  (testing "subvec with an equal start and end returns the empty vector"
+    (is (empty? (subvec (vector 1 2 3) 0 0))))
+
+  (testing "returns the count"
+    (let [one (subvec (vector 1) 0)
+          two (subvec (vector 1 2 3 4) 2 4)
+          more (subvec (apply vector (range 100)) 0)]
+      (is (= 1 (count one)))
+      (is (= 2 (count two)))
+      (is (= 100 (count more)))))
+
+  (testing "generate an empty vector"
+    (let [v (subvec (vector 1 2 3) 0)]
+      (is (empty? (empty v)))))
+
+  (testing "empty vector retains the meta"
+    (let [mta {:so :meta}
+          v (with-meta (subvec (vector 1 2 3) 0) mta)]
+      (is (= mta (meta (empty v))))))
+
+  (testing "returns the nth object"
+    (let [new-vec (subvec (vector :a :b :c :d :e :f) 0)]
+      (is (= :a (nth new-vec 0)))
+      (is (= :c (nth new-vec 2)))
+      (is (= :f (nth new-vec 5)))))
+
+  (testing "returns the nth object or not-found"
+    (let [new-vec (subvec (vector :a :b :c :d :e :f) 0)]
+      (is (= :a (nth new-vec 0)))
+      (is (= :c (nth new-vec 2)))
+      (is (= :not-found (nth new-vec 8 :not-found)))))
+
+  (testing "cons"
+    (let [new-vec (subvec (vector 1 2 3) 0)
+          cons-vec (cons 4 new-vec)
+          next-cons (cons 5 cons-vec)]
+      (is (= 4 (first cons-vec)))
+      (is (= 5 (first next-cons)))))
+
+  (testing "assoc the index key with the value"
+    (let [new-vec (subvec (vector 1 2 3) 0)
+          assoc-vec (assoc new-vec 0 :a)
+          assoc-vec (assoc assoc-vec 2 :b)]
+      (is (= :a (nth assoc-vec 0)))
+      (is (= :b (nth assoc-vec 2)))))
+
+  (testing "throws argument error if key is not an integer"
+    (let [new-vec (subvec (vector 1 2 3) 0)]
+      (argument-error-is-thrown? #"Key must be an integer"
+        (assoc new-vec :a :b))))
+
+  (testing "throws out of bounds exception if index is out of bounds"
+    (let [new-vec (subvec (vector 1 2 3) 0)]
+      (out-of-bounds-exception-is-thrown? #""
+        (assoc new-vec 5 :b))))
+
+  (testing "contains?"
+    (let [new-vec (subvec (vector :a :b :c :d) 0)]
+      (is (contains? new-vec 3))
+      (is (not (contains? new-vec 5)))))
+
+  (testing "peek"
+    (is (= 3 (peek (subvec (vector 1 2 3) 1 3)))))
+
+  (testing "popping a single element vector preserves the meta"
+    (let [v (with-meta (subvec (vector 1 2) 0) {:so :meta})
+          empty-v (pop v)]
+      (is (= {:so :meta} (meta empty-v)))))
+
+  (testing "popping many elements off of a vector"
+    (let [fifty-foos (clojure.core/repeat 50 :foo)
+          v (subvec (apply vector fifty-foos) 0)]
       (let [result (reduce (fn [acc _] (pop acc)) v fifty-foos)]
         (is (empty? result))))))
 
