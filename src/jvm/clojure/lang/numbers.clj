@@ -126,26 +126,29 @@
 (defmacro unchecked->byte [x]
   `(. Cast (uncheckedCastToByte ~x)))
 
-(defmacro unchecked->short [x]
-  `(. Cast (uncheckedCastToShort ~x)))
-
-(defmacro unchecked->int [x]
-  `(. Cast (uncheckedCastToInt ~x)))
-
-(defmacro unchecked->long [x]
-  `(. Cast (uncheckedCastToLong ~x)))
-
 (defmacro ->short [x]
   `(. Cast (castToShort ~x)))
+
+(defmacro unchecked->short [x]
+  `(. Cast (uncheckedCastToShort ~x)))
 
 (defmacro ->int [x]
   `(. Cast (castToInt ~x)))
 
+(defmacro unchecked->int [x]
+  `(. Cast (uncheckedCastToInt ~x)))
+
 (defmacro ->long [x]
   `(. Cast (castToLong ~x)))
 
+(defmacro unchecked->long [x]
+  `(. Cast (uncheckedCastToLong ~x)))
+
 (defmacro ->float [x]
   `(. Cast (castToFloat ~x)))
+
+(defmacro unchecked->float [x]
+  `(. Cast (uncheckedCastToFloat ~x)))
 
 (defmacro ->double [x]
   `(. Cast (castToDouble ~x)))
