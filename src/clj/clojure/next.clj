@@ -139,29 +139,32 @@
 (defn unchecked-byte [x]
   (platform-numbers/unchecked->byte x))
 
-(defn unchecked-short [x]
-  (platform-numbers/unchecked->short x))
-
-(defn unchecked-int [x]
-  (platform-numbers/unchecked->int x))
-
-(defn unchecked-long [x]
-  (platform-numbers/unchecked->long x))
-
 (defn short [x]
   (platform-numbers/->short x))
+
+(defn unchecked-short [x]
+  (platform-numbers/unchecked->short x))
 
 (defn int [x]
   (platform-numbers/->int x))
 
+(defn unchecked-int [x]
+  (platform-numbers/unchecked->int x))
+
 (defn long [x]
   (platform-numbers/->long x))
 
-(defn double [x]
-  (platform-numbers/->double x))
+(defn unchecked-long [x]
+  (platform-numbers/unchecked->long x))
 
 (defn float [x]
   (platform-numbers/->float x))
+
+(defn unchecked-float [x]
+  (platform-numbers/unchecked->float x))
+
+(defn double [x]
+  (platform-numbers/->double x))
 
 (defn bigint [x]
   (platform-numbers/->bigint x))

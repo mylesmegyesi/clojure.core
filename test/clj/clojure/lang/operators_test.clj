@@ -164,10 +164,19 @@
     (testing (str "can cast from " t " via unchecked-long")
       (is (= (long 0) (unchecked-long 0)))))
 
-  (testing "truncated when cast from less than min int"
+  (testing "truncated when cast from less than min long"
     (is (= 9223372036854775807 (unchecked-long -9223372036854775809N))))
 
-  )
+  (testing "truncated when cast from more than max long"
+    (is (= -9223372036854775808 (unchecked-long 9223372036854775808N)))))
+
+(deftest float-test
+  (testing "throws an exception when cast from greater than max float"
+    (argument-error-is-thrown? #"" (float 3.4028235E38M))))
+
+(deftest unchecked-float-test
+  (testing "truncated when cast from more than max float"
+    (is (not= 3.4028235E38 (unchecked-float 3.4028235E38M)))))
 
 (deftest bit-shift-right-test
   (testing "returns for a numbers and a shift"

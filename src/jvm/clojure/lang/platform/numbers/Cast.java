@@ -230,6 +230,34 @@ public final class Cast {
     return (float) n;
   }
 
+  public static float uncheckedCastToFloat(Object x) {
+    return ((Number) x).floatValue();
+  }
+
+  public static float uncheckedCastToFloat(byte x) {
+    return (float) x;
+  }
+
+  public static float uncheckedCastToFloat(short x) {
+    return (float) x;
+  }
+
+  public static float uncheckedCastToFloat(int x) {
+    return (float) x;
+  }
+
+  public static float uncheckedCastToFloat(long x) {
+    return (float) x;
+  }
+
+  public static float uncheckedCastToFloat(float x) {
+    return x;
+  }
+
+  public static float uncheckedCastToFloat(double x) {
+    return (float) x;
+  }
+
   public static double castToDouble(Object x) {
     return ((Number) x).doubleValue();
   }
