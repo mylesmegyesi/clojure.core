@@ -1,9 +1,12 @@
 (ns clojure.lang.lazy-seq
-  (:refer-clojure :only [declare defn defn- deftype let list locking loop])
-  (:require [clojure.lang.object    :as    platform-object]
-            [clojure.lang.protocols :refer [ICounted ILazySeq IMeta IObj ISeq ISeqable ISequential
-                                            -sval -seq -first -next -more]]
-            [clojure.next           :refer :all]))
+  (:refer-clojure :only [declare defn defn- let list locking loop])
+  (:require [clojure.lang.aseq        :refer [seq-equal?]]
+            [clojure.lang.deftype     :refer [deftype]]
+            [clojure.lang.equivalence :as    equiv]
+            [clojure.lang.object      :as    platform-object]
+            [clojure.lang.protocols   :refer [ICounted ILazySeq IMeta IObj ISeq ISeqable ISequential
+                                              -sval -seq -first -next -more]]
+            [clojure.next             :refer :all]))
 
 (declare make-lazy-seq)
 
@@ -69,7 +72,11 @@
   (-more [this]
     (if (nil? s)
       (list)
-      (-more (-seq this)))))
+      (-more (-seq this))))
+
+  platform-object/base-object
+  (equiv/equals-method [this other]
+    (seq-equal? this other)))
 
 (defn make-lazy-seq
   ([-fn]

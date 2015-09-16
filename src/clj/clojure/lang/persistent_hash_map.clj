@@ -1,12 +1,17 @@
 (ns clojure.lang.persistent-hash-map
-  (:refer-clojure :only [defn defn- declare defprotocol deftype -> let if-let when even? loop format cond])
-  (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
+  (:refer-clojure :only [defn defn- declare defprotocol let if-let when even? loop cond ->])
+  (:require [clojure.lang.apersistent-map :refer [map-cons map-equals? map-hash]]
             [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.key-value       :refer [platform-map-entry-type]]
             [clojure.lang.atomic-ref      :refer [new-atomic-ref ref-get ref-set!]]
-            [clojure.lang.map-entry       :refer [new-map-entry]]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
+            [clojure.lang.deftype         :refer [deftype]]
+            [clojure.lang.enumerable      :as    enum]
+            [clojure.lang.equivalence     :as    equiv]
             [clojure.lang.exceptions      :refer [new-argument-error new-illegal-access-error]]
+            [clojure.lang.hash            :as    hash-code]
+            [clojure.lang.key-value       :refer [platform-map-entry-type]]
+            [clojure.lang.map-entry       :refer [new-map-entry]]
+            [clojure.lang.object          :as    obj]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.hash-map        :refer [->bitnum empty-object
                                                   bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
                                                   + inc * - dec]]
@@ -537,7 +542,7 @@
 
 (declare EMPTY-HASH-MAP)
 
-(defmap PersistentHashMap [-meta -count -root -has-nil? -nil-value]
+(deftype PersistentHashMap [-meta -count -root -has-nil? -nil-value]
   IAssociative
   (-assoc [this key val]
     (if (nil? key)
@@ -612,7 +617,18 @@
       nil
       (node-seq -root))
     ;return hasNull ? new Cons(new MapEntry(null, nullValue), s) : s;
-    ))
+    )
+
+  obj/base-object
+  (equiv/equals-method [this other]
+    (map-equals? this other))
+
+  (hash-code/hash-method [this]
+    (map-hash this))
+
+  enum/base-enumerator
+  (enum/enumerable-method [this]
+    (enum/new-seq-iterator (seq this))))
 
 (defn new-hash-map [-meta -count -root -has-nil? -nil-value]
   (PersistentHashMap. -meta -count -root -has-nil? -nil-value))

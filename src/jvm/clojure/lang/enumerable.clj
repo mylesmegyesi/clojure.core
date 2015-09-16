@@ -1,6 +1,8 @@
 (ns clojure.lang.enumerable
-  (:refer-clojure :only [deftype let reset! defn update-in fn cons list])
+  (:refer-clojure :only [defmacro deftype let reset! defn update-in fn cons list])
   (:require [clojure.next :refer [first next] :exclude [cons]]))
+
+(def base-enumerator Iterable)
 
 (deftype SeqIterator [^:unsynchronized-mutable -current-seq]
   java.util.Iterator
@@ -30,3 +32,7 @@
                        (list 'clojure.lang.enumerable/new-seq-iterator
                              (list 'clojure.next/seq 'this)))
                  old))))
+
+(defmacro enumerable-method [bindings & body]
+  `(iterator ~bindings ~@body))
+

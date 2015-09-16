@@ -1,11 +1,16 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [apply cond declare defn defn- deftype let loop when if-let even? format ->])
-  (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
+  (:refer-clojure :only [apply cond declare defn defn- let loop when if-let even? format ->])
+  (:require [clojure.lang.apersistent-map :refer [map-cons map-equals? map-hash]]
             [clojure.lang.array           :refer [array-copy]]
             [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.map-entry       :refer [new-map-entry]]
+            [clojure.lang.deftype         :refer [deftype]]
+            [clojure.lang.enumerable      :as    enum]
+            [clojure.lang.equivalence     :as    equiv]
             [clojure.lang.exceptions      :refer [new-argument-error new-illegal-access-error]]
+            [clojure.lang.hash            :as    hash-code]
             [clojure.lang.key-value       :refer [platform-map-entry-type]]
+            [clojure.lang.map-entry       :refer [new-map-entry]]
+            [clojure.lang.object          :as    obj]
             [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.protocols       :refer [ICounted ILookup IAssociative
                                                   IPersistentCollection IPersistentMap
@@ -133,7 +138,7 @@
   (when (not= 0 count)
     (PersistentArrayMapSeq. arr count position)))
 
-(defmap PersistentArrayMap [-arr -size -count -meta]
+(deftype PersistentArrayMap [-arr -size -count -meta]
   IAssociative
   (-assoc [this k v]
     (if-let [idx (index-of -arr -size k)] ; key exists
@@ -195,7 +200,18 @@
 
   ISeqable
   (-seq [this]
-    (new-array-map-seq -arr -count 0)))
+    (new-array-map-seq -arr -count 0))
+
+  obj/base-object
+  (equiv/equals-method [this other]
+    (map-equals? this other))
+
+  (hash-code/hash-method [this]
+    (map-hash this))
+
+  enum/base-enumerator
+  (enum/enumerable-method [this]
+    (enum/new-seq-iterator (seq this))))
 
 (defn new-array-map [arr size count meta]
   (PersistentArrayMap. arr size count meta))

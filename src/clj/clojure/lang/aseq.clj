@@ -26,3 +26,4 @@
     (-> {}
       (platform-equals-method 'clojure.lang.aseq/seq-equal?)
       expand-methods)))
+

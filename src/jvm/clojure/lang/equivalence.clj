@@ -17,3 +17,7 @@
                  (list 'equals ['this 'other]
                        (list init-macro 'this 'other))
                  old))))
+
+(defmacro equals-method [bindings & body]
+  `(equals ~bindings ~@body))
+
