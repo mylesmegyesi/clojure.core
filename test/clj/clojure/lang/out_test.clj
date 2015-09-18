@@ -1,9 +1,11 @@
 (ns clojure.lang.out-test
-  (:refer-clojure :only [binding let reify re-matches subs])
-  (:require [clojure.test                       :refer :all]
-            [clojure.next                       :refer :all]
-            [clojure.support.test-seq           :refer [test-seq]]
-            [clojure.lang.protocols             :refer [IMeta ISeq ISeqable ISequential]]))
+  (:refer-clojure :only [binding defprotocol deftype let reify re-matches subs])
+  (:require [clojure.test           :refer :all]
+            [clojure.next           :refer :all]
+            [clojure.support
+              [exception-assertions :refer [argument-error-is-thrown?]]
+              [test-seq             :refer [test-seq]]]
+            [clojure.lang.protocols :refer [IMeta ISeq ISeqable ISequential]]))
 
 (deftest print-simple-test
   (testing "writes the to string version of an obj"
@@ -154,4 +156,35 @@
   (testing "flush returns nil"
     (with-out-str
       (is (nil? (flush))))))
+
+(defprotocol Closable
+  (close [this]))
+
+(deftype TestClose [was-closed]
+  Closable
+  (close [this] (reset! was-closed true)))
+
+(deftest with-open-test
+  (testing "throws an exception is the first argument is not a vector"
+    (argument-error-is-thrown? #"a vector for its binding*"
+      (clojure.core/macroexpand-1 '(with-open ()))))
+
+  (testing "throws an exception if the number of bindings is not even"
+    (argument-error-is-thrown? #"an even number of forms in binding vector*"
+      (clojure.core/macroexpand-1 '(with-open [a]))))
+
+  (testing "throws an exception if a binding is not a symbol"
+    (argument-error-is-thrown? #"with-open only allows Symbols in bindings"
+      (clojure.core/macroexpand-1 '(with-open [:a (TestClose.)]))))
+
+  (testing "will return the body with no args"
+    (is (= :foo (with-open [] :foo))))
+
+  (testing "will close all bindings"
+    (let [close1 (atom false)
+          close2 (atom false)]
+      (with-open [a (TestClose. close1) b (TestClose. close2)]
+        "do something")
+      (is (= true (deref close1)))
+      (is (= true (deref close2))))))
 
