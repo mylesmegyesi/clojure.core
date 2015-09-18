@@ -374,7 +374,7 @@
                     (if (not= (bit-and (unsigned-bit-shift-right bitmap i) ONE) ZERO)
                       (do
                         (if (nil? (aget arr j))
-                          (aset nodes i (aget (inc j)))
+                          (aset nodes i (aget arr (inc j)))
                           (aset nodes i (node-assoc-ref EMPTY-BitmapIndexedNode
                                                               edit
                                                               (+ FIVE shift)

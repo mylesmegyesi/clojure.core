@@ -16,13 +16,13 @@
   `(and (= ~x-name ~y-name)
         (= ~x-ns ~y-ns)))
 
-(declare symbol?)
+(declare is-symbol?)
 
 (defmacro symbol-equals?
   {:private true}
   [x-ns x-name y]
   `(let [y# ~y]
-     (if (symbol? y#)
+     (if (is-symbol? y#)
        (named-equivalence? ~x-name
                            (name y#)
                            ~x-ns
@@ -97,7 +97,7 @@
 
 (defsymbol Symbol)
 
-(defn symbol? [obj]
+(defn is-symbol? [obj]
   (instance? Symbol obj))
 
 (defn new-symbol [ns name str hash-code meta]

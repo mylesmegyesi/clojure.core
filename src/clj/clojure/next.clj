@@ -523,43 +523,14 @@
       (make-cons elem seqable)
       (make-cons elem (seq seqable)))))
 
-(defn first [s]
-  (-first (seq s)))
-
 (defn chunk-first [s]
   (-chunked-first s))
-
-(defn ffirst [s]
-  (first (first s)))
-
-(defn next [s]
-  (-next (seq s)))
 
 (defn chunk-next [s]
   (-chunked-next s))
 
-(defn nfirst [s]
-  (next (first s)))
-
-(defn nnext [s]
-  (next (next s)))
-
-(defn fnext [s]
-  (first (next s)))
-
-(defn rest [s]
-  (-more (seq s)))
-
 (defn chunk-rest [s]
   (-chunked-more s))
-
-(defn last [s]
-  (if (next s)
-    (recur (next s))
-    (first s)))
-
-(defn second [s]
-  (first (next s)))
 
 (declare atom)
 (declare reset!)
@@ -1183,7 +1154,7 @@
    (build-string (cons x more))))
 
 (defn symbol? [x]
-  (sym/symbol? x))
+  (sym/is-symbol? x))
 
 (defn symbol
   ([name]
@@ -1211,7 +1182,7 @@
 (require ['clojure.lang.keyword :as 'kwd])
 
 (defn keyword? [x]
-  (kwd/keyword? x))
+  (kwd/is-keyword? x))
 
 (defn keyword
   ([n]
@@ -1422,4 +1393,5 @@
   (-nth
     ([this n] nil)
     ([this n default] default)))
+
 
