@@ -23,6 +23,11 @@
           arr-chunk (make-array-chunk arr)]
       (is (= 2 (nth arr-chunk 1)))))
 
+  (testing "nth of an array chunk in bounds with a not found value"
+    (let [arr (into-array (test-seq '(1 2 3)))
+          arr-chunk (make-array-chunk arr)]
+      (is (= 2 (nth arr-chunk 1 :not-found)))))
+
   (testing "nth when not in bounds"
     (let [arr (into-array (test-seq '(1 2 3)))
           arr-chunk (make-array-chunk arr)]
