@@ -1180,7 +1180,7 @@
   ([x]
    (if (nil? x) "" (-show x)))
   ([x & more]
-   (build-string (clojure.core/cons x more))))
+   (build-string (cons x more))))
 
 (defn symbol? [x]
   (sym/symbol? x))
@@ -1240,6 +1240,15 @@
      (when ~test
        `@body
        (recur))))
+
+(defmacro ^:private assert-args [& pairs]
+  `(do
+    (when-not ~(first pairs)
+      (throw (new-argument-error
+               (str (first ~'&form) " requires " ~(second pairs) " in " ~'clojure.core/*ns* ":" (:line (meta ~'&form))))))
+     ~(let [more (nnext pairs)]
+        (when more
+          (list* `assert-args more)))))
 
 (def ^:dynamic *print-dup* false)
 (def ^:dynamic *print-meta* false)
@@ -1375,6 +1384,22 @@
     (binding [*out* o#]
       ~@body
       (str o#))))
+
+(defmacro with-open [bindings & body]
+  (assert-args
+     (clojure.core/vector? bindings) "a vector for its binding"
+     (even? (count bindings)) "an even number of forms in binding vector")
+  (cond
+    (= (count bindings) 0)
+      `(do ~@body)
+    (clojure.core/symbol? (bindings 0))
+      `(let ~(clojure.core/subvec bindings 0 2)
+         (try
+           (with-open ~(clojure.core/subvec bindings 2) ~@body)
+           (finally
+             (. ~(bindings 0) close))))
+    :else
+      (throw (new-argument-error "with-open only allows Symbols in bindings"))))
 
 (require ['clojure.lang.time :refer ['nano-time]])
 
