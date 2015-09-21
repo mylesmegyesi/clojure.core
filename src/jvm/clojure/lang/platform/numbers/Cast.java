@@ -262,5 +262,34 @@ public final class Cast {
     return ((Number) x).doubleValue();
   }
 
+  public static double uncheckedCastToDouble(Object x) {
+    return ((Number) x).doubleValue();
+  }
+
+  public static double uncheckedCastToDouble(byte x) {
+    return (double) x;
+  }
+
+  public static double uncheckedCastToDouble(short x) {
+    return (double) x;
+  }
+
+  public static double uncheckedCastToDouble(int x) {
+    return (double) x;
+  }
+
+  public static double uncheckedCastToDouble(long x) {
+    return (double) x;
+  }
+
+  public static double uncheckedCastToDouble(float x) {
+    return (double) x;
+  }
+
+  public static double uncheckedCastToDouble(double x) {
+    return x;
+  }
+
+
 }
 
