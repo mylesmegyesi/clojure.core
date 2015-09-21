@@ -2,6 +2,7 @@
   (:refer-clojure :only [*assert* apply binding defmacro deftype eval let map reify subs var-set])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
+            [clojure.lang.exceptions              :refer [new-exception]]
             [clojure.lang.protocols               :refer :all]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?
                                                           assertion-error-is-thrown?]]
@@ -10,6 +11,13 @@
 (deftest clojure-version-test
   (testing "current clojure version as a string"
     (is (= "1.6.0" (clojure-version)))))
+
+(deftest comment-test
+  (testing "comment returns nil"
+    (is (nil? (comment))))
+
+  (testing "the body is not evaluated"
+    (is (nil? (comment (throw (new-exception)))))))
 
 (deftest type-test
   (testing "will use the :type meta value"

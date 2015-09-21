@@ -21,6 +21,8 @@
        (:minor *clojure-version*) "."
        (:incremental *clojure-version*)))
 
+(defmacro comment [& body])
+
 (defn instance? [c x]
   (platform-object/instance? c x))
 
