@@ -45,6 +45,18 @@ public final class Increment {
     return (Number) Double.valueOf(x + 1);
   }
 
+  public static Number numberUncheckedIncrement(long x) {
+    return x + 1;
+  }
+
+  public static Number numberUncheckedIncrement(double x) {
+    return x + 1;
+  }
+
+  public static Number numberUncheckedIncrement(Number x) {
+    return numberIncrement(x);
+  }
+
   public static Number numberPrecisionIncrement(Number x) {
     Categories category = CategoryType.findCategoryType(x);
     if (category == Categories.INT) {

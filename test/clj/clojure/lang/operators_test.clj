@@ -425,18 +425,25 @@
     (is (= 2 (inc 1))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-is-thrown? #"" (inc "Foo")))
+    (class-cast-exception-is-thrown? #"" (inc "Foo"))))
 
-  )
+(deftest unchecked-inc-test
+  (testing "all types can be unchecked-inc'd"
+    (doseq [t types]
+      (is (= (inc (t 0)) (unchecked-inc (t 0))))))
+
+  (testing "increment max long will overflow"
+    (is (= -9223372036854775808 (unchecked-inc 9223372036854775807))))
+
+  (testing "increment max double will stay the same"
+    (is (= 1.7976931348623157E308 (unchecked-inc 1.7976931348623157E308)))))
 
 (deftest inc'-test
   (testing "increment an argument"
     (is (= 2 (inc 1))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-is-thrown? #"" (inc "Foo")))
-
-  )
+    (class-cast-exception-is-thrown? #"" (inc "Foo"))))
 
 (deftest *-test
   (testing "returns 1 without arguments"
@@ -513,18 +520,25 @@
     (is (= 1 (dec 2))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-is-thrown? #"" (dec "Foo")))
+    (class-cast-exception-is-thrown? #"" (dec "Foo"))))
 
-  )
+(deftest unchecked-dec-test
+  (testing "all types can be unchecked-dec'd"
+    (doseq [t types]
+      (is (= (dec (t 0)) (unchecked-dec (t 0))))))
+
+  (testing "decrement min long will underflow"
+    (is (= 9223372036854775807 (unchecked-dec -9223372036854775808))))
+
+  (testing "decrement min double will produce -1.0"
+    (is (= -1.0 (unchecked-dec 4.9E-324)))))
 
 (deftest dec'-test
   (testing "decrement an argument"
     (is (= 1 (dec 2))))
 
   (testing "raises an error without numbers"
-    (class-cast-exception-is-thrown? #"" (dec "Foo")))
-
-  )
+    (class-cast-exception-is-thrown? #"" (dec "Foo"))))
 
 (deftest max-test
   (testing "max with one argument is identity"
