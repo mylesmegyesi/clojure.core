@@ -48,13 +48,4 @@
           (let [entry (first s)]
             (recur (assoc mp (key entry) (val entry)) (next s)))
           mp))))
-
-(defmacro defmap [type bindings & body]
-  (concat
-    (list* 'clojure.core/deftype type bindings body)
-    (-> {}
-      (platform-hash-method 'clojure.lang.apersistent-map/map-hash)
-      ;platform-show-method
-      platform-enumerable-method
-      (platform-equals-method 'clojure.lang.apersistent-map/map-equals?)
-      expand-methods)))
+ 

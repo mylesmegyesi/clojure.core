@@ -1,14 +1,19 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [cond count declare defn defn- defprotocol deftype empty? even? format if-let let loop ->])
-  (:require [clojure.lang.apersistent-map :refer [defmap map-cons]]
+  (:refer-clojure :only [cond declare defn defn- defprotocol even? format if-let let loop ->])
+  (:require [clojure.lang.apersistent-map :refer [map-cons map-equals? map-hash]]
             [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.map-entry       :refer [new-map-entry]]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
+            [clojure.lang.deftype         :refer [deftype]]
+            [clojure.lang.enumerable      :as    enum]
+            [clojure.lang.equivalence     :as    equiv]
             [clojure.lang.exceptions      :refer [new-argument-error new-unsupported-error]]
+            [clojure.lang.hash            :as    hash-code]
+            [clojure.lang.map-entry       :refer [new-map-entry]]
+            [clojure.lang.object          :as    obj]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
             [clojure.lang.protocols       :refer [ICounted ILookup IMeta IObj
                                                   IAssociative IPersistentCollection IPersistentMap
                                                   ISeqable ISeq]]
-            [clojure.next                 :refer :all :exclude [empty? count]]))
+            [clojure.next                 :refer :all]))
 
 (declare red-node?)
 (declare black-node?)
@@ -398,7 +403,7 @@
 
 (declare EMPTY-SORTED-MAP)
 
-(defmap PersistentTreeMap [-root -count -comparator -meta] ; PersistentTreeMap is the clojure class name
+(deftype PersistentTreeMap [-root -count -comparator -meta] ; PersistentTreeMap is the clojure class name
   IAssociative
   (-assoc [this k v]
     (let [[tree cnt] (sorted-map-assoc -root -comparator k v)]
@@ -439,7 +444,18 @@
 
   ISeqable
   (-seq [this]
-    (make-sorted-map-seq (make-seq-stack -root nil) -count)))
+    (make-sorted-map-seq (make-seq-stack -root nil) -count))
+
+  obj/base-object
+  (equiv/equals-method [this other]
+    (map-equals? this other))
+
+  (hash-code/hash-method [this]
+    (map-hash this))
+
+  enum/base-enumerator
+  (enum/enumerable-method [this]
+    (enum/new-seq-iterator (seq this))))
 
 (defn- new-sorted-map [root cnt compare-fn mta]
   (PersistentTreeMap. root cnt compare-fn mta))

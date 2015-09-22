@@ -1,11 +1,14 @@
 (ns clojure.lang.persistent-struct-map
-  (:refer-clojure :only [apply declare defn defn- deftype interleave let loop range when])
-  (:require [clojure.lang.apersistent-map     :refer [defmap map-cons]]
+  (:refer-clojure :only [apply declare defn defn- interleave let loop range when])
+  (:require [clojure.lang.apersistent-map     :refer [map-cons map-equals? map-hash]]
             [clojure.lang.aseq                :refer [defseq]]
-            [clojure.lang.exceptions          :refer [new-argument-error
-                                                      new-runtime-exception]]
+            [clojure.lang.deftype             :refer [deftype]]
+            [clojure.lang.enumerable          :as    enum]
+            [clojure.lang.equivalence         :as    equiv]
+            [clojure.lang.exceptions          :refer [new-argument-error new-runtime-exception]]
+            [clojure.lang.hash                :as    hash-code]
             [clojure.lang.map-entry           :refer [new-map-entry]]
-            [clojure.lang.object              :refer [new-base-object]]
+            [clojure.lang.object              :as    obj]
             [clojure.lang.persistent-hash-map :refer [EMPTY-HASH-MAP]]
             [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
             [clojure.lang.protocols           :refer [-get-keys -get-keyslots
@@ -62,10 +65,10 @@
 (defn- make-struct-map-seq [-i -keys -vals -ext -meta]
   (PersistentStructMapSeq. -i -keys -vals -ext -meta))
 
-(defmap PersistentStructMap [-def -vals -ext -meta]
+(deftype PersistentStructMap [-def -vals -ext -meta]
   IAssociative
   (-assoc [this k v]
-    (let [sentinel (new-base-object)
+    (let [sentinel (obj/new-base-object)
           ve (get (-get-keyslots -def) k sentinel)]
       (if (not (identical? ve sentinel))
         (let [new-vals (aclone -vals)]
@@ -83,7 +86,7 @@
 
   ILookup
   (-lookup [this k not-found]
-    (let [sentinel (new-base-object)
+    (let [sentinel (obj/new-base-object)
           ve (get (-get-keyslots -def) k sentinel)]
       (if (not (identical? ve sentinel))
         (aget -vals (dec ve))
@@ -119,7 +122,18 @@
 
   ISeqable
   (-seq [this]
-    (make-struct-map-seq 0 (-get-keys -def) -vals -ext nil)))
+    (make-struct-map-seq 0 (-get-keys -def) -vals -ext nil))
+
+  obj/base-object
+  (equiv/equals-method [this other]
+    (map-equals? this other))
+
+  (hash-code/hash-method [this]
+    (map-hash this))
+
+  enum/base-enumerator
+  (enum/enumerable-method [this]
+    (enum/new-seq-iterator (seq this))))
 
 (defn make-struct-map [-def -vals -ext -meta]
   (PersistentStructMap. -def -vals -ext -meta))
