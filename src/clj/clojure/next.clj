@@ -166,6 +166,9 @@
 (defn double [x]
   (platform-numbers/->double x))
 
+(defn unchecked-double [x]
+  (platform-numbers/unchecked->double x))
+
 (defn bigint [x]
   (platform-numbers/->bigint x))
 

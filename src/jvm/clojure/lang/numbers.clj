@@ -153,6 +153,9 @@
 (defmacro ->double [x]
   `(. Cast (castToDouble ~x)))
 
+(defmacro unchecked->double [x]
+  `(. Cast (uncheckedCastToDouble ~x)))
+
 (defmacro ->bigint [x]
   `(let [x# ~x]
      (cond

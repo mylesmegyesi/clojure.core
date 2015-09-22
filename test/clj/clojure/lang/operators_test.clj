@@ -162,7 +162,7 @@
 (deftest unchecked-long-test
   (doseq [t types]
     (testing (str "can cast from " t " via unchecked-long")
-      (is (= (long 0) (unchecked-long 0)))))
+      (is (= (long 0) (unchecked-long (t 0))))))
 
   (testing "truncated when cast from less than min long"
     (is (= 9223372036854775807 (unchecked-long -9223372036854775809N))))
@@ -175,8 +175,20 @@
     (argument-error-is-thrown? #"" (float 3.4028235E38M))))
 
 (deftest unchecked-float-test
+  (doseq [t types]
+    (testing (str "can cast from " t " via unchecked-float")
+      (is (= (float 0) (unchecked-float (t 0))))))
+
   (testing "truncated when cast from more than max float"
     (is (not= 3.4028235E38 (unchecked-float 3.4028235E38M)))))
+
+(deftest unchecked-double-test
+  (doseq [t types]
+    (testing (str "can cast form " t " via unchecked-double")
+      (is (= (double 0) (unchecked-double (t 0))))))
+
+  (testing "truncated when cast from more than min float"
+    (is (= 0.0 (unchecked-double 4.9E-325M)))))
 
 (deftest bit-shift-right-test
   (testing "returns for a numbers and a shift"
