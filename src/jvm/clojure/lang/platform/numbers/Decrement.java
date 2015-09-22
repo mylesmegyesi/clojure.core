@@ -45,6 +45,18 @@ public final class Decrement {
     return (Number) Double.valueOf(x - 1);
   }
 
+  public static Number numberUncheckedDecrement(long x) {
+    return x - 1;
+  }
+
+  public static Number numberUncheckedDecrement(double x) {
+    return x - 1;
+  }
+
+  public static Number numberUncheckedDecrement(Number x) {
+    return numberDecrement(x);
+  }
+
   public static Number numberPrecisionDecrement(Number x) {
     Categories category = CategoryType.findCategoryType(x);
     if (category == Categories.INT) {

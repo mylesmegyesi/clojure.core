@@ -271,11 +271,17 @@
 (defn inc [i]
   (platform-numbers/inc i))
 
+(defn unchecked-inc [i]
+  (platform-numbers/unchecked-inc i))
+
 (defn inc' [i]
   (platform-numbers/inc' i))
 
 (defn dec [i]
   (platform-numbers/dec i))
+
+(defn unchecked-dec [i]
+  (platform-numbers/unchecked-dec i))
 
 (defn dec' [i]
   (platform-numbers/dec' i))
