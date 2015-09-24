@@ -543,6 +543,11 @@
 (defn chunk-rest [s]
   (-chunked-more s))
 
+(require '[clojure.lang.enumeration-seq :refer [make-enumeration-seq]])
+
+(defn enumeration-seq [iter]
+  (make-enumeration-seq iter))
+
 (declare atom)
 (declare reset!)
 (require ['clojure.lang.lazy-seq :refer ['make-lazy-seq]])
