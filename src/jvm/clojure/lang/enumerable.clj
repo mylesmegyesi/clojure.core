@@ -6,7 +6,6 @@
 
 (deftype SeqIterator [^:unsynchronized-mutable -current-seq]
   java.util.Iterator
-
   (hasNext [this]
     (if -current-seq true false))
 
@@ -32,6 +31,12 @@
                        (list 'clojure.lang.enumerable/new-seq-iterator
                              (list 'clojure.next/seq 'this)))
                  old))))
+
+(defn has-more-elements? [^java.util.Enumeration iter]
+  (.hasMoreElements iter))
+
+(defn get-next [^java.util.Enumeration iter]
+  (.nextElement iter))
 
 (defmacro enumerable-method [bindings & body]
   `(iterator ~bindings ~@body))
