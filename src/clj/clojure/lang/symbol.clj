@@ -1,104 +1,66 @@
 (ns clojure.lang.symbol
-  (:refer-clojure :only [defmacro deftype declare satisfies? defn defn- let list list* cond butlast first count ->])
-  (:require [clojure.lang.deftype     :refer [expand-methods]]
-            [clojure.lang.hash        :refer [hash-combine]]
-            [clojure.lang.comparison  :refer [platform-compare-to-method]]
-            [clojure.lang.equivalence :refer [platform-equals-method]]
-            [clojure.lang.hash        :refer [platform-hash-method]]
-            [clojure.lang.show        :refer [platform-show-method]]
-            [clojure.lang.protocols   :refer [IMeta IObj INamed]]
-            [clojure.next             :refer :all :exclude [count first]]
-            [clojure.string]))
+  (:refer-clojure :only [declare defn defn- let cond])
+  (:require [clojure.lang
+              [comparison  :as    comparison]
+              [deftype     :refer [deftype]]
+              [equivalence :as    equiv]
+              [hash        :as    hash-code]
+              [object      :as    obj]
+              [protocols   :refer [IMeta IObj INamed]]
+              [show        :as    show]]
+            [clojure.next :refer :all]))
 
-(defmacro named-equivalence?
-  {:private true}
-  [x-name y-name x-ns y-ns]
-  `(and (= ~x-name ~y-name)
-        (= ~x-ns ~y-ns)))
+(declare is-symbol? new-symbol)
 
-(declare is-symbol?)
+(defn- named-equivalent? [s-name s-ns other]
+  (and (= s-name (name other))
+       (= s-ns (namespace other))))
 
-(defmacro symbol-equals?
-  {:private true}
-  [x-ns x-name y]
-  `(let [y# ~y]
-     (if (is-symbol? y#)
-       (named-equivalence? ~x-name
-                           (name y#)
-                           ~x-ns
-                           (namespace y#))
-       false)))
+(deftype Symbol [-ns -name -str -hash-code -meta]
+  IMeta
+  (-meta [this] -meta)
 
-(defmacro symbol-equals?-init
-  {:private true}
-  [_ other-arg]
-  (list 'symbol-equals? '-ns '-name other-arg))
+  IObj
+  (-with-meta [this m]
+    (new-symbol -ns -name -str -hash-code m))
 
-(defmacro symbol-compare
-  {:private true}
-  [x-ns x-name y]
-  `(let [y# ~y
-         x-name# ~x-name
-         y-name# (name y#)
-         x-ns#   ~x-ns
-         y-ns#   (namespace y#)]
-     (cond
-       (named-equivalence? x-name# y-name# x-ns# y-ns#)
-       0
-       (and (nil? x-ns#)
-            (not (nil? y-ns#)))
-       -1
-       (not (nil? x-ns#))
-       (cond
-         (nil? y-ns#) 1
-         :else
-         (let [num# (compare x-ns# y-ns#)]
-           (if (= num# 0)
-             (compare x-name# y-name#)
-             num#))))))
+  INamed
+  (-name [this] -name)
 
-(defmacro symbol-compare-init
-  {:private true}
-  [_ other-arg]
-  (list 'symbol-compare '-ns '-name other-arg))
+  (-namespace [this] -ns)
 
-(defmacro symbol-hash-init
-  {:private true}
-  [_] '-hash-code)
+  obj/base-object
+  (equiv/equals-method [this other]
+    (if (is-symbol? other)
+      (named-equivalent? -name -ns other)
+      false))
 
-(defmacro symbol-str-init
-  {:private true}
-  [_] '-str)
+  (hash-code/hash-method [this]
+    -hash-code)
 
-(def platform-symbol-methods
-  (-> {}
-    (platform-hash-method 'symbol-hash-init)
-    (platform-show-method 'symbol-str-init)
-    (platform-compare-to-method 'symbol-compare-init)
-    (platform-equals-method 'symbol-equals?-init)
-    expand-methods))
+  (show/show-method [this]
+    -str)
 
-(defmacro defsymbol [type]
-  (list*
-    'deftype type ['-ns '-name '-str '-hash-code '-meta]
-
-    'IMeta
-    (list '-meta ['this] '-meta)
-
-    'IObj
-    (list '-with-meta ['this 'new-meta]
-          (list 'new type '-ns '-name '-str '-hash-code 'new-meta))
-
-    'INamed
-    (list '-name ['this] '-name)
-    (list '-namespace ['this] '-ns)
-
-    platform-symbol-methods))
-
-(defsymbol Symbol)
+  comparison/base-comparable
+  (comparison/comparison-method [this other]
+    (cond
+      (named-equivalent? -name -ns other)
+        0
+      (and (nil? -ns) (not (nil? (namespace other))))
+        -1
+      (not (nil? -ns))
+        (let [other-name      (name other)
+              other-namespace (namespace other)]
+          (if (nil? other-namespace)
+            1
+            (let [n (compare -ns other-namespace)]
+              (if (zero? n)
+                (compare -name other-name)
+                n)))))))
 
 (defn is-symbol? [obj]
   (instance? Symbol obj))
 
 (defn new-symbol [ns name str hash-code meta]
   (Symbol. ns name str hash-code meta))
+

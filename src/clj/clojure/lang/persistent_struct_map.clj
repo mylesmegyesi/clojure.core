@@ -1,21 +1,22 @@
 (ns clojure.lang.persistent-struct-map
   (:refer-clojure :only [apply declare defn defn- interleave let loop range when])
-  (:require [clojure.lang.apersistent-map     :refer [map-cons map-equals? map-hash]]
-            [clojure.lang.aseq                :refer [defseq]]
-            [clojure.lang.deftype             :refer [deftype]]
-            [clojure.lang.enumerable          :as    enum]
-            [clojure.lang.equivalence         :as    equiv]
-            [clojure.lang.exceptions          :refer [new-argument-error new-runtime-exception]]
-            [clojure.lang.hash                :as    hash-code]
-            [clojure.lang.map-entry           :refer [new-map-entry]]
-            [clojure.lang.object              :as    obj]
-            [clojure.lang.persistent-hash-map :refer [EMPTY-HASH-MAP]]
-            [clojure.lang.persistent-list     :refer [EMPTY-LIST]]
-            [clojure.lang.protocols           :refer [-get-keys -get-keyslots
-                                                      IAssociative ICounted IDef ILookup
-                                                      IMeta IObj IPersistentCollection
-                                                      IPersistentMap ISeq ISeqable]]
-            [clojure.next                     :refer :all]))
+  (:require [clojure.lang
+              [apersistent-map     :refer [map-cons map-equals? map-hash]]
+              [aseq                :refer [defseq]]
+              [deftype             :refer [deftype]]
+              [enumerable          :as    enum]
+              [equivalence         :as    equiv]
+              [exceptions          :refer [new-argument-error new-runtime-exception]]
+              [hash                :as    hash-code]
+              [map-entry           :refer [new-map-entry]]
+              [object              :as    obj]
+              [persistent-hash-map :refer [EMPTY-HASH-MAP]]
+              [persistent-list     :refer [EMPTY-LIST]]
+              [protocols           :refer [-get-keys -get-keyslots
+                                           IAssociative ICounted IDef ILookup
+                                           IMeta IObj IPersistentCollection
+                                           IPersistentMap ISeq ISeqable ISequential]]]
+            [clojure.next :refer :all]))
 
 (deftype Def [-keys -keyslots]
   IDef

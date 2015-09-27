@@ -1,10 +1,13 @@
 (ns clojure.lang.persistent-queue
-  (:refer-clojure :only [declare defn deftype if-let let list loop satisfies?])
-  (:require [clojure.next           :refer :all]
-            [clojure.lang.aseq      :refer [defseq]]
-            [clojure.lang.protocols :refer [ICounted IPersistentStack IPersistentCollection IPersistentQueue
-                                            IMeta IObj
-                                            ISeq ISeqable]]))
+  (:refer-clojure :only [declare defn if-let let list loop satisfies?])
+  (:require [clojure.next :refer :all]
+            [clojure.lang
+              [aseq      :refer [defseq]]
+              [deftype   :refer [deftype]]
+              [equivalence]
+              [protocols :refer [ICounted IPersistentStack IPersistentCollection IPersistentQueue
+                                 IMeta IObj
+                                 ISeq ISeqable ISequential]]]))
 
 (declare make-queue)
 

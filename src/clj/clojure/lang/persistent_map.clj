@@ -1,8 +1,12 @@
 (ns clojure.lang.persistent-map
-  (:refer-clojure :only [deftype defn defn- declare if-let when-let when loop])
-  (:require [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [ICounted ISeq -assoc -dissoc]]
+  (:refer-clojure :only [defn declare if-let when])
+  (:require [clojure.lang
+              [aseq            :refer [defseq]]
+              [deftype]
+              [equivalence]
+              [persistent-list :refer [EMPTY-LIST]]
+              [protocols       :refer [ICounted ISeq ISeqable ISequential
+                                       -assoc -dissoc]]]
             [clojure.next                 :refer :all]))
 
 (declare new-key-seq)

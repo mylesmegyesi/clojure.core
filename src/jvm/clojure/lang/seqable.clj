@@ -2,7 +2,10 @@
 
 (ns clojure.lang.platform.seqable
   (:refer-clojure :only [extend-type fn defn deftype declare when-let])
-  (:require [clojure.lang.protocols :refer [ICounted ISeqable ISeq]]))
+  (:require [clojure.lang
+              [deftype]
+              [equivalence]
+              [protocols :refer [ICounted ISeq ISeqable ISequential]]]))
 
 (declare old-seq->new-seq)
 
@@ -24,3 +27,4 @@
 (extend-type clojure.lang.ISeq
   ISeqable
   (-seq [this] (old-seq->new-seq this)))
+

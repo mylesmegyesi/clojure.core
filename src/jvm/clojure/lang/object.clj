@@ -17,3 +17,4 @@
 
 (defn class [^Object x]
   (if-let [cx x] (.getClass cx)))
+

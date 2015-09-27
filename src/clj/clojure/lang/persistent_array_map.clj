@@ -1,25 +1,26 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [apply cond declare defn defn- let loop when if-let even? format ->])
-  (:require [clojure.lang.apersistent-map :refer [map-cons map-equals? map-hash]]
-            [clojure.lang.array           :refer [array-copy]]
-            [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.deftype         :refer [deftype]]
-            [clojure.lang.enumerable      :as    enum]
-            [clojure.lang.equivalence     :as    equiv]
-            [clojure.lang.exceptions      :refer [new-argument-error new-illegal-access-error]]
-            [clojure.lang.hash            :as    hash-code]
-            [clojure.lang.key-value       :refer [platform-map-entry-type]]
-            [clojure.lang.map-entry       :refer [new-map-entry]]
-            [clojure.lang.object          :as    obj]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [ICounted ILookup IAssociative
-                                                  IPersistentCollection IPersistentMap
-                                                  IMeta IObj ISeq ISeqable
-                                                  IEditableCollection ITransientCollection
-                                                  ITransientAssociative ITransientMap
-                                                  -assoc!]]
-            [clojure.lang.thread          :refer [thread-reference]]
-            [clojure.next                 :refer :all]))
+  (:refer-clojure :only [apply cond declare defn defn- let loop when if-let even? ->])
+  (:require [clojure.lang
+              [apersistent-map :refer [map-cons map-equals? map-hash]]
+              [array           :refer [array-copy]]
+              [aseq            :refer [defseq]]
+              [deftype         :refer [deftype]]
+              [enumerable      :as    enum]
+              [equivalence     :as    equiv]
+              [exceptions      :refer [new-argument-error new-illegal-access-error]]
+              [hash            :as    hash-code]
+              [key-value       :refer [platform-map-entry-type]]
+              [map-entry       :refer [new-map-entry]]
+              [object          :as    obj]
+              [persistent-list :refer [EMPTY-LIST]]
+              [protocols       :refer [ICounted ILookup IAssociative
+                                       IPersistentCollection IPersistentMap
+                                       IMeta IObj ISeq ISeqable ISequential
+                                       IEditableCollection ITransientCollection
+                                       ITransientAssociative ITransientMap
+                                       -assoc!]]
+              [thread          :refer [thread-reference]]]
+            [clojure.next :refer :all]))
 
 (def ^:private hashtable-threshold 16)
 

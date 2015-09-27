@@ -1,11 +1,14 @@
 (ns clojure.lang.sequence
   (:refer-clojure :only [cond declare defn defn- if-let let locking loop satisfies? when])
   (:require [clojure.next                 :refer :all]
-            [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [IIndexedSeq IPersistentCollection
-                                                  ICounted IObj IMeta
-                                                  ISeq]])
+            [clojure.lang
+              [aseq            :refer [defseq]]
+              [deftype]
+              [equivalence]
+              [persistent-list :refer [EMPTY-LIST]]
+              [protocols       :refer [IIndexedSeq IPersistentCollection
+                                       ICounted IObj IMeta
+                                       ISeq ISeqable ISequential]]])
   (:import [java.lang.reflect Array]
            [java.util Iterator Map]))
 
