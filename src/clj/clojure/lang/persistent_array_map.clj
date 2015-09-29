@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-array-map
-  (:refer-clojure :only [apply cond declare defn defn- let loop when if-let even? ->])
+  (:refer-clojure :only [apply cond declare defn defn- let loop when if-let ->])
   (:require [clojure.lang
               [apersistent-map :refer [map-cons map-equals? map-hash]]
               [array           :refer [array-copy]]

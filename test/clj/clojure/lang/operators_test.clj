@@ -666,7 +666,31 @@
   (testing "modulus is added to the second arguments if the signs do not match"
     (is (= -1 (mod 3 -2)))))
 
-(deftest zero-test
+(deftest even?-test
+  (testing "is even with an even integer"
+    (doseq [t int-types]
+      (is (true? (even? 2)))))
+
+  (testing "is false with an odd integer"
+    (doseq [t int-types]
+      (is (false? (even? 1)))))
+
+  (testing "throws an exception when not given an integer"
+    (argument-error-is-thrown? #"Argument must be an integer: 1.0" (even? 1.0))))
+
+(deftest odd?-test
+  (testing "is true with an odd integer"
+    (doseq [t int-types]
+      (is (true? (odd? 1)))))
+
+  (testing "is false with an even integer"
+    (doseq [t int-types]
+      (is (false? (odd? 2)))))
+
+  (testing "throws an exception when not given an integer"
+    (argument-error-is-thrown? #"Argument must be an integer: 1.0" (odd? 1.0))))
+
+(deftest zero?-test
   (doseq [x types]
     (testing (str x " with a zero value is zero?")
       (is (zero? (x 0)))))

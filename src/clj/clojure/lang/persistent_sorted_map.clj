@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [cond declare defn defn- defprotocol even? format if-let let loop])
+  (:refer-clojure :only [cond declare defn defn- defprotocol format if-let let loop])
   (:require [clojure.lang
               [apersistent-map :refer [map-cons map-equals? map-hash]]
               [aseq            :refer [defseq]]

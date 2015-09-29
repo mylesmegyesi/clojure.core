@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding cond declare defmacro defmulti defmethod defn defn-
-                         even? extend-type fn if-let let neg? pos? require satisfies? range
+                         extend-type fn if-let let neg? pos? require satisfies? range
                          doseq for list list* load loop format pr-str into butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
@@ -260,6 +260,14 @@
 
 (defn zero? [i]
   (platform-numbers/zero? i))
+
+(defn even? [i]
+  (if (integer? i)
+    (zero? (bit-and (platform-numbers/unchecked->long i) 1))
+    (throw (new-argument-error (str "Argument must be an integer: " i)))))
+
+(defn odd? [i]
+  (not (even? i)))
 
 (defn quot [n div]
   (platform-numbers/quot n div))
