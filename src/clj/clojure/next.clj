@@ -396,7 +396,7 @@
   (-alter-meta! m f args))
 
 (defn meta [m]
-  (if (satisfies? IMeta m)
+  (when (satisfies? IMeta m)
     (-meta m)))
 
 (defn reset-meta! [m new-meta]
@@ -1235,6 +1235,11 @@
      (when ~test
        `@body
        (recur))))
+
+(defn test [v]
+  (if-let [f (get (meta v) :test)]
+    (do (f) :ok)
+    :no-test))
 
 (defmacro ^:private assert-args [& pairs]
   `(do

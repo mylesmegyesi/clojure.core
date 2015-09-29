@@ -1,5 +1,5 @@
 (ns clojure.lang.meta-test
-  (:refer-clojure :only [apply cons deftype let select-keys])
+  (:refer-clojure :only [apply cons deftype fn let select-keys])
   (:require [clojure.test           :refer :all]
             [clojure.lang.protocols :refer [IMeta IObj IReference -reset-meta!]]
             [clojure.next           :refer :all :exclude [cons]]))
@@ -52,4 +52,20 @@
           obj2 (vary-meta obj1 select-keys '(:b))]
       (is (= {:a 1 :b 2 :c 3} (meta obj1)))
       (is (= {:b 2} (meta obj2))))))
+
+(deftest test-test
+  (testing "returns :ok if there is a test in the meta"
+    (let [meta-test (with-meta (vector) (array-map :test (fn [])))]
+      (is (= :ok (test meta-test)))))
+
+  (testing "executes the function if a test is in the meta"
+    (let [was-invoked (atom false)
+          test-fn (fn [] (reset! was-invoked true))
+          meta-test (with-meta (vector) (array-map :test test-fn))]
+      (test meta-test)
+      (is (true? (deref was-invoked)))))
+
+  (testing "returns :no-test if there is not a test in the meta"
+    (let [no-meta-test (vector)]
+      (is (= :no-test (test no-meta-test))))))
 
