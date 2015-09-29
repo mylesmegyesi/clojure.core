@@ -1,12 +1,15 @@
 (ns clojure.lang.enumeration-seq
   (:refer-clojure :only [declare defn if-let locking loop satisfies?])
-  (:require [clojure.next                 :refer :all]
-            [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.enumerable      :refer [get-next has-more-elements?]]
-            [clojure.lang.object          :refer [new-base-object]]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [ICounted IMeta IObj
-                                                  IPersistentCollection ISeq]]))
+  (:require [clojure.next :refer :all]
+            [clojure.lang
+              [aseq            :refer [defseq]]
+              [deftype]
+              [enumerable      :refer [get-next has-more-elements?]]
+              [equivalence]
+              [object          :refer [new-base-object]]
+              [persistent-list :refer [EMPTY-LIST]]
+              [protocols       :refer [ICounted IMeta IObj IPersistentCollection
+                                       ISeq ISeqable ISequential]]]))
 
 (declare make-enumeration-seq)
 

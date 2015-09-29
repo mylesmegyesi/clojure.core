@@ -22,16 +22,6 @@
 (defn new-seq-iterator [-seq]
   (SeqIterator. -seq))
 
-(defn platform-enumerable-method [methods]
-  (update-in methods
-             ['Iterable]
-             (fn [old]
-               (cons
-                 (list 'iterator ['this]
-                       (list 'clojure.lang.enumerable/new-seq-iterator
-                             (list 'clojure.next/seq 'this)))
-                 old))))
-
 (defn has-more-elements? [^java.util.Enumeration iter]
   (.hasMoreElements iter))
 

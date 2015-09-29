@@ -1,10 +1,13 @@
 (ns clojure.lang.persistent-list
   (:refer-clojure :only [declare defn defn- deftype butlast loop])
   (:require [clojure.next            :refer :all]
-            [clojure.lang.aseq       :refer [defseq]]
-            [clojure.lang.exceptions :refer [new-illegal-state-error]]
-            [clojure.lang.protocols  :refer [ICounted IMeta IObj IPersistentCollection -cons
-                                             IPersistentList IPersistentStack ISeq ISeqable ISequential]]))
+            [clojure.lang
+              [aseq         :refer [defseq]]
+              [deftype]
+              [equivalence]
+              [exceptions   :refer [new-illegal-state-error]]
+              [protocols    :refer [ICounted IMeta IObj IPersistentCollection -cons
+                                    IPersistentList IPersistentStack ISeq ISeqable ISequential]]]))
 
 (declare make-list)
 (declare EMPTY-LIST)

@@ -1,14 +1,18 @@
 (ns clojure.lang.map-entry
-  (:refer-clojure :refer [concat cond deftype defmacro defn defn- let list list* -> satisfies?])
-  (:require [clojure.lang.deftype     :refer [expand-methods]]
-            [clojure.lang.equivalence :refer [platform-equals-method]]
-            [clojure.lang.exceptions  :refer [new-out-of-bounds-exception]]
-            [clojure.lang.key-value   :refer [platform-map-entry]]
-            [clojure.lang.numbers     :refer [platform-long platform-big-int platform-big-integer]]
-            [clojure.lang.protocols   :refer [ICounted IIndexed ILookup IMapEntry
-                                              IPersistentCollection ISeqable
-                                              -key -nth -val]]
-            [clojure.next             :refer :all]))
+  (:refer-clojure :refer [cond defn defn- let satisfies?])
+  (:require [clojure.lang
+              [deftype     :refer [deftype]]
+              [equivalence :as    equiv]
+              [exceptions  :refer [new-out-of-bounds-exception]]
+              [key-value   :as    key-value]
+              [numbers     :refer [platform-long platform-big-int platform-big-integer]]
+              [object      :as    obj]
+              [protocols   :refer [ICounted IIndexed ILookup IMapEntry
+                                   IPersistentCollection ISeqable
+                                   -key -nth -val]]]
+            [clojure.next :refer :all]))
+
+(key-value/import-map-entry-type)
 
 (defn- is-integer? [i]
   (or (integer? i)
@@ -16,68 +20,56 @@
       (instance? platform-big-int i)
       (instance? platform-big-integer i)))
 
-(defn- as-vector [m]
-  (vector (key m) (val m)))
+(deftype MapEntry [-k -v]
+  ICounted
+  (-count [this] 2)
 
-(defmacro map-entry-equals? ^:private [k v other]
-  `(let [other# ~other]
-     (and (satisfies? IMapEntry other#)
-          (= ~k (key other#))
-          (= ~v (val other#)))))
+  IIndexed
+  (-nth [this n]
+    (cond
+      (zero? n) -k
+      (= n 1) -v
+      :else (throw (new-out-of-bounds-exception))))
 
-(defmacro map-entry-equals?-init ^:private [this-arg other-arg]
-  (list 'map-entry-equals? 'k 'v other-arg))
+  (-nth [this n not-found]
+    (if (or (= n 0) (= n 1))
+      (-nth this n)
+      not-found))
 
-(defmacro defmapentry [type]
-  (concat
-    (list*
-      'deftype type ['k 'v]
+  ILookup
+  (-lookup [this k not-found]
+    (if (is-integer? k)
+      (let [i (int k)]
+        (if (or (= i 0) (= i 1))
+          (-nth this k)
+          not-found))
+      not-found))
 
-      'ICounted
-      (list '-count ['this] 2)
+  ISeqable
+  (-seq [this]
+    (seq (vector -k -v)))
 
-      'IIndexed
-      (list '-nth ['this 'n]
-        (list 'cond
-          (list 'zero? 'n) 'k
-          (list '= 'n 1) 'v
-          :else (list 'throw (list 'new-out-of-bounds-exception ""))))
+  IPersistentCollection
+  (-cons [this o]
+    (cons (vector -k -v) o))
 
-      (list '-nth ['this 'n 'not-found]
-        (list 'if (list 'or (list '= 'n 0) (list '= 'n 1))
-          (list '-nth 'this 'n)
-          'not-found))
+  (-empty [this] nil)
 
-      'ILookup
-      (list '-lookup ['this 'k 'not-found]
-        (list 'if (list 'is-integer? 'k)
-          (list 'let ['i (list 'int 'k)]
-            (list 'if (list 'or (list '= 'i 0) (list '= 'i 1))
-              (list '-nth 'this 'k)
-              'not-found))
-          'not-found))
+  IMapEntry
+  (-key [this] -k)
 
-      'ISeqable
-      (list '-seq ['this]
-        (list 'seq (list 'as-vector 'this)))
+  (-val [this] -v)
 
-      'IPersistentCollection
-      (list '-cons ['this 'o]
-        (list 'cons (list 'as-vector 'this) 'o))
+  key-value/platform-map-entry-type
+  (key-value/key-method [this] -k)
 
-      (list '-empty ['this]
-        nil)
+  (key-value/val-method [this] -v)
 
-      'IMapEntry
-      (list '-key ['this] 'k)
-      (list '-val ['this] 'v)
-
-      (-> {}
-        (platform-equals-method 'map-entry-equals?-init)
-        expand-methods))
-     platform-map-entry))
-
-(defmapentry MapEntry)
+  obj/base-object
+  (equiv/equals-method [this other]
+    (and (satisfies? IMapEntry other)
+         (= -k (key other))
+         (= -v (val other)))))
 
 (defn new-map-entry [k v]
   (MapEntry. k v))

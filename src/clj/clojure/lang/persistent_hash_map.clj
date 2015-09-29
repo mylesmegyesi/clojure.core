@@ -1,27 +1,29 @@
 (ns clojure.lang.persistent-hash-map
   (:refer-clojure :only [defn defn- declare defprotocol let if-let when even? loop cond ->])
-  (:require [clojure.lang.apersistent-map :refer [map-cons map-equals? map-hash]]
-            [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.atomic-ref      :refer [new-atomic-ref ref-get ref-set!]]
-            [clojure.lang.deftype         :refer [deftype]]
-            [clojure.lang.enumerable      :as    enum]
-            [clojure.lang.equivalence     :as    equiv]
-            [clojure.lang.exceptions      :refer [new-argument-error new-illegal-access-error]]
-            [clojure.lang.hash            :as    hash-code]
-            [clojure.lang.key-value       :refer [platform-map-entry-type]]
-            [clojure.lang.map-entry       :refer [new-map-entry]]
-            [clojure.lang.object          :as    obj]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.hash-map        :refer [->bitnum empty-object
-                                                  bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
-                                                  + inc * - dec]]
-            [clojure.lang.thread          :refer [thread-reference]]
-            [clojure.lang.protocols       :refer [IAssociative ICounted ILookup
-                                                  IMeta IObj IPersistentCollection IPersistentMap
-                                                  ISeqable ISeq
-                                                  IEditableCollection ITransientAssociative ITransientCollection ITransientMap
-                                                  -assoc!]]
-            [clojure.next                 :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right + inc * - dec]]))
+  (:require [clojure.lang
+              [apersistent-map :refer [map-cons map-equals? map-hash]]
+              [aseq            :refer [defseq]]
+              [atomic-ref      :refer [new-atomic-ref ref-get ref-set!]]
+              [deftype         :refer [deftype]]
+              [enumerable      :as    enum]
+              [equivalence     :as    equiv]
+              [exceptions      :refer [new-argument-error new-illegal-access-error]]
+              [hash            :as    hash-code]
+              [key-value       :refer [platform-map-entry-type]]
+              [map-entry       :refer [new-map-entry]]
+              [object          :as    obj]
+              [persistent-list :refer [EMPTY-LIST]]
+              [hash-map        :refer [->bitnum empty-object
+                                       bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
+                                       + inc * - dec]]
+              [thread          :refer [thread-reference]]
+              [protocols       :refer [IAssociative ICounted ILookup IEditableCollection
+                                       IMeta IObj IPersistentCollection IPersistentMap
+                                       ISeqable ISeq ISeqable ISequential
+                                       ITransientAssociative ITransientCollection ITransientMap
+                                       -assoc!]]]
+            [clojure.next :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left
+                                                unsigned-bit-shift-right + inc * - dec]]))
 
 (def ^:private NEG-ONE    (->bitnum -1))
 (def ^:private ZERO       (->bitnum 0))

@@ -1,8 +1,12 @@
 (ns clojure.lang.cons
-  (:refer-clojure :only [declare defn deftype list])
+  (:refer-clojure :only [declare defn list])
   (:require [clojure.next           :refer :all]
-            [clojure.lang.aseq      :refer [defseq]]
-            [clojure.lang.protocols :refer [ICounted IMeta IObj ISeq]]))
+            [clojure.lang
+              [aseq      :refer [defseq]]
+              [deftype]
+              [equivalence]
+              [protocols :refer [ICounted IMeta IObj
+                                 ISeq ISeqable ISequential]]]))
 
 (declare make-cons)
 

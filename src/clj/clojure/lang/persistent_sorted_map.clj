@@ -1,19 +1,20 @@
 (ns clojure.lang.persistent-sorted-map
-  (:refer-clojure :only [cond declare defn defn- defprotocol even? format if-let let loop ->])
-  (:require [clojure.lang.apersistent-map :refer [map-cons map-equals? map-hash]]
-            [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.deftype         :refer [deftype]]
-            [clojure.lang.enumerable      :as    enum]
-            [clojure.lang.equivalence     :as    equiv]
-            [clojure.lang.exceptions      :refer [new-argument-error new-unsupported-error]]
-            [clojure.lang.hash            :as    hash-code]
-            [clojure.lang.map-entry       :refer [new-map-entry]]
-            [clojure.lang.object          :as    obj]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [ICounted ILookup IMeta IObj
-                                                  IAssociative IPersistentCollection IPersistentMap
-                                                  ISeqable ISeq]]
-            [clojure.next                 :refer :all]))
+  (:refer-clojure :only [cond declare defn defn- defprotocol even? format if-let let loop])
+  (:require [clojure.lang
+              [apersistent-map :refer [map-cons map-equals? map-hash]]
+              [aseq            :refer [defseq]]
+              [deftype         :refer [deftype]]
+              [enumerable      :as    enum]
+              [equivalence     :as    equiv]
+              [exceptions      :refer [new-argument-error new-unsupported-error]]
+              [hash            :as    hash-code]
+              [map-entry       :refer [new-map-entry]]
+              [object          :as    obj]
+              [persistent-list :refer [EMPTY-LIST]]
+              [protocols       :refer [ICounted ILookup IMeta IObj
+                                       IAssociative IPersistentCollection IPersistentMap
+                                       ISeq ISeqable ISequential]]]
+            [clojure.next :refer :all]))
 
 (declare red-node?)
 (declare black-node?)
@@ -31,7 +32,7 @@
 (declare balance-left-del)
 (declare balance-right-del)
 
-(defprotocol SortedNode ^{:private true}
+(defprotocol SortedNode ^:private
   (-color [this])
   (-entry [this])
   (-left [this])
@@ -46,7 +47,7 @@
   (-redden [this])
   (-replace [this entry left right]))
 
-(deftype SortedBlackNode ^{:private true}
+(deftype SortedBlackNode ^:private
   [-map-entry]
 
   SortedNode
@@ -72,7 +73,7 @@
   (-replace [this entry left right]
     (make-black-node entry left right)))
 
-(deftype SortedBlackBranch ^{:private true}
+(deftype SortedBlackBranch ^:private
   [-map-entry -left-node -right-node]
 
   SortedNode
@@ -98,7 +99,7 @@
   (-replace [this entry left right]
     (make-black-node entry left right)))
 
-(deftype SortedRedNode ^{:private true}
+(deftype SortedRedNode ^:private
   [-map-entry]
 
   SortedNode
@@ -125,7 +126,7 @@
   (-replace [this entry left right]
     (make-red-node entry left right)))
 
-(deftype SortedRedBranch ^{:private true}
+(deftype SortedRedBranch ^:private
   [-map-entry -left-node -right-node]
 
   SortedNode

@@ -23,3 +23,7 @@
      (if (empty? strs#)
        (.toString sb#)
        (recur (.append sb# (str (first strs#))) (rest strs#)))))
+
+(defmacro show-method [bindings & body]
+  `(toString ~bindings ~@body))
+
