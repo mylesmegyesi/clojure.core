@@ -460,9 +460,7 @@
 
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (* "Foo"))
-    (class-cast-exception-is-thrown? #"" (* 1 "Foo")))
-
-  )
+    (class-cast-exception-is-thrown? #"" (* 1 "Foo"))))
 
 (deftest *'-test
   (testing "returns 1 without arguments"
@@ -479,9 +477,37 @@
 
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (*' "Foo"))
-    (class-cast-exception-is-thrown? #"" (*' 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (*' 1 "Foo"))))
 
-  )
+(deftest unchecked-multiply-test
+  (testing "can multiply all number types by all number types"
+    (doseq [t1 types
+            t2 types]
+      (is (= 1 (long (unchecked-multiply (t1 1) (t2 1)))))))
+
+  (testing "can overflow when multiplying longs"
+    (is (= -4611686018427387907 (unchecked-multiply 4611686018427387903 3))))
+
+  (testing "promotes an integer"
+    (is (= 4294967290 (unchecked-multiply (int 2147483645) (int 2)))))
+
+  (testing "mulitplies as a big int"
+    (is (= 18446744073709551614N (unchecked-multiply 2N 9223372036854775807))))
+
+  (testing "can underflow when multiplying longs"
+    (is (= 4611686018427387904 (unchecked-multiply -4611686018427387904 3)))))
+
+(deftest unchecked-multiply-int-test
+  (testing "can multiply all number types by all number types and always returns an int"
+    (doseq [t1 types
+            t2 types]
+      (is (identical? (int 1) (unchecked-multiply-int (t1 1) (t2 1))))))
+
+  (testing "can overflow when multiplying to a result greater than max int"
+    (is (= -2 (unchecked-multiply-int 2147483647 2))))
+
+  (testing "can underflow when multiplying to a result less than min int"
+    (is (= 2 (unchecked-multiply-int -2147483647 2)))))
 
 (deftest --test
   (testing "negation of a single element"

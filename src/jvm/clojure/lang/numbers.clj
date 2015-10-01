@@ -82,6 +82,12 @@
 (defmacro *' [x y]
   `(. Multiplication (numberPrecisionMultiply ~x ~y)))
 
+(defmacro unchecked-multiply [x y]
+  `(. Multiplication (numberUncheckedMultiply ~x ~y)))
+
+(defmacro unchecked-multiply-int [x y]
+  `(. Multiplication (numberUncheckedMultiplyInt ~x ~y)))
+
 (defmacro -
   ([x] `(. Negation (numberNegate ~x)))
   ([x y] `(. Subtraction (numberSubtract ~x ~y))))
