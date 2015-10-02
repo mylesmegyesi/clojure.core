@@ -2,17 +2,18 @@
   (:refer-clojure :only [char defmacro defn- let map])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
+            [clojure.lang.object                  :refer [base-object]]
             [clojure.support.exception-assertions :refer [out-of-bounds-exception-is-thrown?]]
             [clojure.support.test-seq             :refer [test-seq]]))
 
 (deftest aget-and-set-test
   (testing "setting mutates the given array"
-    (let [arr (make-array 1)]
+    (let [arr (object-array 1)]
       (aset arr 0 :val)
       (is (= :val (aget arr 0)))))
 
   (testing "throws an exception if setting at index greater than or equal to max size"
-    (let [arr (make-array 1)]
+    (let [arr (object-array 1)]
       (out-of-bounds-exception-is-thrown?
         #".*"
         (aset arr 1 :val))
@@ -21,13 +22,13 @@
         (aset arr 2 :val))))
 
   (testing "throws an exception if setting at index less than zero"
-    (let [arr (make-array 1)]
+    (let [arr (object-array 1)]
       (out-of-bounds-exception-is-thrown?
         #".*"
         (aset arr -1 :val))))
 
   (testing "throws an exception if getting at index greater than or equal to max size"
-    (let [arr (make-array 1)]
+    (let [arr (object-array 1)]
       (out-of-bounds-exception-is-thrown?
         #".*"
         (aget arr 1))
@@ -36,21 +37,19 @@
         (aget arr 2))))
 
   (testing "throws an exception if setting at index less than zero"
-    (let [arr (make-array 1)]
+    (let [arr (object-array 1)]
       (out-of-bounds-exception-is-thrown?
         #".*"
-        (aget arr -1))))
-
-  )
+        (aget arr -1)))))
 
 (deftest alength-test
   (testing "returns the length of the array"
-    (is (= 1 (alength (make-array 1))))
-    (is (= 2 (alength (make-array 2))))))
+    (is (= 1 (alength (object-array 1))))
+    (is (= 2 (alength (object-array 2))))))
 
 (deftest array-clone-test
   (testing "returns a new array with the same elements and size"
-    (let [arr (make-array 2)
+    (let [arr (object-array 2)
           _ (aset arr 0 :one)
           _ (aset arr 1 :two)
           new-arr (aclone arr)]
@@ -60,9 +59,18 @@
       (is (not (identical? new-arr arr)))))
 
   (testing "cloning an empty array"
-    (let [arr (make-array 0)
+    (let [arr (object-array 0)
           new-arr (aclone arr)]
       (is (= 0 (alength new-arr))))))
+
+(deftest make-array-test
+  (testing "creates an array for a type of a certain length"
+    (let [arr (make-array base-object 1)]
+      (is (= 1 (alength arr)))))
+
+  (testing "creates a nested array for a type of a certain length"
+    (let [arr (make-array base-object 1 1)]
+      (is (= 1 (alength (aget arr 0)))))))
 
 (deftest into-array-test
   (testing "makes an array out of seq items"
