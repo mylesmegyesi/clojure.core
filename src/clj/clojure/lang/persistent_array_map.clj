@@ -146,12 +146,12 @@
       (let [value-idx (inc idx)]
         (if (= v (aget -arr value-idx))
           this ; key exists and value is the same, do nothing
-          (let [new-array (make-array -size)]
+          (let [new-array (object-array -size)]
             (acopy -arr 0 new-array 0 -size)
             (aset new-array value-idx v)
             (new-array-map new-array -size -count -meta))))
       (let [new-size (+ -size 2)
-            new-array (make-array new-size)]
+            new-array (object-array new-size)]
         (acopy -arr 0 new-array 2 -size)
         (aset new-array 0 k)
         (aset new-array 1 v)
@@ -178,7 +178,7 @@
 
   IObj
   (-with-meta [this m]
-    (let [new-arr (make-array -size)]
+    (let [new-arr (object-array -size)]
       (acopy -arr 0 new-arr 0 -size)
       (new-array-map new-arr -size -count m)))
 
@@ -193,7 +193,7 @@
   (-dissoc [this k]
     (if-let [idx (index-of -arr -size k)] ; key exists
       (let [new-size (- -size 2)
-            new-array (make-array new-size)]
+            new-array (object-array new-size)]
         (acopy -arr 0 new-array 0 idx)
         (acopy -arr (+ idx 2) new-array idx (- -size idx 2))
         (new-array-map new-array new-size (dec -count) -meta))

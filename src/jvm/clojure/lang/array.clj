@@ -1,11 +1,17 @@
 (ns clojure.lang.array
-  (:refer-clojure :only [defmacro let loop inc])
-  (:require [clojure.lang.numbers :refer [unsafe-cast-int]]
-            [clojure.next         :refer :all :exclude [inc]])
+  (:refer-clojure :only [cons defmacro defn dotimes let])
+  (:require [clojure.next :refer :all :exclude [cons]])
   (:import [java.lang.reflect Array]))
 
-(defmacro make-array [type size]
-  `(Array/newInstance ~type (unsafe-cast-int ~size)))
+(defn make-array
+  ([^Class c size]
+    (Array/newInstance c size))
+  ([^Class c d ds]
+    (let [dims (cons d ds)
+          ^"[I" dimarray (make-array Integer/TYPE (count dims))]
+      (dotimes [i (Array/getLength dimarray)]
+        (Array/setInt dimarray i (int (clojure.core/nth dims i))))
+      (Array/newInstance c dimarray))))
 
 (defmacro array-set! [arr idx v]
   `(Array/set ~arr ~idx ~v))

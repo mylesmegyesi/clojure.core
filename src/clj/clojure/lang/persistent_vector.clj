@@ -204,7 +204,7 @@
   ([edit arr]
    (Node. edit arr))
   ([edit]
-   (Node. edit (make-array 32))))
+   (Node. edit (object-array 32))))
 
 (defn- tailoff [length]
   (if (< length 32)
@@ -349,7 +349,7 @@
         (set! -length (inc -length))
         this)
       (let [tail-node (make-node (get-edit -root) -tail)
-            new-tail (make-array 32)]
+            new-tail (object-array 32)]
         (aset new-tail 0 x)
         (if (> (unsigned-bit-shift-right (->bitnum -length) (->bitnum 5)) (bit-shift-left (->bitnum 1) (->bitnum -shift)))
           (let [new-root (make-node (get-edit -root))]
@@ -369,7 +369,7 @@
   (-persistent [this]
     (ensure-editable -root)
     (set! -root (make-node nil (get-array -root)))
-    (let [trimmed-tail (make-array (- (->bitnum -length) (->bitnum (tailoff -length))))]
+    (let [trimmed-tail (object-array (- (->bitnum -length) (->bitnum (tailoff -length))))]
       (acopy -tail 0 trimmed-tail 0 (alength trimmed-tail))
       (make-vector -meta -length -shift -root trimmed-tail)))
 
@@ -416,7 +416,7 @@
   (make-node (thread-reference) (aclone (get-array root))))
 
 (defn- editable-tail [tail]
-  (let [new-arr (make-array 32)]
+  (let [new-arr (object-array 32)]
     (acopy tail 0 new-arr 0 (alength tail))
     new-arr))
 
@@ -428,12 +428,12 @@
   (-cons [this x]
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
       (let [tail-length (alength -tail)
-            new-tail (make-array (inc tail-length))]
+            new-tail (object-array (inc tail-length))]
         (acopy -tail 0 new-tail 0 tail-length)
         (aset new-tail tail-length x)
         (make-vector -meta (inc -length) -shift -root new-tail))
       (let [tail-node (make-node (get-edit -root) -tail)
-            new-arr (make-array 1)]
+            new-arr (object-array 1)]
         (aset new-arr 0 x)
         (if (> (unsigned-bit-shift-right (->bitnum -length) (->bitnum 5)) (bit-shift-left (->bitnum 1) (->bitnum -shift)))
           (let [new-root (make-node (get-edit -root))]
@@ -477,7 +477,7 @@
       (n-in-range? n -length)
       (if (>= n (tailoff -length))
         (let [tail-length (alength -tail)
-              new-tail (make-array tail-length)]
+              new-tail (object-array tail-length)]
           (acopy -tail 0 new-tail 0 tail-length)
           (aset new-tail (bit-and (->bitnum n) (->bitnum 0x01f)) x)
           (make-vector -meta -length -shift -root new-tail))
@@ -535,9 +535,9 @@
 (defn- make-vector [meta length shift root arr]
   (PersistentVector. meta length shift root arr))
 
-(def ^:private EMPTY-NODE (make-node nil (make-array 32)))
+(def ^:private EMPTY-NODE (make-node nil (object-array 32)))
 
-(def ^:private EMPTY-ARRAY (make-array 0))
+(def ^:private EMPTY-ARRAY (object-array 0))
 
 (def EMPTY-VECTOR (make-vector nil 0 5 EMPTY-NODE EMPTY-ARRAY))
 

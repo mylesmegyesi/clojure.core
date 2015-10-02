@@ -104,7 +104,7 @@
   ([shift key1 val1 key2hash key2 val2]
    (let [key1hash (->bitnum (hash key1))]
      (if (= key1hash key2hash)
-       (let [arr (make-array FOUR)]
+       (let [arr (object-array FOUR)]
          (aset arr ZERO key1)
          (aset arr ONE val1)
          (aset arr TWO key2)
@@ -118,7 +118,7 @@
   ([edit shift key1 val1 key2hash key2 val2]
    (let [key1hash (->bitnum (hash key1))]
      (if (= key1hash key2hash)
-       (let [arr (make-array FOUR)]
+       (let [arr (object-array FOUR)]
          (aset arr ZERO key1)
          (aset arr ONE val1)
          (aset arr TWO key2)
@@ -139,7 +139,7 @@
 
 (defn- remove-pair [arr i]
   (let [new-size (- (alength arr) TWO)
-        new-arr (make-array new-size)
+        new-arr (object-array new-size)
         two*i (* TWO i)]
     (acopy arr ZERO new-arr ZERO two*i)
     (acopy arr (* TWO (inc i)) new-arr two*i (- new-size two*i))
@@ -231,13 +231,13 @@
           (if (= (aget array (inc idx)) val)
             this
             (new-hash-collision-node nil hash count (clone-and-set! array (inc idx) val)))
-          (let [new-arr (make-array (* TWO (inc count)))]
+          (let [new-arr (object-array (* TWO (inc count)))]
             (acopy array ZERO new-arr ZERO (* TWO count))
             (aset new-arr (* TWO count) key)
             (aset new-arr (inc (* TWO count)) val)
             (set-value! added-leaf added-leaf)
             (new-hash-collision-node edit hash (inc count) new-arr))))
-      (let [new-arr (make-array TWO)]
+      (let [new-arr (object-array TWO)]
         (aset new-arr ZERO nil)
         (aset new-arr ONE this)
         (node-assoc (new-bitmap-node nil (bit-pos hash shift) new-arr)
@@ -265,7 +265,7 @@
       this
       (let [n (bit-count bitmap)
             arr-size (if (>= n ZERO) (* TWO (inc n)) FOUR)
-            new-arr (make-array arr-size)]
+            new-arr (object-array arr-size)]
         (acopy arr ZERO new-arr ZERO (* TWO n))
         (new-bitmap-node -edit bitmap new-arr))))
 
@@ -311,7 +311,7 @@
                                                                        hash key val))))))
         (let [n (bit-count bitmap)]
           (if (>= n SIXTEEN)
-            (let [nodes (make-array THIRTY-TWO)
+            (let [nodes (object-array THIRTY-TWO)
                   jdx (mask hash shift)
                   jdx-node (node-assoc EMPTY-BitmapIndexedNode
                                        (+ shift FIVE) hash key val added-leaf)]
@@ -331,7 +331,7 @@
                       (recur (inc i) (+ j TWO)))
                     (recur (inc i) j))))
               (new-array-node nil (inc n) nodes))
-            (let [new-arr (make-array (* TWO (inc n)))]
+            (let [new-arr (object-array (* TWO (inc n)))]
               (acopy arr ZERO new-arr ZERO (* TWO idx))
               (aset new-arr (* TWO idx) key)
               (set-value! added-leaf added-leaf)
@@ -373,7 +373,7 @@
                   (set-bitmap! editable (bit-or (get-bitmap editable) bit))
                   editable))
               (>= n SIXTEEN)
-              (let [nodes (make-array THIRTY-TWO)
+              (let [nodes (object-array THIRTY-TWO)
                     jdx (mask hash shift)
                     jdx-node (node-assoc-ref EMPTY-BitmapIndexedNode edit (+ FIVE shift) hash key val added-leaf)]
                 (loop [i ZERO j ZERO]
@@ -393,7 +393,7 @@
                     (recur (inc i) j))))
                 (new-array-node edit (inc n) nodes))
               :else
-              (let [new-array (make-array (* TWO (+ FOUR n)))]
+              (let [new-array (object-array (* TWO (+ FOUR n)))]
                 (acopy arr ZERO new-array ZERO (* TWO idx))
                 (aset new-array (* TWO idx) key)
                 (set-value! added-leaf added-leaf)
@@ -436,7 +436,7 @@
 (defn- new-bitmap-node [edit bitmap arr]
   (BitmapIndexedNode. edit bitmap arr))
 
-(def ^:private EMPTY-BitmapIndexedNode (new-bitmap-node nil ZERO (make-array ZERO)))
+(def ^:private EMPTY-BitmapIndexedNode (new-bitmap-node nil ZERO (object-array ZERO)))
 
 (def ^:private NOT-FOUND (empty-object))
 

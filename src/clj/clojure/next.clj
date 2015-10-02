@@ -733,9 +733,10 @@
   (arr/array-copy src src-pos dest dest-pos length))
 
 (defn make-array
-  ([size] (make-array platform-object/base-object size))
-  ([type size]
-   (arr/make-array type size)))
+  ([t len]
+    (arr/make-array t (int len)))
+  ([t len & lens]
+    (arr/make-array t len lens)))
 
 (defn into-array
   ([seqable] (into-array platform-object/base-object seqable))
