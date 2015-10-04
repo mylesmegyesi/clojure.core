@@ -290,6 +290,5 @@ public final class Cast {
     return x;
   }
 
-
 }
 

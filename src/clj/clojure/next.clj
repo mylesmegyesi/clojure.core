@@ -253,6 +253,12 @@
   ([x y] (platform-numbers/*' x y))
   ([x y & more] (reduce *' (*' x y) more)))
 
+(defn unchecked-multiply [x y]
+  (platform-numbers/unchecked-multiply x y))
+
+(defn unchecked-multiply-int [x y]
+  (platform-numbers/unchecked-multiply-int x y))
+
 (defn /
   ([x] (/ 1 x))
   ([x y] (platform-numbers// x y))

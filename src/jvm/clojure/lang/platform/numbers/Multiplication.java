@@ -78,5 +78,17 @@ public final class Multiplication {
     return (Number) ret;
   }
 
+  public static long numberUncheckedMultiply(Long x, Long y) {
+    return x * y;
+  }
+
+  public static Number numberUncheckedMultiply(Number x, Number y) {
+    return Multiplication.numberMultiply(x, y);
+  }
+
+  public static int numberUncheckedMultiplyInt(int x, int y) {
+    return x * y;
+  }
+
 }
 
