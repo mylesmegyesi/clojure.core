@@ -12,37 +12,32 @@
   (testing "returns 0 the count"
     (is (= 1 (count (list :a))))
     (is (= 2 (count (list :a :b))))
-    (is (= 3 (count (list :a :b :c)))))
-)
+    (is (= 3 (count (list :a :b :c))))))
 
 (deftest first-test
   (testing "returns nil for empty"
     (is (= nil (first (list)))))
 
   (testing "returns first element"
-    (is (= "A" (first (list "A" "B" "C")))))
-)
+    (is (= "A" (first (list "A" "B" "C"))))))
 
 (deftest next-test
   (testing "returns nil for one element"
     (is (= nil (next (list 1)))))
 
   (testing "returns next"
-    (is (= (list 2 3) (next (list 1 2 3)))))
-)
+    (is (= (list 2 3) (next (list 1 2 3))))))
 
 (deftest rest-test
   (testing "returns an empty list for one element"
     (is (= EMPTY-LIST (rest (list 1)))))
 
   (testing "returns rest"
-    (is (= (list 2 3) (rest (list 1 2 3)))))
-)
+    (is (= (list 2 3) (rest (list 1 2 3))))))
 
 (deftest list?-test
   (testing "is a list"
-    (is (list? (list))))
-)
+    (is (list? (list)))))
 
 (deftest meta-test
   (testing "meta"
@@ -50,8 +45,7 @@
 
   (testing "with-meta"
     (let [meta-list (with-meta (list "a" "b") {:my :meta})]
-      (is (= :meta (:my (meta meta-list))))))
-)
+      (is (= :meta (:my (meta meta-list)))))))
 
 (deftest empty-test
   (testing "returns empty list"
@@ -61,15 +55,13 @@
     (let [new-list (with-meta (list :a :b :c) {:this :that})
           empty-list (empty new-list)]
       (is (= 0 (count empty-list)))
-      (is (= :that (:this (meta empty-list))))))
-)
+      (is (= :that (:this (meta empty-list)))))))
 
 (deftest peek-test
   (testing "returns first element"
     (let [new-list (list 1 2 3 4)]
       (is (= 1 (peek new-list)))
-      (is (= 2 (peek (next new-list))))))
-)
+      (is (= 2 (peek (next new-list)))))))
 
 (deftest pop-test
   (testing "returns the rest"
@@ -79,11 +71,9 @@
   (testing "throws exception for empty list"
     (illegal-state-error-is-thrown?
       #"Can't pop empty list"
-      (pop (list))))
-)
+      (pop (list)))))
 
 (deftest seq-test
   (testing "return nil for empty list"
-    (is (= nil (seq (list)))))
-)
+    (is (= nil (seq (list))))))
 

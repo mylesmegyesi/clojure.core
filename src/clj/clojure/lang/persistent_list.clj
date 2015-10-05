@@ -1,11 +1,12 @@
 (ns clojure.lang.persistent-list
-  (:refer-clojure :only [declare defn defn- deftype butlast loop])
+  (:refer-clojure :only [declare defn defn- butlast loop satisfies?])
   (:require [clojure.next            :refer :all]
             [clojure.lang
               [aseq         :refer [defseq]]
-              [deftype]
-              [equivalence]
+              [deftype      :refer [deftype]]
+              [equivalence  :as    equiv]
               [exceptions   :refer [new-illegal-state-error]]
+              [object       :as    obj]
               [protocols    :refer [ICounted IMeta IObj IPersistentCollection -cons
                                     IPersistentList IPersistentStack ISeq ISeqable ISequential]]]))
 
@@ -13,6 +14,8 @@
 (declare EMPTY-LIST)
 
 (deftype EmptyList [meta]
+  IPersistentList
+
   ICounted
   (-count [this] 0)
 
@@ -39,20 +42,25 @@
 
   ISequential
 
-  ISeq
-  (-first [this] nil)
-
   ISeqable
   (-seq [this] nil)
+
+  ISeq
+  (-first [this] nil)
 
   (-next [this] nil)
 
   (-more [this] this)
 
-  IPersistentList
-)
+  obj/base-object
+  (equiv/equals-method [this other]
+    (and
+      (satisfies? ISequential other)
+      (nil? (seq other)))))
 
 (defseq PersistentList [meta first rest count]
+  IPersistentList
+
   ICounted
   (-count [this] count)
 
@@ -82,10 +90,7 @@
   (-next [this]
     (if (= count 1) nil rest))
 
-  (-more [this] rest)
-
-  IPersistentList
-)
+  (-more [this] rest))
 
 (defn- make-list [meta first rest count]
   (PersistentList. meta first rest count))
