@@ -1263,6 +1263,25 @@
 (defmacro when-not [test & body]
   (list 'if test nil (clojure.core/cons 'do body)))
 
+(require '[clojure.lang.regex :as regex])
+
+(defn re-pattern [pattern]
+  (regex/make-pattern pattern))
+
+(defn re-matcher [pattern s]
+  (regex/make-matcher pattern s))
+
+(defn re-groups [matcher]
+  (regex/get-groups matcher))
+
+(defn re-find
+  ([matcher] (regex/regex-find matcher))
+  ([pattern s]
+    (regex/regex-find (re-matcher pattern s))))
+
+(defn re-seq [pattern s]
+  (regex/regex-seq pattern s))
+
 (defmacro assert
   ([assertion]
     (when *assert*
