@@ -31,3 +31,22 @@
          new-arr# (make-array Object size#)]
      (array-copy arr# 0 new-arr# 0 size#)
      new-arr#))
+
+(defmacro array-set-byte! [arr idx v]
+  `(Array/setByte ~arr ~idx ~v))
+
+(defmacro array-set-short! [arr idx v]
+  `(Array/setShort ~arr ~idx ~v))
+
+(defmacro array-set-int! [arr idx v]
+  `(Array/setInt ~arr ~idx ~v))
+
+(defmacro array-set-long! [arr idx v]
+  `(Array/setLong ~arr ~idx ~v))
+
+(defmacro array-set-float! [arr idx v]
+  `(Array/setFloat ~arr ~idx ~v))
+
+(defmacro array-set-double! [arr idx v]
+  `(Array/setDouble ~arr ~idx ~v))
+

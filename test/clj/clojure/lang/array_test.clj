@@ -2,8 +2,11 @@
   (:refer-clojure :only [char defmacro defn- let map])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
-            [clojure.lang.object                  :refer [base-object]]
-            [clojure.support.exception-assertions :refer [out-of-bounds-exception-is-thrown?]]
+            [clojure.lang.object                  :as    obj]
+            [clojure.lang.numbers                 :as    numbers]
+            [clojure.support.exception-assertions :refer [argument-error-is-thrown?
+                                                          class-cast-exception-is-thrown?
+                                                          out-of-bounds-exception-is-thrown?]]
             [clojure.support.test-seq             :refer [test-seq]]))
 
 (deftest aget-and-set-test
@@ -42,6 +45,43 @@
         #".*"
         (aget arr -1)))))
 
+(defn- aset-type-test [aset-fn t v]
+  (testing (str "set a " t " value in an array")
+    (let [arr (make-array t 1)]
+      (aset-fn arr 0 v)
+      (is (= v (aget arr 0)))))
+
+  (testing (str "an illegal argument error is thrown if the array is not a" t " array")
+    (let [arr (object-array 1)]
+      (argument-error-is-thrown? #"" (aset-fn arr 0 v))))
+
+  (testing (str "a class cast exception is thrown if the arg is not castable to an " t)
+    (let [arr (make-array t 1)]
+      (class-cast-exception-is-thrown? #"" (aset-fn arr 0 "foo"))))
+
+  (testing (str "a value can be set in a nested " t " array")
+    (let [arr (make-array t 1 1)]
+      (aset-fn arr 0 0 v)
+      (is (= v (aget (aget arr 0) 0))))))
+
+(deftest aset-byte-test
+  (aset-type-test aset-byte numbers/platform-native-byte 42))
+
+(deftest aset-short-test
+  (aset-type-test aset-short numbers/platform-native-short 42))
+
+(deftest aset-int-test
+  (aset-type-test aset-int numbers/platform-native-int 42))
+
+(deftest aset-long-test
+  (aset-type-test aset-long numbers/platform-native-long 42))
+
+(deftest aset-float-test
+  (aset-type-test aset-float numbers/platform-native-float 42.0))
+
+(deftest aset-double-test
+  (aset-type-test aset-double numbers/platform-native-double 42.0))
+
 (deftest alength-test
   (testing "returns the length of the array"
     (is (= 1 (alength (object-array 1))))
@@ -65,11 +105,11 @@
 
 (deftest make-array-test
   (testing "creates an array for a type of a certain length"
-    (let [arr (make-array base-object 1)]
+    (let [arr (make-array obj/base-object 1)]
       (is (= 1 (alength arr)))))
 
   (testing "creates a nested array for a type of a certain length"
-    (let [arr (make-array base-object 1 1)]
+    (let [arr (make-array obj/base-object 1 1)]
       (is (= 1 (alength (aget arr 0)))))))
 
 (deftest into-array-test

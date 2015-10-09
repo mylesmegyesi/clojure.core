@@ -723,11 +723,47 @@
 
 (require ['clojure.lang.array :as 'arr])
 
+(defn aget [arr i]
+  (arr/array-get arr i))
+
 (defn aset [arr i val]
   (arr/array-set! arr i val))
 
-(defn aget [arr i]
-  (arr/array-get arr i))
+(defn aset-byte
+  ([arr i v]
+    (arr/array-set-byte! arr i (byte v)))
+  ([arr i i2 & vs]
+    (apply aset-byte (aget arr i) i2 vs)))
+
+(defn aset-short
+  ([arr i v]
+    (arr/array-set-short! arr i (short v)))
+  ([arr i i2 & vs]
+    (apply aset-short (aget arr i) i2 vs)))
+
+(defn aset-int
+  ([arr i v]
+    (arr/array-set-int! arr i (int v)))
+  ([arr i i2 & vs]
+    (apply aset-int (aget arr i) i2 vs)))
+
+(defn aset-long
+  ([arr i v]
+    (arr/array-set-long! arr i (long v)))
+  ([arr i i2 & vs]
+    (apply aset-long (aget arr i) i2 vs)))
+
+(defn aset-float
+  ([arr i v]
+    (arr/array-set-float! arr i (float v)))
+  ([arr i i2 & vs]
+    (apply aset-float (aget arr i) i2 vs)))
+
+(defn aset-double
+  ([arr i v]
+    (arr/array-set-double! arr i (double v)))
+  ([arr i i2 & vs]
+    (apply aset-double (aget arr i) i2 vs)))
 
 (defn alength [arr]
   (arr/array-length arr))

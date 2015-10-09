@@ -13,14 +13,20 @@
                                           Quotient Rationalize Remainder
                                           Subtraction Zero]))
 
-(def platform-byte        Byte)
-(def platform-short       Short)
-(def platform-int         Integer)
-(def platform-long        Long)
-(def platform-big-int     BigInt)
-(def platform-big-integer BigInteger)
-(def platform-float       Float)
-(def platform-double      Double)
+(def platform-byte          Byte)
+(def platform-native-byte   Byte/TYPE)
+(def platform-short         Short)
+(def platform-native-short  Short/TYPE)
+(def platform-int           Integer)
+(def platform-native-int    Integer/TYPE)
+(def platform-long          Long)
+(def platform-native-long   Long/TYPE)
+(def platform-big-int       BigInt)
+(def platform-big-integer   BigInteger)
+(def platform-float         Float)
+(def platform-native-float  Float/TYPE)
+(def platform-double        Double)
+(def platform-native-double Double/TYPE)
 
 (defmacro number? [x]
   `(instance? Number ~x))
