@@ -825,6 +825,16 @@
               (aset arr i (first sq))
               (recur (inc i) (next sq)))))))))
 
+(defmacro amap [a idx ret expr]
+  `(let [a# ~a
+         ~ret (aclone a#)]
+     (loop [~idx 0]
+       (if (< ~idx (alength a#))
+         (do
+           (aset ~ret ~idx ~expr)
+           (recur (unchecked-inc ~idx)))
+         ~ret))))
+
 (defn byte-array
   ([seq-or-size]
     (primitive-array seq-or-size byte-array-for-size))

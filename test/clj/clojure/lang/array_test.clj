@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [char defmacro defn- let map])
+  (:refer-clojure :only [char cond defmacro defn- let map])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.lang.object                  :as    obj]
@@ -125,6 +125,22 @@
     (let [seqable '()
           arr (into-array seqable)]
       (is (= 0 (alength arr))))))
+
+(deftest amap-test
+  (testing "map over array elements with an index reference and return reference"
+    (let [seqable '(1 2 3)
+          arr (into-array seqable)
+          ret (amap arr idx ret
+                    (cond
+                      (= idx 0) (inc (aget arr 0))
+                      (= idx 1) (+ 2 (aget ret 0))
+                      (= idx 2) (- (aget arr 2) 5)))]
+      (is (= 1 (aget arr 0)))
+      (is (= 2 (aget arr 1)))
+      (is (= 3 (aget arr 2)))
+      (is (= 2 (aget ret 0)))
+      (is (= 4 (aget ret 1)))
+      (is (= -2 (aget ret 2))))))
 
 (deftest object-array-test
   (testing "returns an array of nils for given size"
