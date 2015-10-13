@@ -835,6 +835,13 @@
            (recur (unchecked-inc ~idx)))
          ~ret))))
 
+(defmacro areduce [a idx ret init expr]
+ `(let [a# ~a]
+     (loop [~idx 0 ~ret ~init]
+       (if (< ~idx  (alength a#))
+         (recur (unchecked-inc ~idx) ~expr)
+         ~ret))))
+
 (defn byte-array
   ([seq-or-size]
     (primitive-array seq-or-size byte-array-for-size))
