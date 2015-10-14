@@ -521,9 +521,7 @@
 
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (- "Foo"))
-    (class-cast-exception-is-thrown? #"" (- 1 "Foo")))
-
-  )
+    (class-cast-exception-is-thrown? #"" (- 1 "Foo"))))
 
 (deftest -'-test
   (testing "negation of a single element"
@@ -537,9 +535,27 @@
 
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (-' "Foo"))
-    (class-cast-exception-is-thrown? #"" (-' 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (-' 1 "Foo"))))
 
-  )
+(deftest unchecked-negate-test
+  (testing "can negate all number types"
+    (doseq [t types]
+      (is (= -1 (long (unchecked-negate (t 1)))))))
+
+  (testing "will underflow min long"
+    (is (= -9223372036854775808 (unchecked-negate -9223372036854775808)))))
+
+(deftest unchecked-negate-int-test
+  (testing "can negate all number types"
+    (doseq [t types]
+      (is (= -1 (long (unchecked-negate (t 1)))))))
+
+  (testing "will underflow min int"
+    (is (= -2147483648 (unchecked-negate-int (int -2147483648)))))
+
+  (testing "will cast numbers being negated to int"
+    (argument-error-is-thrown? #""
+      (unchecked-negate-int 2147483649))))
 
 (deftest dec-test
   (testing "decrement an argument"

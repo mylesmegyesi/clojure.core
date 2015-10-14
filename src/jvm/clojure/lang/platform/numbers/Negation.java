@@ -62,5 +62,25 @@ public final class Negation {
     }
   }
 
+  public static final Number numberUncheckedNegate(Number x) {
+    if (x instanceof Long) {
+      return -(x.longValue());
+    } else if ((x instanceof Double) || (x instanceof Float)) {
+      return Negation.doubleNegate(Coercion.toDouble(x));
+    } else if (x instanceof BigDecimal) {
+      return Negation.bigDecimalNegate((BigDecimal) x);
+    } else if (x instanceof Ratio) {
+      return Negation.ratioNegate((Ratio) x);
+    } else if ((x instanceof BigInt) || (x instanceof BigInteger)) {
+      return Negation.bigIntNegate(Coercion.toBigInt(x));
+    } else {
+      return Negation.longNegate(Coercion.toLong(x));
+    }
+  }
+
+  public static final Number numberUncheckedNegateInt(int x) {
+    return -x;
+  }
+
 }
 

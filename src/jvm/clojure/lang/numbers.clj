@@ -102,6 +102,12 @@
   ([x] `(. Negation (numberPrecisionNegate ~x)))
   ([x y] `(. Subtraction (numberPrecisionSubtract ~x ~y))))
 
+(defmacro unchecked-negate [x]
+  `(. Negation (numberUncheckedNegate ~x)))
+
+(defmacro unchecked-negate-int [x]
+  `(. Negation (numberUncheckedNegateInt ~x)))
+
 (defmacro dec [x]
   `(. Decrement (numberDecrement ~x)))
 
