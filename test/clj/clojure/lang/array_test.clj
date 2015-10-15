@@ -142,6 +142,19 @@
       (is (= 4 (aget ret 1)))
       (is (= -2 (aget ret 2))))))
 
+(deftest areduce-test
+  (testing "reduce over array elements with an index reference and return reference"
+    (let [seqable '(1 2 3)
+          arr (into-array seqable)
+          ret (areduce arr idx ret 42
+                       (cond
+                         (even? idx) (+ ret (inc (aget arr idx)))
+                         (odd? idx) (* ret 2)))]
+      (is (= 1 (aget arr 0)))
+      (is (= 2 (aget arr 1)))
+      (is (= 3 (aget arr 2)))
+      (is (= 92 ret)))))
+
 (deftest object-array-test
   (testing "returns an array of nils for given size"
     (let [arr (object-array 42)]
