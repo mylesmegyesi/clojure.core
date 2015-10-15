@@ -537,6 +537,28 @@
     (class-cast-exception-is-thrown? #"" (-' "Foo"))
     (class-cast-exception-is-thrown? #"" (-' 1 "Foo"))))
 
+(deftest unchecked-subtract-test
+  (testing "can subtract all number types"
+    (doseq [t1 types
+            t2 types]
+      (is (= 1 (long (unchecked-subtract (t1 2) (t2 1)))))))
+
+  (testing "will underflow min long"
+    (is (= 9223372036854775807 (unchecked-subtract -9223372036854775808 1)))))
+
+(deftest unchecked-subtract-int-test
+  (testing "can subtract all number types"
+    (doseq [t1 types
+            t2 types]
+      (is (= 1 (int (unchecked-subtract-int (t1 2) (t2 1)))))))
+
+  (testing "will underflow min int"
+    (is (= 2147483647 (unchecked-subtract-int (int -2147483648) (int 1)))))
+
+  (testing "will cast numbers being subtracted to int"
+    (argument-error-is-thrown? #""
+      (unchecked-subtract-int 2147483649 1))))
+
 (deftest unchecked-negate-test
   (testing "can negate all number types"
     (doseq [t types]

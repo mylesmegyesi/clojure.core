@@ -241,6 +241,12 @@
   ([x y] (platform-numbers/-' x y))
   ([x y & more] (reduce -' (-' x y) more)))
 
+(defn unchecked-subtract [x y]
+  (platform-numbers/unchecked-subtract x y))
+
+(defn unchecked-subtract-int [x y]
+  (platform-numbers/unchecked-subtract-int x y))
+
 (defn unchecked-negate [x]
   (platform-numbers/unchecked-negate x))
 

@@ -20,5 +20,17 @@ public final class Subtraction {
     return Addition.numberPrecisionAdd((Number) x, (Number) Negation.numberPrecisionNegate(y));
   }
 
+  public static long numberUncheckedSubtract(Long x, Long y) {
+    return x - y;
+  }
+
+  public static Number numberUncheckedSubtract(Number x, Number y) {
+    return Subtraction.numberSubtract(x, y);
+  }
+
+  public static Number numberUncheckedSubtractInt(int x, int y) {
+    return x - y;
+  }
+
 }
 
