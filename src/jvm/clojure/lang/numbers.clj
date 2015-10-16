@@ -79,6 +79,9 @@
 (defmacro unchecked-inc [x]
   `(. Increment (numberUncheckedIncrement ~x)))
 
+(defmacro unchecked-inc-int [x]
+  `(. Increment (numberUncheckedIncrementInt ~x)))
+
 (defmacro inc' [x]
   `(. Increment (numberPrecisionIncrement ~x)))
 

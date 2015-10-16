@@ -305,6 +305,9 @@
 (defn unchecked-inc [i]
   (platform-numbers/unchecked-inc i))
 
+(defn unchecked-inc-int [i]
+  (platform-numbers/unchecked-inc-int i))
+
 (defn inc' [i]
   (platform-numbers/inc' i))
 

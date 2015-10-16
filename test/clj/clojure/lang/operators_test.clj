@@ -427,6 +427,13 @@
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (inc "Foo"))))
 
+(deftest inc'-test
+  (testing "increment an argument"
+    (is (= 2 (inc 1))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-is-thrown? #"" (inc "Foo"))))
+
 (deftest unchecked-inc-test
   (testing "all types can be unchecked-inc'd"
     (doseq [t types]
@@ -438,12 +445,17 @@
   (testing "increment max double will stay the same"
     (is (= 1.7976931348623157E308 (unchecked-inc 1.7976931348623157E308)))))
 
-(deftest inc'-test
-  (testing "increment an argument"
-    (is (= 2 (inc 1))))
+(deftest unchecked-inc-int-test
+  (testing "all types can be inc'd"
+    (doseq [t types]
+      (is (= (int 1) (unchecked-inc-int (t 0))))))
 
-  (testing "raises an error without numbers"
-    (class-cast-exception-is-thrown? #"" (inc "Foo"))))
+  (testing "increment max int will overflow"
+    (is (= -2147483648 (unchecked-inc-int 2147483647))))
+
+  (testing "tries to cast to int"
+    (argument-error-is-thrown? #""
+      (unchecked-inc-int 9223372036854775807))))
 
 (deftest *-test
   (testing "returns 1 without arguments"
