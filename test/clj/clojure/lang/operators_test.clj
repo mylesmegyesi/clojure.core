@@ -427,6 +427,13 @@
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (inc "Foo"))))
 
+(deftest inc'-test
+  (testing "increment an argument"
+    (is (= 2 (inc 1))))
+
+  (testing "raises an error without numbers"
+    (class-cast-exception-is-thrown? #"" (inc "Foo"))))
+
 (deftest unchecked-inc-test
   (testing "all types can be unchecked-inc'd"
     (doseq [t types]
@@ -438,12 +445,17 @@
   (testing "increment max double will stay the same"
     (is (= 1.7976931348623157E308 (unchecked-inc 1.7976931348623157E308)))))
 
-(deftest inc'-test
-  (testing "increment an argument"
-    (is (= 2 (inc 1))))
+(deftest unchecked-inc-int-test
+  (testing "all types can be inc'd"
+    (doseq [t types]
+      (is (= (int 1) (unchecked-inc-int (t 0))))))
 
-  (testing "raises an error without numbers"
-    (class-cast-exception-is-thrown? #"" (inc "Foo"))))
+  (testing "increment max int will overflow"
+    (is (= -2147483648 (unchecked-inc-int 2147483647))))
+
+  (testing "tries to cast to int"
+    (argument-error-is-thrown? #""
+      (unchecked-inc-int 9223372036854775807))))
 
 (deftest *-test
   (testing "returns 1 without arguments"
@@ -521,9 +533,7 @@
 
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (- "Foo"))
-    (class-cast-exception-is-thrown? #"" (- 1 "Foo")))
-
-  )
+    (class-cast-exception-is-thrown? #"" (- 1 "Foo"))))
 
 (deftest -'-test
   (testing "negation of a single element"
@@ -537,9 +547,49 @@
 
   (testing "raises an error without numbers"
     (class-cast-exception-is-thrown? #"" (-' "Foo"))
-    (class-cast-exception-is-thrown? #"" (-' 1 "Foo")))
+    (class-cast-exception-is-thrown? #"" (-' 1 "Foo"))))
 
-  )
+(deftest unchecked-subtract-test
+  (testing "can subtract all number types"
+    (doseq [t1 types
+            t2 types]
+      (is (= 1 (long (unchecked-subtract (t1 2) (t2 1)))))))
+
+  (testing "will underflow min long"
+    (is (= 9223372036854775807 (unchecked-subtract -9223372036854775808 1)))))
+
+(deftest unchecked-subtract-int-test
+  (testing "can subtract all number types"
+    (doseq [t1 types
+            t2 types]
+      (is (= 1 (int (unchecked-subtract-int (t1 2) (t2 1)))))))
+
+  (testing "will underflow min int"
+    (is (= 2147483647 (unchecked-subtract-int (int -2147483648) (int 1)))))
+
+  (testing "will cast numbers being subtracted to int"
+    (argument-error-is-thrown? #""
+      (unchecked-subtract-int 2147483649 1))))
+
+(deftest unchecked-negate-test
+  (testing "can negate all number types"
+    (doseq [t types]
+      (is (= -1 (long (unchecked-negate (t 1)))))))
+
+  (testing "will underflow min long"
+    (is (= -9223372036854775808 (unchecked-negate -9223372036854775808)))))
+
+(deftest unchecked-negate-int-test
+  (testing "can negate all number types"
+    (doseq [t types]
+      (is (= -1 (long (unchecked-negate (t 1)))))))
+
+  (testing "will underflow min int"
+    (is (= -2147483648 (unchecked-negate-int (int -2147483648)))))
+
+  (testing "will cast numbers being negated to int"
+    (argument-error-is-thrown? #""
+      (unchecked-negate-int 2147483649))))
 
 (deftest dec-test
   (testing "decrement an argument"

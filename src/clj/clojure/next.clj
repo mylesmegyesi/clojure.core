@@ -241,6 +241,18 @@
   ([x y] (platform-numbers/-' x y))
   ([x y & more] (reduce -' (-' x y) more)))
 
+(defn unchecked-subtract [x y]
+  (platform-numbers/unchecked-subtract x y))
+
+(defn unchecked-subtract-int [x y]
+  (platform-numbers/unchecked-subtract-int x y))
+
+(defn unchecked-negate [x]
+  (platform-numbers/unchecked-negate x))
+
+(defn unchecked-negate-int [x]
+  (platform-numbers/unchecked-negate-int x))
+
 (defn *
   ([] 1)
   ([x] (platform-numbers/* x 1))
@@ -292,6 +304,9 @@
 
 (defn unchecked-inc [i]
   (platform-numbers/unchecked-inc i))
+
+(defn unchecked-inc-int [i]
+  (platform-numbers/unchecked-inc-int i))
 
 (defn inc' [i]
   (platform-numbers/inc' i))

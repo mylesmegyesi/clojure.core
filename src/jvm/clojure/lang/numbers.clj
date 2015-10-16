@@ -79,6 +79,9 @@
 (defmacro unchecked-inc [x]
   `(. Increment (numberUncheckedIncrement ~x)))
 
+(defmacro unchecked-inc-int [x]
+  `(. Increment (numberUncheckedIncrementInt ~x)))
+
 (defmacro inc' [x]
   `(. Increment (numberPrecisionIncrement ~x)))
 
@@ -101,6 +104,18 @@
 (defmacro -'
   ([x] `(. Negation (numberPrecisionNegate ~x)))
   ([x y] `(. Subtraction (numberPrecisionSubtract ~x ~y))))
+
+(defmacro unchecked-subtract [x y]
+  `(. Subtraction (numberUncheckedSubtract ~x ~y)))
+
+(defmacro unchecked-subtract-int [x y]
+  `(. Subtraction (numberUncheckedSubtractInt ~x ~y)))
+
+(defmacro unchecked-negate [x]
+  `(. Negation (numberUncheckedNegate ~x)))
+
+(defmacro unchecked-negate-int [x]
+  `(. Negation (numberUncheckedNegateInt ~x)))
 
 (defmacro dec [x]
   `(. Decrement (numberDecrement ~x)))
