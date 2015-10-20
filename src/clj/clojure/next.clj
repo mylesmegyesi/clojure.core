@@ -14,7 +14,7 @@
    :minor       6
    :incremental 0})
 
-(declare cons str seq first next reduce)
+(declare cons str seq first next reduce not)
 
 (defn clojure-version []
   (str (:major *clojure-version*) "."
@@ -28,6 +28,9 @@
 
 (defn identical? [x y]
   (platform-object/identical? x y))
+
+(defn counted? [c]
+  (satisfies? ICounted c))
 
 (defn class [x]
   (platform-object/class x))
@@ -78,6 +81,47 @@
 
 (defn associative? [x]
   (satisfies? IAssociative x))
+
+(defn seq? [s]
+  (satisfies? ISeq s))
+
+(defn sequential? [s]
+  (satisfies? ISequential s))
+
+(defn first [s]
+  (-first (seq s)))
+
+(defn ffirst [s]
+  (first (first s)))
+
+(defn next [s]
+  (-next (seq s)))
+
+(defn nfirst [s]
+  (next (first s)))
+
+(defn nnext [s]
+  (next (next s)))
+
+(defn fnext [s]
+  (first (next s)))
+
+(defn rest [s]
+  (-more (seq s)))
+
+(defn last [s]
+  (if (next s)
+    (recur (next s))
+    (first s)))
+
+(defn second [s]
+  (first (next s)))
+
+(defn empty [coll]
+  (-empty coll))
+
+(defn empty? [seqable]
+  (not (seq seqable)))
 
 (declare bigint)
 (require '[clojure.lang.numbers :as platform-numbers])
@@ -375,6 +419,25 @@
         (>= b (first more)))
       false)))
 
+(require ['clojure.lang.size :refer ['platform-count]])
+
+(defn count [obj]
+  (cond
+    (counted? obj)
+      (-count obj)
+    (nil? obj)
+      0
+    (satisfies? IPersistentCollection obj)
+      (loop [s (seq obj)
+             cnt 0]
+        (if s
+          (if (counted? s)
+            (recur (next s) (+ cnt (count s)))
+            (recur (next s) (inc cnt)))
+          cnt))
+    :else
+      (platform-count obj)))
+
 (require '[clojure.lang.primitive-array :refer :all])
 
 (defn booleans [arr]
@@ -401,17 +464,174 @@
 (defn longs [arr]
   (to-longs arr))
 
-(defn seq? [s]
-  (satisfies? ISeq s))
+(require ['clojure.lang.array :as 'arr])
 
-(defn sequential? [s]
-  (satisfies? ISequential s))
+(defn aget [arr i]
+  (arr/array-get arr i))
 
-(defn empty [coll]
-  (-empty coll))
+(defn aset [arr i val]
+  (arr/array-set! arr i val))
 
-(defn empty? [seqable]
-  (not (seq seqable)))
+(defn aset-byte
+  ([arr i v]
+    (arr/array-set-byte! arr i (byte v)))
+  ([arr i i2 & vs]
+    (apply aset-byte (aget arr i) i2 vs)))
+
+(defn aset-short
+  ([arr i v]
+    (arr/array-set-short! arr i (short v)))
+  ([arr i i2 & vs]
+    (apply aset-short (aget arr i) i2 vs)))
+
+(defn aset-int
+  ([arr i v]
+    (arr/array-set-int! arr i (int v)))
+  ([arr i i2 & vs]
+    (apply aset-int (aget arr i) i2 vs)))
+
+(defn aset-long
+  ([arr i v]
+    (arr/array-set-long! arr i (long v)))
+  ([arr i i2 & vs]
+    (apply aset-long (aget arr i) i2 vs)))
+
+(defn aset-float
+  ([arr i v]
+    (arr/array-set-float! arr i (float v)))
+  ([arr i i2 & vs]
+    (apply aset-float (aget arr i) i2 vs)))
+
+(defn aset-double
+  ([arr i v]
+    (arr/array-set-double! arr i (double v)))
+  ([arr i i2 & vs]
+    (apply aset-double (aget arr i) i2 vs)))
+
+(defn alength [arr]
+  (arr/array-length arr))
+
+(defn aclone [arr]
+  (arr/array-clone arr))
+
+(defn acopy [src src-pos dest dest-pos length]
+  (arr/array-copy src src-pos dest dest-pos length))
+
+(defn make-array
+  ([t len]
+    (arr/make-array t (int len)))
+  ([t len & lens]
+    (arr/make-array t len lens)))
+
+(defn into-array
+  ([seqable] (into-array platform-object/base-object seqable))
+  ([type seqable]
+   (let [s (seq seqable)
+         size (count s)
+         arr (make-array type size)]
+     (loop [i 0 s s]
+       (if (nil? s)
+         arr
+         (do
+           (aset arr i (first s))
+           (recur (inc i) (next s))))))))
+
+(defn object-array [seq-or-size]
+  (if (number? seq-or-size)
+    (make-array platform-object/base-object seq-or-size)
+    (into-array platform-object/base-object seq-or-size)))
+
+(defn- primitive-array
+  ([seq-or-size arr-fn]
+    (if (number? seq-or-size)
+      (arr-fn seq-or-size)
+      (loop [i 0
+             arr (arr-fn (count seq-or-size))
+             sq (seq seq-or-size)]
+        (if sq
+          (do
+            (aset arr i (first sq))
+            (recur (inc i) arr (next sq)))
+          arr))))
+  ([size init-val-or-seq t arr-fn]
+    (let [arr (arr-fn size)]
+      (if (instance? t init-val-or-seq)
+        (do
+          (doseq [i (range 0 size)]
+            (aset arr i init-val-or-seq))
+          arr)
+        (loop [i 0
+               sq (seq init-val-or-seq)]
+          (if (or (>= i size) (nil? sq))
+            arr
+            (do
+              (aset arr i (first sq))
+              (recur (inc i) (next sq)))))))))
+
+(defmacro amap [a idx ret expr]
+  `(let [a# ~a
+         ~ret (aclone a#)]
+     (loop [~idx 0]
+       (if (< ~idx (alength a#))
+         (do
+           (aset ~ret ~idx ~expr)
+           (recur (unchecked-inc ~idx)))
+         ~ret))))
+
+(defmacro areduce [a idx ret init expr]
+ `(let [a# ~a]
+     (loop [~idx 0 ~ret ~init]
+       (if (< ~idx  (alength a#))
+         (recur (unchecked-inc ~idx) ~expr)
+         ~ret))))
+
+(defn byte-array
+  ([seq-or-size]
+    (primitive-array seq-or-size byte-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-numbers/platform-byte byte-array-for-size)))
+
+(defn short-array
+  ([seq-or-size]
+    (primitive-array seq-or-size short-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-numbers/platform-short short-array-for-size)))
+
+(defn int-array
+  ([seq-or-size]
+    (primitive-array seq-or-size int-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-numbers/platform-int int-array-for-size)))
+
+(defn long-array
+  ([seq-or-size]
+    (primitive-array seq-or-size long-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-numbers/platform-long long-array-for-size)))
+
+(defn float-array
+  ([seq-or-size]
+    (primitive-array seq-or-size float-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-numbers/platform-float float-array-for-size)))
+
+(defn double-array
+  ([seq-or-size]
+    (primitive-array seq-or-size double-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-numbers/platform-double double-array-for-size)))
+
+(defn boolean-array
+  ([seq-or-size]
+    (primitive-array seq-or-size boolean-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-boolean boolean-array-for-size)))
+
+(defn char-array
+  ([seq-or-size]
+    (primitive-array seq-or-size char-array-for-size))
+  ([size init-val-or-seq]
+    (primitive-array size init-val-or-seq platform-char char-array-for-size)))
 
 (defn alter-meta! [m f & args]
   (-alter-meta! m f args))
@@ -429,56 +649,7 @@
 (defn vary-meta [m f & args]
   (with-meta m (apply f (meta m) args)))
 
-(defn first [s]
-  (-first (seq s)))
-
-(defn ffirst [s]
-  (first (first s)))
-
-(defn next [s]
-  (-next (seq s)))
-
-(defn nfirst [s]
-  (next (first s)))
-
-(defn nnext [s]
-  (next (next s)))
-
-(defn fnext [s]
-  (first (next s)))
-
-(defn rest [s]
-  (-more (seq s)))
-
-(defn last [s]
-  (if (next s)
-    (recur (next s))
-    (first s)))
-
-(defn second [s]
-  (first (next s)))
-
-(defn counted? [c]
-  (satisfies? ICounted c))
-
-(require ['clojure.lang.size :refer ['platform-count]])
-
-(defn count [obj]
-  (cond
-    (counted? obj)
-      (-count obj)
-    (nil? obj)
-      0
-    (satisfies? IPersistentCollection obj)
-      (loop [s (seq obj)
-             cnt 0]
-        (if s
-          (if (counted? s)
-            (recur (next s) (+ cnt (count s)))
-            (recur (next s) (inc cnt)))
-          cnt))
-    :else
-      (platform-count obj)))
+(defn identity [x] x)
 
 (require ['clojure.lang.sequence :refer ['platform-seq 'make-iterator-seq]])
 
@@ -493,8 +664,6 @@
 
 (defn iterator-seq [iter]
   (make-iterator-seq iter))
-
-(defn identity [x] x)
 
 (require ['clojure.lang.delay :refer ['new-delay '-force 'is-delay?]])
 
@@ -735,175 +904,6 @@
 
 (defn pop! [coll]
   (-pop! coll))
-
-(require ['clojure.lang.array :as 'arr])
-
-(defn aget [arr i]
-  (arr/array-get arr i))
-
-(defn aset [arr i val]
-  (arr/array-set! arr i val))
-
-(defn aset-byte
-  ([arr i v]
-    (arr/array-set-byte! arr i (byte v)))
-  ([arr i i2 & vs]
-    (apply aset-byte (aget arr i) i2 vs)))
-
-(defn aset-short
-  ([arr i v]
-    (arr/array-set-short! arr i (short v)))
-  ([arr i i2 & vs]
-    (apply aset-short (aget arr i) i2 vs)))
-
-(defn aset-int
-  ([arr i v]
-    (arr/array-set-int! arr i (int v)))
-  ([arr i i2 & vs]
-    (apply aset-int (aget arr i) i2 vs)))
-
-(defn aset-long
-  ([arr i v]
-    (arr/array-set-long! arr i (long v)))
-  ([arr i i2 & vs]
-    (apply aset-long (aget arr i) i2 vs)))
-
-(defn aset-float
-  ([arr i v]
-    (arr/array-set-float! arr i (float v)))
-  ([arr i i2 & vs]
-    (apply aset-float (aget arr i) i2 vs)))
-
-(defn aset-double
-  ([arr i v]
-    (arr/array-set-double! arr i (double v)))
-  ([arr i i2 & vs]
-    (apply aset-double (aget arr i) i2 vs)))
-
-(defn alength [arr]
-  (arr/array-length arr))
-
-(defn aclone [arr]
-  (arr/array-clone arr))
-
-(defn acopy [src src-pos dest dest-pos length]
-  (arr/array-copy src src-pos dest dest-pos length))
-
-(defn make-array
-  ([t len]
-    (arr/make-array t (int len)))
-  ([t len & lens]
-    (arr/make-array t len lens)))
-
-(defn into-array
-  ([seqable] (into-array platform-object/base-object seqable))
-  ([type seqable]
-   (let [s (seq seqable)
-         size (count s)
-         arr (make-array type size)]
-     (loop [i 0 s s]
-       (if (nil? s)
-         arr
-         (do
-           (aset arr i (first s))
-           (recur (inc i) (next s))))))))
-
-(defn object-array [seq-or-size]
-  (if (number? seq-or-size)
-    (make-array platform-object/base-object seq-or-size)
-    (into-array platform-object/base-object seq-or-size)))
-
-(defn- primitive-array
-  ([seq-or-size arr-fn]
-    (if (number? seq-or-size)
-      (arr-fn seq-or-size)
-      (loop [i 0
-             arr (arr-fn (count seq-or-size))
-             sq (seq seq-or-size)]
-        (if sq
-          (do
-            (aset arr i (first sq))
-            (recur (inc i) arr (next sq)))
-          arr))))
-  ([size init-val-or-seq t arr-fn]
-    (let [arr (arr-fn size)]
-      (if (instance? t init-val-or-seq)
-        (do
-          (doseq [i (range 0 size)]
-            (aset arr i init-val-or-seq))
-          arr)
-        (loop [i 0
-               sq (seq init-val-or-seq)]
-          (if (or (>= i size) (nil? sq))
-            arr
-            (do
-              (aset arr i (first sq))
-              (recur (inc i) (next sq)))))))))
-
-(defmacro amap [a idx ret expr]
-  `(let [a# ~a
-         ~ret (aclone a#)]
-     (loop [~idx 0]
-       (if (< ~idx (alength a#))
-         (do
-           (aset ~ret ~idx ~expr)
-           (recur (unchecked-inc ~idx)))
-         ~ret))))
-
-(defmacro areduce [a idx ret init expr]
- `(let [a# ~a]
-     (loop [~idx 0 ~ret ~init]
-       (if (< ~idx  (alength a#))
-         (recur (unchecked-inc ~idx) ~expr)
-         ~ret))))
-
-(defn byte-array
-  ([seq-or-size]
-    (primitive-array seq-or-size byte-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-numbers/platform-byte byte-array-for-size)))
-
-(defn short-array
-  ([seq-or-size]
-    (primitive-array seq-or-size short-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-numbers/platform-short short-array-for-size)))
-
-(defn int-array
-  ([seq-or-size]
-    (primitive-array seq-or-size int-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-numbers/platform-int int-array-for-size)))
-
-(defn long-array
-  ([seq-or-size]
-    (primitive-array seq-or-size long-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-numbers/platform-long long-array-for-size)))
-
-(defn float-array
-  ([seq-or-size]
-    (primitive-array seq-or-size float-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-numbers/platform-float float-array-for-size)))
-
-(defn double-array
-  ([seq-or-size]
-    (primitive-array seq-or-size double-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-numbers/platform-double double-array-for-size)))
-
-(defn boolean-array
-  ([seq-or-size]
-    (primitive-array seq-or-size boolean-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-boolean boolean-array-for-size)))
-
-(defn char-array
-  ([seq-or-size]
-    (primitive-array seq-or-size char-array-for-size))
-  ([size init-val-or-seq]
-    (primitive-array size init-val-or-seq platform-char char-array-for-size)))
 
 (defn vector? [v]
   (satisfies? IPersistentVector v))
@@ -1503,7 +1503,7 @@
      (prn (str "Elapsed time: " (/ (double (- (nano-time) start#)) 1000000.0) " msecs"))
      ret#))
 
-(require ['clojure.lang.persistent-list :refer ['EMPTY-LIST]])
+(require '[clojure.lang.persistent-list :refer [EMPTY-LIST]])
 
 (extend-type nil
   ISeqable

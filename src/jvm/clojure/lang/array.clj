@@ -3,6 +3,9 @@
   (:require [clojure.next :refer :all :exclude [cons]])
   (:import [java.lang.reflect Array]))
 
+(defn get-array-type [arr]
+  (.getComponentType (.getClass arr)))
+
 (defn make-array
   ([^Class c size]
     (Array/newInstance c size))

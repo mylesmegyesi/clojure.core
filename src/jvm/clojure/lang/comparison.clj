@@ -1,5 +1,5 @@
 (ns clojure.lang.comparison
-  (:refer-clojure :only [defmacro defprotocol extend-protocol fn defn list update-in cons])
+  (:refer-clojure :only [defmacro extend-protocol fn])
   (:require [clojure.lang.protocols :refer [IComparable]]))
 
 (def base-comparable Comparable)
