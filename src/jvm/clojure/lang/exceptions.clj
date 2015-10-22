@@ -28,7 +28,9 @@
 (def unsupported-error UnsupportedOperationException)
 
 (defmacro new-unsupported-error [& args]
-  (list* 'new unsupported-error args))
+  (if (nil? args)
+    (list 'new unsupported-error)
+    (list* 'new unsupported-error args)))
 
 (def out-of-bounds-exception IndexOutOfBoundsException)
 

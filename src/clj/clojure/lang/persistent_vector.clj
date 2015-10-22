@@ -1,21 +1,27 @@
 (ns clojure.lang.persistent-vector
-  (:refer-clojure :only [cond declare defn- defn defprotocol deftype if-let let loop when ->])
-  (:require [clojure.next                 :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.array-chunk     :refer [make-array-chunk]]
-            [clojure.lang.aseq            :refer [defseq]]
-            [clojure.lang.exceptions      :refer [new-argument-error new-out-of-bounds-exception
-                                                  new-illegal-access-error new-illegal-state-error]]
-            [clojure.lang.numbers         :refer [->int platform-long platform-big-int platform-big-integer]]
-            [clojure.lang.hash-map        :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
-            [clojure.lang.protocols       :refer [-as-transient -assoc-n -assoc-n! -array-for
-                                                  -conj! -count -persistent -lookup -nth
-                                                  -chunked-first -chunked-next -chunked-more
-                                                  IAssociative ICounted IEditableCollection IMeta IObj ILookup
-                                                  IPersistentCollection IPersistentVector IPersistentStack
-                                                  ITransientAssociative ITransientCollection ITransientVector
-                                                  IChunkedSeq ISeq ISeqable ISequential IIndexed]]
-            [clojure.lang.thread          :refer [thread-reference]]))
+  (:refer-clojure :only [cond declare defn- defn defprotocol if-let let loop when ->])
+  (:require [clojure.next :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
+            [clojure.lang
+              [array-chunk     :refer [make-array-chunk]]
+              [aseq            :refer [defseq seq->array]]
+              [collection      :as    coll]
+              [deftype         :refer [deftype]]
+              [exceptions      :refer [new-argument-error new-out-of-bounds-exception
+                                       new-illegal-access-error new-illegal-state-error
+                                       new-unsupported-error]]
+              [numbers         :refer [->int platform-long platform-big-int platform-big-integer]]
+              [hash-map        :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
+              [persistent-list :refer [EMPTY-LIST]]
+              [protocols       :refer [-as-transient -assoc-n -assoc-n! -array-for
+                                       -conj! -count -persistent -lookup -nth
+                                       -chunked-first -chunked-next -chunked-more
+                                       IAssociative ICounted IEditableCollection IMeta IObj ILookup
+                                       IPersistentCollection IPersistentVector IPersistentStack
+                                       ITransientAssociative ITransientCollection ITransientVector
+                                       IChunkedSeq ISeq ISeqable ISequential IIndexed]]
+              [thread          :refer [thread-reference]]]))
+
+(coll/import-collection-type)
 
 (declare make-chunked-seq)
 
@@ -180,7 +186,54 @@
   (-seq [this]
     (if (> (count this) 0)
       (make-vector-seq this 0 nil)
-      nil)))
+      nil))
+
+  coll/base-collection
+  (coll/add-method [this o]
+    (throw (new-unsupported-error)))
+
+  (coll/add-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/clear-method [this]
+    (throw (new-unsupported-error)))
+
+  (coll/contains?-method [this o]
+    (loop [s (seq this)]
+      (if s
+        (if (= (first s) o)
+          true
+          (recur (next s)))
+        false)))
+
+  (coll/contains-all?-method [this os]
+    (loop [o (seq os)]
+      (if o
+        (if (not (coll/contains? this (first o)))
+          false
+          (recur (next o)))
+        true)))
+
+  (coll/is-empty?-method [this]
+    (zero? (count this)))
+
+  (coll/remove-method [this o]
+    (throw (new-unsupported-error)))
+
+  (coll/remove-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/retain-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/size-method [this]
+    (count this))
+
+  (coll/to-array-method [this]
+    (seq->array (seq this)))
+
+  (coll/to-array-method [this arr]
+    (seq->array (seq this) arr)))
 
 (defn make-subvec [v start end mta]
   (if (instance? SubVector v)
@@ -530,7 +583,54 @@
   (-nth [this n not-found]
     (if (n-in-range? n -length)
       (nth this n)
-      not-found)))
+      not-found))
+
+  coll/base-collection
+  (coll/add-method [this o]
+    (throw (new-unsupported-error)))
+
+  (coll/add-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/clear-method [this]
+    (throw (new-unsupported-error)))
+
+  (coll/contains?-method [this o]
+    (loop [s (seq this)]
+      (if s
+        (if (= (first s) o)
+          true
+          (recur (next s)))
+        false)))
+
+  (coll/contains-all?-method [this os]
+    (loop [o (seq os)]
+      (if o
+        (if (not (coll/contains? this (first o)))
+          false
+          (recur (next o)))
+        true)))
+
+  (coll/is-empty?-method [this]
+    (zero? (count this)))
+
+  (coll/remove-method [this o]
+    (throw (new-unsupported-error)))
+
+  (coll/remove-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/retain-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/size-method [this]
+    (count this))
+
+  (coll/to-array-method [this]
+    (seq->array (seq this)))
+
+  (coll/to-array-method [this arr]
+    (seq->array (seq this) arr)))
 
 (defn- make-vector [meta length shift root arr]
   (PersistentVector. meta length shift root arr))

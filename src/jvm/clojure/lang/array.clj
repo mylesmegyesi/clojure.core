@@ -31,7 +31,7 @@
 (defmacro array-clone [arr]
   `(let [arr# ~arr
          size# (array-length arr#)
-         new-arr# (make-array Object size#)]
+         new-arr# (make-array (get-array-type arr#) size#)]
      (array-copy arr# 0 new-arr# 0 size#)
      new-arr#))
 
