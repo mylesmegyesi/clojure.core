@@ -21,6 +21,9 @@
 (defmacro illegal-state-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? illegal-state-error msg body)))
 
+(defmacro unsupported-error-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? unsupported-error msg body)))
+
 (defmacro out-of-bounds-exception-is-thrown? [msg & body]
   (list 'is (list* 'thrown? out-of-bounds-exception msg body)))
 

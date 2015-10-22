@@ -1,7 +1,30 @@
 (ns clojure.lang.aseq
-  (:refer-clojure :only [defn defmacro -> when loop cond concat list list* let])
+  (:refer-clojure :only [defn defmacro when loop cond concat list list* let ->])
   (:require [clojure.lang.protocols :refer [-seq -first -next]]
+            [clojure.lang.array     :as    arr]
             [clojure.next           :refer :all]))
+
+(defn ^:private fill-array [arr sq]
+  (loop [s sq i 0]
+    (if s
+      (do
+        (aset arr i (first s))
+        (recur (next s) (inc i)))
+      arr)))
+
+(defn seq->array
+  ([s]
+    (object-array s))
+  ([s arr]
+    (let [len (count s)]
+      (if (> len (alength arr))
+        (let [new-arr (make-array (arr/get-array-type arr) len)]
+          (fill-array new-arr s)
+          new-arr)
+        (let [new-arr (aclone arr)]
+          (fill-array new-arr s)
+          (aset new-arr len nil)
+          new-arr)))))
 
 (defn seq-equal? [x y]
   (boolean

@@ -1,17 +1,24 @@
 (ns clojure.lang.persistent-list
-  (:refer-clojure :only [declare defn defn- butlast loop satisfies?])
-  (:require [clojure.next            :refer :all]
+  (:refer-clojure :only [declare defn defn- butlast let loop satisfies? when])
+  (:require [clojure.next :refer :all]
             [clojure.lang
-              [aseq         :refer [defseq]]
+              [array        :as    arr]
+              [aseq         :refer [defseq seq->array]]
+              [collection   :as    coll]
               [deftype      :refer [deftype]]
               [equivalence  :as    equiv]
-              [exceptions   :refer [new-illegal-state-error]]
+              [exceptions   :refer [new-illegal-state-error
+                                    new-unsupported-error]]
               [object       :as    obj]
               [protocols    :refer [ICounted IMeta IObj IPersistentCollection -cons
                                     IPersistentList IPersistentStack ISeq ISeqable ISequential]]]))
 
 (declare make-list)
 (declare EMPTY-LIST)
+
+(coll/import-collection-type)
+
+(def ^:private empty-array (arr/make-array obj/base-object 0))
 
 (deftype EmptyList [meta]
   IPersistentList
@@ -52,45 +59,131 @@
 
   (-more [this] this)
 
+  coll/base-collection
+  (coll/add-method [this other]
+    (throw (new-unsupported-error)))
+
+  (coll/add-all-method [this others]
+    (throw (new-unsupported-error)))
+
+  (coll/clear-method [this]
+    (throw (new-unsupported-error)))
+
+  (coll/contains?-method [this o]
+    false)
+
+  (coll/contains-all?-method [this os]
+    (coll/is-empty? os))
+
+  (coll/is-empty?-method [this]
+    true)
+
+  (coll/remove-method [this o]
+    (throw (new-unsupported-error)))
+
+  (coll/remove-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/retain-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/size-method [this]
+    0)
+
+  (coll/to-array-method [this]
+    empty-array)
+
+  (coll/to-array-method [this arr]
+    (when (> (alength arr) 0)
+      (aset arr 0 nil))
+    arr)
+
   obj/base-object
   (equiv/equals-method [this other]
     (and
       (satisfies? ISequential other)
       (nil? (seq other)))))
 
-(defseq PersistentList [meta first rest count]
+(defseq PersistentList [-meta -first -rest -count]
   IPersistentList
 
   ICounted
-  (-count [this] count)
+  (-count [this] -count)
 
   IMeta
-  (-meta [this] meta)
+  (-meta [this] -meta)
 
   IObj
   (-with-meta [this new-meta]
-    (make-list new-meta first rest count))
+    (make-list new-meta -first -rest -count))
 
   IPersistentCollection
   (-cons [this x]
-    (make-list meta x this (inc count)))
+    (make-list -meta x this (inc -count)))
 
   (-empty [this]
-    (with-meta EMPTY-LIST meta))
+    (with-meta EMPTY-LIST -meta))
 
   IPersistentStack
-  (-peek [this] first)
+  (-peek [this] -first)
 
   (-pop [this]
-    (if rest rest (empty this)))
+    (if -rest -rest (empty this)))
 
   ISeq
-  (-first [this] first)
+  (-first [this] -first)
 
   (-next [this]
-    (if (= count 1) nil rest))
+    (if (= -count 1) nil -rest))
 
-  (-more [this] rest))
+  (-more [this] -rest)
+
+  coll/base-collection
+  (coll/add-method [this other]
+    (throw (new-unsupported-error)))
+
+  (coll/add-all-method [this others]
+    (throw (new-unsupported-error)))
+
+  (coll/clear-method [this]
+    (throw (new-unsupported-error)))
+
+  (coll/contains?-method [this o]
+    (loop [xs this]
+      (if xs
+        (if (= (first xs) o)
+          true
+          (recur (next xs)))
+        false)))
+
+  (coll/contains-all?-method [this os]
+    (loop [xs (seq os)]
+      (if xs
+        (if (not (coll/contains? this (first xs)))
+          false
+          (recur (next xs)))
+        true)))
+
+  (coll/is-empty?-method [this]
+    (nil? (seq this)))
+
+  (coll/remove-method [this o]
+    (throw (new-unsupported-error)))
+
+  (coll/remove-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/retain-all-method [this os]
+    (throw (new-unsupported-error)))
+
+  (coll/size-method [this]
+    (count this))
+
+  (coll/to-array-method [this]
+    (seq->array this))
+
+  (coll/to-array-method [this arr]
+    (seq->array this arr)))
 
 (defn- make-list [meta first rest count]
   (PersistentList. meta first rest count))

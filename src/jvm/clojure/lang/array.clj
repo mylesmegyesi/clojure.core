@@ -3,6 +3,9 @@
   (:require [clojure.next :refer :all :exclude [cons]])
   (:import [java.lang.reflect Array]))
 
+(defn get-array-type [arr]
+  (.getComponentType (.getClass arr)))
+
 (defn make-array
   ([^Class c size]
     (Array/newInstance c size))
@@ -28,7 +31,7 @@
 (defmacro array-clone [arr]
   `(let [arr# ~arr
          size# (array-length arr#)
-         new-arr# (make-array Object size#)]
+         new-arr# (make-array (get-array-type arr#) size#)]
      (array-copy arr# 0 new-arr# 0 size#)
      new-arr#))
 
