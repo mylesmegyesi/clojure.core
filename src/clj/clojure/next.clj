@@ -741,6 +741,11 @@
 (defn chunk-rest [s]
   (-chunked-more s))
 
+(require '[clojure.lang.chunk-buffer :refer [make-chunk-buffer]])
+
+(defn ^:static ^clojure.lang.chunk_buffer.ChunkBuffer chunk-buffer ^clojure.lang.chunk_buffer.ChunkBuffer [capacity]
+  (make-chunk-buffer capacity))
+
 (require '[clojure.lang.enumeration-seq :refer [make-enumeration-seq]])
 
 (defn enumeration-seq [iter]
