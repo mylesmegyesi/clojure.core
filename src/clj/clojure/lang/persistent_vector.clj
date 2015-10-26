@@ -9,8 +9,10 @@
               [exceptions      :refer [new-argument-error new-out-of-bounds-exception
                                        new-illegal-access-error new-illegal-state-error
                                        new-unsupported-error]]
-              [numbers         :refer [->int platform-long platform-big-int platform-big-integer]]
+              [hash            :as    hash-code]
               [hash-map        :refer [->bitnum bit-shift-left unsigned-bit-shift-right]]
+              [numbers         :refer [->int platform-long platform-big-int platform-big-integer]]
+              [object          :as    obj]
               [persistent-list :refer [EMPTY-LIST]]
               [protocols       :refer [-as-transient -assoc-n -assoc-n! -array-for
                                        -conj! -count -persistent -lookup -nth
@@ -27,6 +29,9 @@
 
 (declare EMPTY-VECTOR)
 (declare EMPTY-NODE)
+
+(defn- vector-hash [v]
+  (reduce #(+ (* 31 %1) (if (nil? %2) 0 (hash %2))) 1 (seq v)))
 
 (defseq ChunkedSeq [-vec -node -i -offset -meta]
   IChunkedSeq
@@ -118,7 +123,7 @@
 
 (declare make-subvec)
 
-(deftype SubVector [-v -start -end -meta]
+(deftype SubVector [-v -start -end -meta ^:unsynchronized-mutable -hash]
   IAssociative
   (-assoc [this k v]
     (if (integer? k)
@@ -233,15 +238,21 @@
     (seq->array (seq this)))
 
   (coll/to-array-method [this arr]
-    (seq->array (seq this) arr)))
+    (seq->array (seq this) arr))
+
+  obj/base-object
+  (hash-code/hash-method [this]
+    (when (= -hash -1)
+      (set! -hash (vector-hash this)))
+    -hash))
 
 (defn make-subvec [v start end mta]
   (if (instance? SubVector v)
     (let [v (.vector v)
           s (+ start (.start v))
           e (+ end (.end v))]
-      (SubVector. v s e mta))
-    (SubVector. v start end mta)))
+      (SubVector. v s e mta -1))
+    (SubVector. v start end mta -1)))
 
 (defprotocol ^:private INode
   (get-array [this])
@@ -476,7 +487,7 @@
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))
 
-(deftype PersistentVector [-meta -length -shift -root -tail]
+(deftype PersistentVector [-meta -length -shift -root -tail ^:unsynchronized-mutable -hash]
   IPersistentCollection
   (-cons [this x]
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
@@ -630,10 +641,16 @@
     (seq->array (seq this)))
 
   (coll/to-array-method [this arr]
-    (seq->array (seq this) arr)))
+    (seq->array (seq this) arr))
+
+  obj/base-object
+  (hash-code/hash-method [this]
+    (when (= -hash -1)
+      (set! -hash (vector-hash this)))
+    -hash))
 
 (defn- make-vector [meta length shift root arr]
-  (PersistentVector. meta length shift root arr))
+  (PersistentVector. meta length shift root arr -1))
 
 (def ^:private EMPTY-NODE (make-node nil (object-array 32)))
 

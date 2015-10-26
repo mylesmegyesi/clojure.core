@@ -82,6 +82,12 @@
       (is (nil? (aget arr 2)))
       (is (= 42 (aget arr 3))))))
 
+(deftest vector-hash-test
+  (testing "vector hash"
+    (is (= 30817 (.hashCode (subvec (vector nil 1 2 3) 1))))
+    (is (= -366456230 (.hashCode (subvec (vector nil :foo :bar :baz) 1))))
+    (is (= 32 (.hashCode (subvec (vector nil (vector)) 1))))))
+
 (deftest vector-collection-test
   (testing "add is not supported on vectors"
     (is (thrown? UnsupportedOperationException (.add (vector :bar) :baz))))
@@ -159,4 +165,13 @@
       (is (= 2 (aget arr 1)))
       (is (nil? (aget arr 2)))
       (is (= 42 (aget arr 3))))))
+
+(deftest vector-hash-test
+  (testing "an empty vector has a hash code of 1"
+    (is (= 1 (.hashCode (vector)))))
+
+  (testing "vector hash"
+    (is (= 30817 (.hashCode (vector 1 2 3))))
+    (is (= -366456230 (.hashCode (vector :foo :bar :baz))))
+    (is (= 32 (.hashCode (vector (vector)))))))
 
