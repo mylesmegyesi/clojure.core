@@ -3,12 +3,13 @@
   (:require [clojure.next :refer :all]
             [clojure.lang
               [array        :as    arr]
-              [aseq         :refer [defseq seq->array]]
+              [aseq         :refer [defseq seq->array seq-equal? seq-hash]]
               [collection   :as    coll]
               [deftype      :refer [deftype]]
               [equivalence  :as    equiv]
               [exceptions   :refer [new-illegal-state-error
                                     new-unsupported-error]]
+              [hash         :as    hash-code]
               [object       :as    obj]
               [protocols    :refer [ICounted IMeta IObj IPersistentCollection -cons
                                     IPersistentList IPersistentStack ISeq ISeqable ISequential]]]))
@@ -102,9 +103,12 @@
   (equiv/equals-method [this other]
     (and
       (satisfies? ISequential other)
-      (nil? (seq other)))))
+      (nil? (seq other))))
 
-(defseq PersistentList [-meta -first -rest -count]
+  (hash-code/hash-method [this]
+    1))
+
+(deftype PersistentList [-meta -first -rest -count ^:unsynchronized-mutable -hash]
   IPersistentList
 
   ICounted
@@ -137,6 +141,20 @@
     (if (= -count 1) nil -rest))
 
   (-more [this] -rest)
+
+  ISequential
+
+  ISeqable
+  (-seq [this] this)
+
+  obj/base-object
+  (equiv/equals-method [this other]
+    (seq-equal? this other))
+
+  (hash-code/hash-method [this]
+    (when (= -hash -1)
+      (set! -hash (seq-hash this)))
+    -hash)
 
   coll/base-collection
   (coll/add-method [this other]
@@ -186,7 +204,7 @@
     (seq->array this arr)))
 
 (defn- make-list [meta first rest count]
-  (PersistentList. meta first rest count))
+  (PersistentList. meta first rest count -1))
 
 (def EMPTY-LIST (EmptyList. nil))
 

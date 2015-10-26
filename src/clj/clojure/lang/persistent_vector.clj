@@ -3,7 +3,7 @@
   (:require [clojure.next :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang
               [array-chunk     :refer [make-array-chunk]]
-              [aseq            :refer [defseq seq->array]]
+              [aseq            :refer [defseq seq->array seq-hash]]
               [collection      :as    coll]
               [deftype         :refer [deftype]]
               [exceptions      :refer [new-argument-error new-out-of-bounds-exception
@@ -29,9 +29,6 @@
 
 (declare EMPTY-VECTOR)
 (declare EMPTY-NODE)
-
-(defn- vector-hash [v]
-  (reduce #(+ (* 31 %1) (if (nil? %2) 0 (hash %2))) 1 (seq v)))
 
 (defseq ChunkedSeq [-vec -node -i -offset -meta]
   IChunkedSeq
@@ -243,7 +240,7 @@
   obj/base-object
   (hash-code/hash-method [this]
     (when (= -hash -1)
-      (set! -hash (vector-hash this)))
+      (set! -hash (seq-hash (seq this))))
     -hash))
 
 (defn make-subvec [v start end mta]
@@ -646,7 +643,7 @@
   obj/base-object
   (hash-code/hash-method [this]
     (when (= -hash -1)
-      (set! -hash (vector-hash this)))
+      (set! -hash (seq-hash (seq this))))
     -hash))
 
 (defn- make-vector [meta length shift root arr]

@@ -123,6 +123,9 @@
 (defn empty? [seqable]
   (not (seq seqable)))
 
+(defn hash [obj]
+  (-hash obj))
+
 (declare bigint)
 (require '[clojure.lang.numbers :as platform-numbers])
 
@@ -842,9 +845,6 @@
     (cond
       (satisfies? IIndexed coll) (-nth coll n not-found)
       (satisfies? ISequential coll) (nth-sequential coll n not-found))))
-
-(defn hash [obj]
-  (-hash obj))
 
 (defn key [entry]
   (-key entry))

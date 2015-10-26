@@ -16,6 +16,10 @@
   (testing "an empty list is not equal to a non-empty list"
     (is (false? (.equals (list) (list :foo))))))
 
+(deftest empty-list-hash-code-test
+  (testing "an empty list has a hash code of one"
+    (is (= 1 (.hashCode (list))))))
+
 (deftest empty-list-collection-test
   (testing "add is not supported on empty list"
     (is (thrown? UnsupportedOperationException (.add (list) :foo))))
@@ -73,6 +77,12 @@
 
   (testing "lists without equal items are not equal"
     (is (false? (.equals (list 1 2 3) (list 1))))))
+
+(deftest list-hash-code-test
+  (testing "list hash"
+    (is (= 30817 (.hashCode (list 1 2 3))))
+    (is (= -366456230 (.hashCode (list :foo :bar :baz))))
+    (is (= 32 (.hashCode (list (list)))))))
 
 (deftest list-collection-test
   (testing "add is not supported on lists"
