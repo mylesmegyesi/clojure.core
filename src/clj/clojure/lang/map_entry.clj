@@ -1,9 +1,11 @@
 (ns clojure.lang.map-entry
-  (:refer-clojure :refer [cond defn defn- let satisfies?])
+  (:refer-clojure :refer [cond defn defn- let satisfies? when])
   (:require [clojure.lang
+              [aseq        :refer [seq-hash]]
               [deftype     :refer [deftype]]
               [equivalence :as    equiv]
               [exceptions  :refer [new-out-of-bounds-exception]]
+              [hash        :as    hash-code]
               [key-value   :as    key-value]
               [numbers     :refer [platform-long platform-big-int platform-big-integer]]
               [object      :as    obj]
@@ -20,7 +22,7 @@
       (instance? platform-big-int i)
       (instance? platform-big-integer i)))
 
-(deftype MapEntry [-k -v]
+(deftype MapEntry [-k -v ^:unsynchronized-mutable -hash]
   ICounted
   (-count [this] 2)
 
@@ -69,8 +71,13 @@
   (equiv/equals-method [this other]
     (and (satisfies? IMapEntry other)
          (= -k (key other))
-         (= -v (val other)))))
+         (= -v (val other))))
+
+  (hash-code/hash-method [this]
+    (when (= -hash -1)
+      (set! -hash (seq-hash (seq this))))
+    -hash))
 
 (defn new-map-entry [k v]
-  (MapEntry. k v))
+  (MapEntry. k v -1))
 
