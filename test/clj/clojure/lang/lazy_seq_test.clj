@@ -118,3 +118,20 @@
       (is (and (>= f 0) (> 1 f)))
       (is (and (>= s 0) (> 1 s))))))
 
+(deftest distinct-test
+  (testing "distinct without repeated elements is a seq of the elements"
+    (let [v (vector 1 2 3)
+          d (distinct v)]
+      (is (= 3 (count d)))
+      (is (= 1 (nth d 0)))
+      (is (= 2 (nth d 1)))
+      (is (= 3 (nth d 2)))))
+
+  (testing "distinct values in collection"
+    (let [v (vector 1 2 2 3)
+          d (distinct v)]
+      (is (= 3 (count d)))
+      (is (= 1 (nth d 0)))
+      (is (= 2 (nth d 1)))
+      (is (= 3 (nth d 2))))))
+

@@ -1,7 +1,7 @@
 (ns clojure.lang.random-test
-  (:refer-clojure :only [let distinct repeatedly some])
+  (:refer-clojure :only [let some])
   (:require [clojure.test :refer :all]
-            [clojure.next :refer :all :exclude [repeatedly]]))
+            [clojure.next :refer :all]))
 
 (deftest rand-test
   (testing "returns a floating point number"
@@ -16,7 +16,7 @@
       (is (= rands (distinct rands)))))
 
   (testing "accepting an upper bound"
-    (let [rands (repeatedly 20 #(rand 42))]
+    (let [rands (clojure.core/repeatedly 20 #(rand 42))]
       (is (some #(>= % 1) rands)))))
 
 (deftest rand-int-test
@@ -24,5 +24,5 @@
     (is (integer? (rand-int 1))))
 
   (testing "accepting an upper bound"
-    (let [rands (repeatedly 20 #(rand-int 42))]
+    (let [rands (clojure.core/repeatedly 20 #(rand-int 42))]
       (is (some #(>= % 1) rands)))))
