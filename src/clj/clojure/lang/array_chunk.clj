@@ -2,7 +2,8 @@
   (:refer-clojure :only [declare defn deftype when])
   (:require [clojure.next            :refer :all]
             [clojure.lang.exceptions :refer [new-illegal-state-error]]
-            [clojure.lang.protocols  :refer [IChunk ICounted IIndexed]]))
+            [clojure.lang.protocols  :refer [IChunk ICounted IIndexed
+                                             -nth]]))
 
 (declare make-array-chunk)
 
@@ -23,7 +24,7 @@
 
   (-nth [this i not-found]
     (if (and (>= i 0) (< i (count this)))
-      (nth this i)
+      (-nth this i)
       not-found)))
 
 (defn make-array-chunk
