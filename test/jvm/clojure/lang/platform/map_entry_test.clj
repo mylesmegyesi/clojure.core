@@ -6,7 +6,6 @@
   (:import  [java.util AbstractMap AbstractMap$SimpleEntry]))
 
 (deftest map-entry-platform-test
-
   (testing "one map entry .equals another"
     (let [m1 (new-map-entry :k 1)
           m2 (new-map-entry :k 1)]
@@ -17,4 +16,6 @@
       (is (= :k (key m)))
       (is (= :v (val m)))))
 
-  )
+  (testing "map entry hash code"
+    (is (= 961 (.hashCode (new-map-entry nil nil))))
+    (is (= 994 (.hashCode (new-map-entry 1 2))))))
