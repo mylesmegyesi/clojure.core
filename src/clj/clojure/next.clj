@@ -88,6 +88,24 @@
 (defn sequential? [s]
   (satisfies? ISequential s))
 
+(defn vector? [v]
+  (satisfies? IPersistentVector v))
+
+(defn map? [m]
+  (satisfies? IPersistentMap m))
+
+(defn set? [s]
+  (satisfies? IPersistentSet s))
+
+(defn coll? [c]
+  (satisfies? IPersistentCollection c))
+
+(defn list? [l]
+  (satisfies? IPersistentList l))
+
+(defn string? [s]
+  (instance? platform-object/platform-string s))
+
 (defn first [s]
   (-first (seq s)))
 
@@ -702,6 +720,14 @@
 (defn type [x]
   (or (get (meta x) :type) (class x)))
 
+(defn contains? [coll k]
+  (cond
+    (nil? coll) false
+    (satisfies? IAssociative coll) (-contains-key? coll k)
+    (map? coll) (-contains-key? coll k)
+    (set? coll) (-contains? coll k)
+    :else (throw (new-argument-error (str "contains? not supported on type: " (type coll))))))
+
 (defn name [named]
   (-name named))
 
@@ -916,24 +942,6 @@
 (defn pop! [coll]
   (-pop! coll))
 
-(defn vector? [v]
-  (satisfies? IPersistentVector v))
-
-(defn map? [m]
-  (satisfies? IPersistentMap m))
-
-(defn set? [s]
-  (satisfies? IPersistentSet s))
-
-(defn coll? [c]
-  (satisfies? IPersistentCollection c))
-
-(defn list? [l]
-  (satisfies? IPersistentList l))
-
-(defn string? [s]
-  (instance? platform-object/platform-string s))
-
 (require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq? 'make-subvec]])
 
 (defn vector [& args]
@@ -1077,13 +1085,17 @@
           (recur (inc idx) (next v))))
       (make-struct-map d v-arr EMPTY-HASH-MAP nil))))
 
-(defn contains? [coll k]
-  (cond
-    (nil? coll) false
-    (satisfies? IAssociative coll) (-contains-key? coll k)
-    (map? coll) (-contains-key? coll k)
-    (set? coll) (-contains? coll k)
-    :else (throw (new-argument-error (str "contains? not supported on type: " (type coll))))))
+(defn distinct [coll]
+  (let [step (fn step [xs seen]
+                 (lazy-seq
+                  ((fn [xs seen]
+                    (let [f (first xs)]
+                      (when-let [s (seq xs)]
+                        (if (contains? seen f)
+                          (recur (rest s) seen)
+                          (cons f (step (rest s) (conj seen f)))))))
+                   xs seen)))]
+    (step coll (hash-set))))
 
 (defn get-validator [this]
   (-get-validator this))
