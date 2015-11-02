@@ -227,8 +227,6 @@
 
   )
 
-(declare EMPTY-ACTION-QUEUE)
-
 (defn new-agent [-state -error-handler -meta -validator -watches -error-mode]
   (Agent. -state -error-handler -meta -validator -watches -error-mode
     (new-atomic-ref EMPTY-ACTION-QUEUE)))

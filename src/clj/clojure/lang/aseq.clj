@@ -1,8 +1,9 @@
 (ns clojure.lang.aseq
   (:refer-clojure :only [defn defmacro when loop cond concat list list* let ->])
-  (:require [clojure.lang.protocols :refer [-seq -first -next]]
-            [clojure.lang.array     :as    arr]
-            [clojure.next           :refer :all]))
+  (:require [clojure.next :refer :all]
+            [clojure.lang
+              [protocols :refer [-seq -first -next]]
+              [array     :as    arr]]))
 
 (defn seq-hash [s]
   (reduce #(+ (* 31 %1) (if (nil? %2) 0 (hash %2))) 1 s))
