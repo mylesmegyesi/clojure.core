@@ -1,5 +1,5 @@
 (ns clojure.lang.input-output
-  (:refer-clojure :only [binding cond defmacro defmethod defn dotimes fn let loop neg? pos? prefer-method satisfies? when when-let])
+  (:refer-clojure :only [binding cond defmacro defmethod defn dotimes fn let loop prefer-method satisfies? when when-let])
   (:require [clojure.next           :refer :all]
             [clojure.lang.protocols :refer [IMeta]])
   (:import [java.io Writer OutputStreamWriter StringWriter]

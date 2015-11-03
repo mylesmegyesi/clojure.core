@@ -1,5 +1,5 @@
 (ns clojure.lang.agent
-  (:refer-clojure :only [apply declare defmacro defn defn- defprotocol deftype let loop pos? vec])
+  (:refer-clojure :only [apply declare defmacro defn defn- defprotocol deftype let loop vec])
   (:require [clojure.next                   :refer :all]
             [clojure.lang.atomic-ref        :refer :all]
             [clojure.lang.persistent-queue  :as    queue]
