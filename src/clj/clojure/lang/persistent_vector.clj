@@ -2,6 +2,7 @@
   (:refer-clojure :only [cond declare defn- defn defprotocol if-let let loop when ->])
   (:require [clojure.next :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang
+              [array           :refer [EMPTY-ARRAY]]
               [array-chunk     :refer [make-array-chunk]]
               [aseq            :refer [defseq seq->array seq-hash]]
               [collection      :as    coll]
@@ -650,8 +651,6 @@
   (PersistentVector. meta length shift root arr -1))
 
 (def ^:private EMPTY-NODE (make-node nil (object-array 32)))
-
-(def ^:private EMPTY-ARRAY (object-array 0))
 
 (def EMPTY-VECTOR (make-vector nil 0 5 EMPTY-NODE EMPTY-ARRAY))
 
