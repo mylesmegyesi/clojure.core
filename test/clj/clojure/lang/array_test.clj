@@ -155,6 +155,11 @@
       (is (= 3 (aget arr 2)))
       (is (= 92 ret)))))
 
+(deftest to-array-test
+  (testing "passing nil returns a zero argument object array"
+    (is (= (type (to-array nil)) (type (object-array 0))))
+    (is (zero? (count (to-array nil))))))
+
 (deftest object-array-test
   (testing "returns an array of nils for given size"
     (let [arr (object-array 42)]

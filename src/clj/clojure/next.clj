@@ -459,6 +459,34 @@
     :else
       (platform-count obj)))
 
+(defn- nth-sequential
+  ([coll n]
+    (loop [s (seq coll)
+           cnt 0]
+      (if (nil? s)
+        (throw (new-out-of-bounds-exception ""))
+        (if (= cnt n)
+          (first s)
+          (recur (next s) (inc cnt))))))
+  ([coll n not-found]
+    (loop [s (seq coll)
+           cnt 0]
+      (if (nil? s)
+        not-found
+        (if (= cnt n)
+          (first s)
+          (recur (next s) (inc cnt)))))))
+
+(defn nth
+  ([coll n]
+    (cond
+      (satisfies? IIndexed coll) (-nth coll n)
+      (satisfies? ISequential coll) (nth-sequential coll n)))
+  ([coll n not-found]
+    (cond
+      (satisfies? IIndexed coll) (-nth coll n not-found)
+      (satisfies? ISequential coll) (nth-sequential coll n not-found))))
+
 (require '[clojure.lang.primitive-array :refer :all])
 
 (defn booleans [arr]
@@ -556,6 +584,11 @@
          (do
            (aset arr i (first s))
            (recur (inc i) (next s))))))))
+
+(defn to-array [coll]
+  (if (nil? coll)
+    arr/EMPTY-ARRAY
+    (arr/to-array coll)))
 
 (defn object-array [seq-or-size]
   (if (number? seq-or-size)
@@ -843,34 +876,6 @@
       (nil? s) true
       (pred (first sq)) (recur pred (next sq))
       :else false)))
-
-(defn- nth-sequential
-  ([coll n]
-    (loop [s (seq coll)
-           cnt 0]
-      (if (nil? s)
-        (throw (new-out-of-bounds-exception ""))
-        (if (= cnt n)
-          (first s)
-          (recur (next s) (inc cnt))))))
-  ([coll n not-found]
-    (loop [s (seq coll)
-           cnt 0]
-      (if (nil? s)
-        not-found
-        (if (= cnt n)
-          (first s)
-          (recur (next s) (inc cnt)))))))
-
-(defn nth
-  ([coll n]
-    (cond
-      (satisfies? IIndexed coll) (-nth coll n)
-      (satisfies? ISequential coll) (nth-sequential coll n)))
-  ([coll n not-found]
-    (cond
-      (satisfies? IIndexed coll) (-nth coll n not-found)
-      (satisfies? ISequential coll) (nth-sequential coll n not-found))))
 
 (defn key [entry]
   (-key entry))

@@ -1,7 +1,10 @@
 (ns clojure.lang.array
-  (:refer-clojure :only [cons defmacro defn dotimes let])
+  (:refer-clojure :only [cond cons defmacro defn dotimes let loop when while])
   (:require [clojure.next :refer :all :exclude [cons]])
-  (:import [java.lang.reflect Array]))
+  (:import [java.lang.reflect Array]
+           [java.util ArrayList Collection Map]))
+
+(def object-array-type (Class/forName "[Ljava.lang.Object;"))
 
 (defn get-array-type [arr]
   (.getComponentType (.getClass arr)))
@@ -15,6 +18,8 @@
       (dotimes [i (Array/getLength dimarray)]
         (Array/setInt dimarray i (int (clojure.core/nth dims i))))
       (Array/newInstance c dimarray))))
+
+(def EMPTY-ARRAY (make-array Object 0))
 
 (defmacro array-set! [arr idx v]
   `(Array/set ~arr ~idx ~v))
@@ -52,4 +57,38 @@
 
 (defmacro array-set-double! [arr idx v]
   `(Array/setDouble ~arr ~idx ~v))
+
+(defmacro to-array [coll]
+  `(let [coll# ~coll]
+     (cond
+      (instance? object-array-type coll#)
+        coll#
+      (instance? Collection coll#)
+        (.toArray coll#)
+      (instance? Iterable coll#)
+        (let [ret# (ArrayList.)
+              iter# (.iterator coll#)]
+          (while (.hasNext iter#)
+            (.add ret# (.next iter#)))
+          (.toArray ret#))
+      (instance? Map coll#)
+        (.toArray (.entrySet coll#))
+      (instance? String coll#)
+        (let [chrs# (.toCharArray coll#)
+              len# (array-length chrs#)
+              ret# (make-array Object len#)]
+          (loop [i# 0]
+            (when (< i# len#)
+              (do (array-set! ret# i# (array-get chrs# i#)) (recur (inc i#)))))
+          ret#)
+      (.isArray (.getClass coll#))
+        (let [s# (seq coll#)
+              len# (count s#)
+              ret# (make-array Object len#)]
+          (loop [i# 0]
+            (when (< i# len#)
+              (do (array-set! ret# i# (nth s# i#)) (recur (inc i#)))))
+          ret#)
+      :else
+        (throw (RuntimeException. (str "Unable to convert: " (.getClass coll#) " to Object[]"))))))
 
