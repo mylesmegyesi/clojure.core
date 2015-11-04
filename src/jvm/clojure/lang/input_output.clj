@@ -129,7 +129,7 @@
   (.write wrtr (str n))
   (.write wrtr "M"))
 
-(defmethod print-method clojure.lang.BigInt [n ^Writer wrtr]
+(defmethod print-method clojure.lang.platform.BigInt [n ^Writer wrtr]
   (.write wrtr (str n))
   (.write wrtr "N"))
 

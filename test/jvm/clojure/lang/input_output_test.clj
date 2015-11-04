@@ -71,7 +71,7 @@
 
   (testing "pr for a BigInt"
     (is (=
-          (with-out-str (pr 42N))
+          (with-out-str (pr (bigint 42)))
           "42N")))
 
   (testing "pr for a Class"

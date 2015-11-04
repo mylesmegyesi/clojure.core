@@ -2,7 +2,7 @@ package clojure.lang.platform.numbers;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;
-import clojure.lang.BigInt;
+import clojure.lang.platform.BigInt;
 import clojure.lang.platform.Ratio;
 
 public final class Division {
