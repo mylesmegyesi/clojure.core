@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding cond declare defmacro defmulti defmethod defn defn-
-                         extend-type fn if-let let neg? pos? require satisfies? range
+                         extend-type fn if-let let require satisfies? range
                          doseq for list list* load loop format pr-str into butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
@@ -343,6 +343,12 @@
 
 (defn zero? [i]
   (platform-numbers/zero? i))
+
+(defn pos? [i]
+  (platform-numbers/pos? i))
+
+(defn neg? [i]
+  (platform-numbers/neg? i))
 
 (defn even? [i]
   (if (integer? i)

@@ -771,6 +771,22 @@
   (testing "raises an error without a number argument"
     (class-cast-exception-is-thrown? #"" (zero? "Foo"))))
 
+(deftest pos?-test
+  (doseq [x types]
+    (testing (str x " can be pos?")
+      (is (pos? (x 1))))
+
+    (testing (str x " can be not pos?")
+      (is (not (pos? (x -1)))))))
+
+(deftest neg?-test
+  (doseq [x types]
+    (testing (str x " can be neg?")
+      (is (neg? (x -1))))
+
+    (testing (str x " can be not neg?")
+      (is (not (neg? (x 1)))))))
+
 (deftest <-test
   (testing "< with one argument returns true"
     (is (< nil)))

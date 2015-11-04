@@ -9,8 +9,8 @@
            [clojure.lang.platform.numbers Addition BitOps Cast Comparison
                                           Decrement Division Equivalence
                                           Increment Multiplication Negation
-                                          Quotient Rationalize Remainder
-                                          Subtraction Zero]))
+                                          PositiveNegative Quotient Rationalize
+                                          Remainder Subtraction Zero]))
 
 (def platform-byte          Byte)
 (def platform-native-byte   Byte/TYPE)
@@ -151,6 +151,12 @@
 
 (defmacro zero? [x]
   `(. Zero (numberIsZero ~x)))
+
+(defmacro pos? [x]
+  `(. PositiveNegative (numberIsPositive ~x)))
+
+(defmacro neg? [x]
+  `(. PositiveNegative (numberIsNegative ~x)))
 
 (defmacro ->byte [x]
   `(. Cast (castToByte ~x)))
