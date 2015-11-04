@@ -2,7 +2,7 @@ package clojure.lang.platform.numbers;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;
-import clojure.lang.BigInt;
+import clojure.lang.platform.BigInt;
 import clojure.lang.platform.Ratio;
 
 public final class Cast {
@@ -110,8 +110,8 @@ public final class Cast {
     } else if (x instanceof Ratio) {
       return (int) Cast.toLongFromBigInteger(((Ratio) x).bigIntegerValue());
     } else if (x instanceof BigInt) {
-      if (((BigInt) x).bipart == null) {
-        return (int) ((BigInt) x).lpart;
+      if (((BigInt) x).getBipart() == null) {
+        return (int) ((BigInt) x).getLpart();
       } else {
         throw new IllegalArgumentException("Value out of range for int: " + x);
       }
@@ -169,8 +169,8 @@ public final class Cast {
     } else if (x instanceof Ratio) {
       return Cast.toLongFromBigInteger(((Ratio) x).bigIntegerValue());
     } else if (x instanceof BigInt) {
-      if (((BigInt) x).bipart == null) {
-        return ((BigInt) x).lpart;
+      if (((BigInt) x).getBipart() == null) {
+        return ((BigInt) x).getLpart();
       } else {
         throw new IllegalArgumentException("Value out of range for long: " + x);
       }

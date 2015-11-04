@@ -8,9 +8,9 @@ public final class Ratio extends Number {
   final private BigInteger numerator;
   final private BigInteger denominator;
 
-  public Ratio(BigInteger _numerator, BigInteger _denominator) {
-    numerator   = _numerator;
-    denominator = _denominator;
+  public Ratio(BigInteger numerator, BigInteger denominator) {
+    this.numerator   = numerator;
+    this.denominator = denominator;
   }
 
   public BigInteger getNumerator() {

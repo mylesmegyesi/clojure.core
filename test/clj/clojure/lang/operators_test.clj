@@ -153,11 +153,11 @@
 (deftest long-test
   (testing "raises an error when cast from less than min long"
     (is (= -9223372036854775808 (long -9223372036854775808)))
-    (argument-error-is-thrown? #"" (long -9223372036854775809)))
+    (argument-error-is-thrown? #"" (long (dec (bigint -9223372036854775808)))))
 
   (testing "raises an error when cast from greater than max long"
     (is (= 9223372036854775807 (long 9223372036854775807)))
-    (argument-error-is-thrown? #"" (long 9223372036854775808))))
+    (argument-error-is-thrown? #"" (long (inc (bigint 9223372036854775807))))))
 
 (deftest unchecked-long-test
   (doseq [t types]
@@ -502,9 +502,6 @@
 
   (testing "promotes an integer"
     (is (= 4294967290 (unchecked-multiply (int 2147483645) (int 2)))))
-
-  (testing "mulitplies as a big int"
-    (is (= 18446744073709551614N (unchecked-multiply 2N 9223372036854775807))))
 
   (testing "can underflow when multiplying longs"
     (is (= 4611686018427387904 (unchecked-multiply -4611686018427387904 3)))))

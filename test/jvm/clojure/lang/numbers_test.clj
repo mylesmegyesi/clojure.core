@@ -3,7 +3,7 @@
   (:require [clojure.test            :refer [deftest is testing]]
             [clojure.lang.numbers    :refer [make-ratio]]
             [clojure.next            :refer :all])
-  (:import  [clojure.lang.platform FallBackNumber]))
+  (:import  [clojure.lang.platform BigInt FallBackNumber]))
 
 (defmacro all-pairs-equal [equal-var vals]
   `(let [equal-var# ~equal-var
@@ -28,7 +28,7 @@
    (short val)      ; java.lang.Short
    (int val)        ; java.lang.Integer
    (long val)       ; java.lang.Long
-   (bigint val)     ; clojure.lang.BigInt
+   (bigint val)     ; clojure.lang.platform.BigInt
    (biginteger val) ; java.math.BigInteger
    ])
 
@@ -112,7 +112,7 @@
                                        (short 10)      ; java.lang.Short
                                        (int 10)        ; java.lang.Integer
                                        (long 10)       ; java.lang.Long
-                                       (bigint 10)     ; clojure.lang.BigInt
+                                       (bigint 10)     ; clojure.lang.platform.BigInt
                                        ; (biginteger val) ; java.math.BigInteger
                                        ])
     ; maybe some day ...
@@ -141,7 +141,7 @@
                                        (short 10)         ; java.lang.Short
                                        (int 10)           ; java.lang.Integer
                                        (long 10)          ; java.lang.Long
-                                       (bigint 10)        ; clojure.lang.BigInt
+                                       (bigint 10)        ; clojure.lang.platform.BigInt
                                        ; (biginteger val) ; java.math.BigInteger
                                        ; (float 10.0)     ; java.lang.Float
                                        (double 10.0)      ; java.lang.Double
@@ -175,7 +175,7 @@
                                        (short 10)      ; java.lang.Short
                                        (int 10)        ; java.lang.Integer
                                        (long 10)       ; java.lang.Long
-                                       (bigint 10)     ; clojure.lang.BigInt
+                                       (bigint 10)     ; clojure.lang.platform.BigInt
                                        ; (biginteger val) ; java.math.BigInteger
                                        10.0M
                                        10.00M])
@@ -279,7 +279,7 @@
 
 (deftest integer-addition-test
   (op-test {Long [[int long] [number int long]]
-            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+            clojure.lang.platform.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
            #(+ %1 %2)
            3 1 2))
 
@@ -288,7 +288,7 @@
     (let [r1 (make-ratio 1 1)
           r2 (make-ratio 2 1)]
       (is (= 3 (+ r1 r2)))
-      (is (= clojure.lang.BigInt (type (+ r1 r2))))))
+      (is (= clojure.lang.platform.BigInt (type (+ r1 r2))))))
 
   (testing "adding a decimal ratio to a decimal ratio"
     (let [r1 (make-ratio 1 3)
@@ -298,32 +298,32 @@
   (testing "adding a ratio to an int and vica-versa"
     (let [t1 (int 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (+ t1 t2))))
-      (is (= clojure.lang.BigInt (type (+ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (+ t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (+ t2 t1))))
       (is (= 3 (+ t1 t2)))
       (is (= 3 (+ t2 t1)))))
 
   (testing "adding a ratio to a long and vica-versa"
     (let [t1 (long 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (+ t1 t2))))
-      (is (= clojure.lang.BigInt (type (+ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (+ t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (+ t2 t1))))
       (is (= 3 (+ t1 t2)))
       (is (= 3 (+ t2 t1)))))
 
   (testing "adding a ratio to a biginteger and vica-versa"
     (let [t1 (biginteger 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (+ t1 t2))))
-      (is (= clojure.lang.BigInt (type (+ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (+ t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (+ t2 t1))))
       (is (= 3 (+ t1 t2)))
       (is (= 3 (+ t2 t1)))))
 
   (testing "adding a ratio to a bigint and vica-versa"
     (let [t1 (bigint 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (+ t1 t2))))
-      (is (= clojure.lang.BigInt (type (+ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (+ t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (+ t2 t1))))
       (is (= 3 (+ t1 t2)))
       (is (= 3 (+ t2 t1)))))
 
@@ -354,8 +354,8 @@
   (testing "adding a ratio to a non-specified Number type and vica-versa"
     (let [t1 (number 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (+ t1 t2))))
-      (is (= clojure.lang.BigInt (type (+ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (+ t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (+ t2 t1))))
       (is (= 3 (+ t1 t2)))
       (is (= 3 (+ t2 t1))))))
 
@@ -423,12 +423,12 @@
 
 (deftest integer-precision-addition-test
   (op-test {Long [[int long] [number int long]]
-            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+            clojure.lang.platform.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
            #(+' %1 %2)
            3 1 2))
 
 (deftest integer-precision-upper-overflow-addition-test
-  (is (= 9223372036854775808N (+' Long/MAX_VALUE 1))))
+  (is (= (BigInt/fromBigInteger (BigInteger. "9223372036854775808")) (+' Long/MAX_VALUE 1))))
 
 (deftest integer-increment-test
   (testing "increment an int"
@@ -442,11 +442,11 @@
 (deftest big-int-increment-test
   (testing "incing a big int"
     (is (= (bigint -1) (inc (bigint -2))))
-    (is (= clojure.lang.BigInt (type (inc (bigint -2))))))
+    (is (= clojure.lang.platform.BigInt (type (inc (bigint -2))))))
 
   (testing "incrementing a big integer"
     (is (= (bigint 3) (inc (biginteger 2))))
-    (is (= clojure.lang.BigInt (type (inc (biginteger 2)))))))
+    (is (= clojure.lang.platform.BigInt (type (inc (biginteger 2)))))))
 
 (deftest ratio-increment-test
   (testing "incrementing a ratio"
@@ -477,11 +477,11 @@
 
 (deftest integer-precision-intecrement-overflow-test
   (testing "overflow into BigInt when increment Long/MAX_VALUE"
-    (is (= 9223372036854775808N (inc' Long/MAX_VALUE)))))
+    (is (= (BigInt/fromBigInteger (BigInteger. "9223372036854775808")) (inc' Long/MAX_VALUE)))))
 
 (deftest integer-multiplication-test
   (op-test {Long [[int long] [number int long]]
-            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+            clojure.lang.platform.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
            #(* %1 %2)
            6 2 3))
 
@@ -490,7 +490,7 @@
     (let [r1 (make-ratio 3 1)
           r2 (make-ratio 2 1)]
       (is (= 6 (* r1 r2)))
-      (is (= clojure.lang.BigInt (type (* r1 r2))))))
+      (is (= clojure.lang.platform.BigInt (type (* r1 r2))))))
 
   (testing "multiplying a decimal ratio by a decimal ratio"
     (let [r1 (make-ratio 1 3)
@@ -500,32 +500,32 @@
   (testing "multiplying a ratio by an int and vica-versa"
     (let [t1 (int 2)
           t2 (make-ratio 3 1)]
-      (is (= clojure.lang.BigInt (type (* t1 t2))))
-      (is (= clojure.lang.BigInt (type (* t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (* t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (* t2 t1))))
       (is (= 6 (* t1 t2)))
       (is (= 6 (* t2 t1)))))
 
   (testing "multiplying a ratio by a long and vica-versa"
     (let [t1 (long 2)
           t2 (make-ratio 3 1)]
-      (is (= clojure.lang.BigInt (type (* t1 t2))))
-      (is (= clojure.lang.BigInt (type (* t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (* t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (* t2 t1))))
       (is (= 6 (* t1 t2)))
       (is (= 6 (* t2 t1)))))
 
   (testing "multiplying a ratio by a biginteger and vica-versa"
     (let [t1 (biginteger 2)
           t2 (make-ratio 3 1)]
-      (is (= clojure.lang.BigInt (type (* t1 t2))))
-      (is (= clojure.lang.BigInt (type (* t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (* t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (* t2 t1))))
       (is (= 6 (* t1 t2)))
       (is (= 6 (* t2 t1)))))
 
   (testing "multiplying a ratio by a bigint and vica-versa"
     (let [t1 (bigint 2)
           t2 (make-ratio 3 1)]
-      (is (= clojure.lang.BigInt (type (* t1 t2))))
-      (is (= clojure.lang.BigInt (type (* t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (* t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (* t2 t1))))
       (is (= 6 (* t1 t2)))
       (is (= 6 (* t2 t1)))))
 
@@ -556,8 +556,8 @@
   (testing "multiplying a ratio by a non-specified Number type and vica-versa"
     (let [t1 (number 2)
           t2 (make-ratio 3 1)]
-      (is (= clojure.lang.BigInt (type (* t1 t2))))
-      (is (= clojure.lang.BigInt (type (* t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (* t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (* t2 t1))))
       (is (= 6 (* t1 t2)))
       (is (= 6 (* t2 t1))))))
 
@@ -629,14 +629,14 @@
             8 4 2))
 
 (deftest integer-precision-upper-overflow-multiplicaton-test
-  (is (= 9223372036854775808N (*' 4611686018427387904 2))))
+  (is (= (BigInt/fromBigInteger (BigInteger. "9223372036854775808"))  (*' 4611686018427387904 2))))
 
 (deftest integer-precision-lower-overflow-multiplication-test
-  (is (= -9223372036854775810N (*' -4611686018427387905 2))))
+  (is (= (BigInt/fromBigInteger (BigInteger. "-9223372036854775810")) (*' -4611686018427387905 2))))
 
 (deftest integer-subtraction-test
   (op-test {Long [[int long] [number int long]]
-            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+            clojure.lang.platform.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
            #(- %1 %2)
            6 10 4))
 
@@ -651,7 +651,7 @@
   (testing "subtracting an integer ratio from an integer ratio"
     (let [r1 (make-ratio 10 1)
           r2 (make-ratio 5 1)]
-      (is (= clojure.lang.BigInt (type (- r1 r2))))
+      (is (= clojure.lang.platform.BigInt (type (- r1 r2))))
       (is (= 5 (- r1 r2)))))
 
   (testing "subtracting a decimal from a ratio by a decimal ratio"
@@ -663,32 +663,32 @@
   (testing "subtracting a ratio by an int and vica-versa"
     (let [t1 (int 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (- t1 t2))))
-      (is (= clojure.lang.BigInt (type (- t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (- t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (- t2 t1))))
       (is (= -1 (- t1 t2)))
       (is (= 1 (- t2 t1)))))
 
   (testing "subtracting a ratio by a long and vica-versa"
     (let [t1 (long 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (- t1 t2))))
-      (is (= clojure.lang.BigInt (type (- t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (- t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (- t2 t1))))
       (is (= -1 (- t1 t2)))
       (is (= 1 (- t2 t1)))))
 
   (testing "subtracting a ratio by a biginteger and vica-versa"
     (let [t1 (biginteger 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (- t1 t2))))
-      (is (= clojure.lang.BigInt (type (- t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (- t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (- t2 t1))))
       (is (= -1 (- t1 t2)))
       (is (= 1 (- t2 t1)))))
 
   (testing "subtracting a ratio by a bigint and vica-versa"
     (let [t1 (bigint 1)
           t2 (make-ratio 2 1)]
-      (is (= clojure.lang.BigInt (type (- t1 t2))))
-      (is (= clojure.lang.BigInt (type (- t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (- t1 t2))))
+      (is (= clojure.lang.platform.BigInt (type (- t2 t1))))
       (is (= -1 (- t1 t2)))
       (is (= 1 (- t2 t1)))))
 
@@ -823,11 +823,11 @@
 
 (deftest integer-precision-negation-subtraction-test
   (testing "overflow an integer into a BigInt by negating Long/MIN_VALUE"
-    (is (= 9223372036854775808N (-' Long/MIN_VALUE)))))
+    (is (= (BigInt/fromBigInteger (BigInteger. "9223372036854775808")) (-' Long/MIN_VALUE)))))
 
 (deftest integer-precision-subtraction-test
   (testing "overflow an integer via min value"
-    (is (= -9223372036854775809N (-' Long/MIN_VALUE 1)))))
+    (is (= (BigInt/fromBigInteger (BigInteger. "-9223372036854775809")) (-' Long/MIN_VALUE 1))))):w
 
 (deftest integer-decrement-test
   (testing "decrement an int"
@@ -841,11 +841,11 @@
 (deftest big-int-decrement-test
   (testing "decrementing a big int"
     (is (= (bigint -3) (dec (bigint -2))))
-    (is (= clojure.lang.BigInt (type (dec (bigint -2))))))
+    (is (= clojure.lang.platform.BigInt (type (dec (bigint -2))))))
 
   (testing "decrementing a big integer"
     (is (= (bigint 1) (dec (biginteger 2))))
-    (is (= clojure.lang.BigInt (type (dec (biginteger 2)))))))
+    (is (= clojure.lang.platform.BigInt (type (dec (biginteger 2)))))))
 
 (deftest ratio-decrement-test
   (testing "decrementing a ratio"
@@ -876,11 +876,11 @@
 
 (deftest integer-precision-decrement-overflow-test
   (testing "overflows into BigInt when decrementing Long/MIN_VALUE"
-    (is (= -9223372036854775809N (dec' Long/MIN_VALUE)))))
+    (is (= (BigInt/fromBigInteger (BigInteger. "-9223372036854775809")) (dec' Long/MIN_VALUE)))))
 
 (deftest integer-division-test
   (op-test {Long [[int long] [number int long]]
-            clojure.lang.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
+            clojure.lang.platform.BigInt [[bigint biginteger] [number int long bigint biginteger]]}
            #(/ %1 %2)
            2 10 5))
 
@@ -888,7 +888,7 @@
   (testing "dividing an integer by a ratio by an integer ratio"
     (let [r1 (make-ratio 10 1)
           r2 (make-ratio 5 1)]
-      (is (= clojure.lang.BigInt (type (/ r1 r2))))
+      (is (= clojure.lang.platform.BigInt (type (/ r1 r2))))
       (is (= 2 (/ r1 r2)))))
 
   (testing "dividing a decimal by a ratio to a decimal ratio"
@@ -901,7 +901,7 @@
     (let [t1 (int 1)
           t2 (make-ratio 2 1)]
       (is (= clojure.lang.platform.Ratio (type (/ t1 t2))))
-      (is (= clojure.lang.BigInt (type (/ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (/ t2 t1))))
       (is (= (make-ratio 1 2) (/ t1 t2)))
       (is (= 2 (/ t2 t1)))))
 
@@ -909,7 +909,7 @@
     (let [t1 (long 1)
           t2 (make-ratio 2 1)]
       (is (= clojure.lang.platform.Ratio (type (/ t1 t2))))
-      (is (= clojure.lang.BigInt (type (/ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (/ t2 t1))))
       (is (= (make-ratio 1 2) (/ t1 t2)))
       (is (= 2 (/ t2 t1)))))
 
@@ -917,7 +917,7 @@
     (let [t1 (biginteger 1)
           t2 (make-ratio 2 1)]
       (is (= clojure.lang.platform.Ratio (type (/ t1 t2))))
-      (is (= clojure.lang.BigInt (type (/ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (/ t2 t1))))
       (is (= (make-ratio 1 2) (/ t1 t2)))
       (is (= 2 (/ t2 t1)))))
 
@@ -925,7 +925,7 @@
     (let [t1 (bigint 1)
           t2 (make-ratio 2 1)]
       (is (= clojure.lang.platform.Ratio (type (/ t1 t2))))
-      (is (= clojure.lang.BigInt (type (/ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (/ t2 t1))))
       (is (= (make-ratio 1 2) (/ t1 t2)))
       (is (= 2 (/ t2 t1)))))
 
@@ -975,7 +975,7 @@
     (let [t1 (number 1)
           t2 (make-ratio 2 1)]
       (is (= clojure.lang.platform.Ratio (type (/ t1 t2))))
-      (is (= clojure.lang.BigInt (type (/ t2 t1))))
+      (is (= clojure.lang.platform.BigInt (type (/ t2 t1))))
       (is (= (make-ratio 1 2) (/ t1 t2)))
       (is (= 2 (/ t2 t1))))))
 

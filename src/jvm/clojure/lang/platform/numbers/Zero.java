@@ -2,7 +2,7 @@ package clojure.lang.platform.numbers;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;
-import clojure.lang.BigInt;
+import clojure.lang.platform.BigInt;
 import clojure.lang.platform.Ratio;
 
 public final class Zero {
@@ -22,10 +22,10 @@ public final class Zero {
   }
 
   public static boolean bigIntIsZero(BigInt x) {
-    if (x.bipart == null) {
-      return x.lpart == 0;
+    if (x.getBipart() == null) {
+      return x.getLpart() == 0;
     } else {
-      return x.bipart.signum() == 0;
+      return x.getBipart().signum() == 0;
     }
   }
 

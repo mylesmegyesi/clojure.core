@@ -5,8 +5,7 @@
             [clojure.next           :refer :all])
   (:import [java.lang Number Short Byte Integer Long Float Double]
            [java.math BigInteger BigDecimal]
-           [clojure.lang BigInt]
-           [clojure.lang.platform Ratio]
+           [clojure.lang.platform BigInt Ratio]
            [clojure.lang.platform.numbers Addition BitOps Cast Comparison
                                           Decrement Division Equivalence
                                           Increment Multiplication Negation

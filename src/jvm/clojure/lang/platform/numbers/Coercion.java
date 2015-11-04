@@ -2,7 +2,7 @@ package clojure.lang.platform.numbers;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;
-import clojure.lang.BigInt;
+import clojure.lang.platform.BigInt;
 import clojure.lang.platform.Ratio;
 
 public final class Coercion {
@@ -43,10 +43,10 @@ public final class Coercion {
     if (x instanceof BigDecimal) {
       return (BigDecimal) x;
     } else if (x instanceof BigInt) {
-      if (((BigInt) x).bipart == null) {
-        return BigDecimal.valueOf(((BigInt) x).lpart);
+      if (((BigInt) x).getBipart() == null) {
+        return BigDecimal.valueOf(((BigInt) x).getLpart());
       } else {
-        return new BigDecimal(((BigInt) x).bipart);
+        return new BigDecimal(((BigInt) x).getBipart());
       }
     } else if (x instanceof BigInteger) {
       return new BigDecimal((BigInteger) x);
