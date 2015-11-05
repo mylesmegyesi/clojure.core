@@ -1,5 +1,5 @@
 (ns clojure.lang.atom-test
-  (:refer-clojure :only [apply assoc fn defmacro defn dorun dotimes first flatten let map partition pcalls range repeat sort vec])
+  (:refer-clojure :only [apply assoc fn defmacro defn dorun dotimes first flatten let partition pcalls range repeat sort vec])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all :exclude [first assoc repeat]]
             [clojure.support.exception-assertions :refer [illegal-state-error-is-thrown?]]))
@@ -80,7 +80,7 @@
   (testing "swap! is an atomic operation"
     (let [distinct-items 50
           vec-size 10
-          integer-vecs (vec (map vec (partition vec-size (range distinct-items))))
+          integer-vecs (vec (clojure.core/map vec (partition vec-size (range distinct-items))))
           atm (atom integer-vecs)
           thread-count 10
           iterations-per-thread 100]

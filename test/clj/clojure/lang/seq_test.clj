@@ -114,6 +114,16 @@
   (testing "reduces the collection with a supplied start value"
     (is (= 10 (reduce + 1 (test-seqable '(2 3 4)))))))
 
+(deftest map-test
+  (testing "map over nil returns an empty result"
+    (is (empty? (map identity nil))))
+
+  (testing "map over a seqable collection returns a lazy seq"
+    (let [res (map identity (vector 1 2 3))]
+      (is (not (realized? res)))
+      (is (= 3 (count res)))
+      (is (realized? res)))))
+
 (deftest nth-test
   (testing "find the nth of a seq"
     (let [s (test-seqable '(1 2 3))]

@@ -1,5 +1,5 @@
 (ns clojure.lang.delay-test
-  (:refer-clojure :only [let fn pmap map filter loop list])
+  (:refer-clojure :only [let fn pmap filter loop list])
   (:require [clojure.test :refer :all]
             [clojure.next :refer :all]))
 
@@ -34,10 +34,12 @@
                      (swap! nthreads inc)
                      (list (realized? d) (deref d)))
                    (list dly dly dly))
-          realized-list (map first derefs)
+          realized-list (clojure.core/map first derefs)
           deref-list (map last derefs)]
       (is (= 2 (count (seq (filter identity realized-list)))))
-      (is (= (list 1 1 1) deref-list))))
+      (is (= 1 (nth deref-list 0)))
+      (is (= 1 (nth deref-list 1)))
+      (is (= 1 (nth deref-list 2)))))
 
   (testing "force derefs the delay"
     (is (= 5 (force (delay (- 10 5))))))

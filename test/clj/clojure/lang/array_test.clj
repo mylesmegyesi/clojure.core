@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [char cond defmacro defn- let map])
+  (:refer-clojure :only [char cond defmacro defn- let])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.lang.object                  :as    obj]
@@ -181,7 +181,7 @@
       (is (= (type-fn 0) (aget arr 21)))))
 
   (testing "returns an array from a given seq"
-    (let [s (test-seq (map #(type-fn %) '(1 2 3)))
+    (let [s (map #(type-fn %) (vector 1 2 3))
           arr (array-fn s)]
       (is (= 3 (alength arr)))
       (is (= (type-fn 1) (aget arr 0)))
@@ -197,7 +197,7 @@
       (is (= n42 (aget arr 2)))))
 
   (testing "returns an array of a given size sourcing from a seq"
-    (let [s (test-seq (map #(type-fn %) '(1 2 3 4 5)))
+    (let [s (map #(type-fn %) (vector 1 2 3 4 5))
           arr (array-fn 3 s)]
       (is (= 3 (alength arr)))
       (is (= (type-fn 1) (aget arr 0)))
