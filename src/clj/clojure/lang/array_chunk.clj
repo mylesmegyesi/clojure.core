@@ -1,9 +1,10 @@
 (ns clojure.lang.array-chunk
   (:refer-clojure :only [declare defn deftype when])
   (:require [clojure.next            :refer :all]
-            [clojure.lang.exceptions :refer [new-illegal-state-error]]
-            [clojure.lang.protocols  :refer [IChunk ICounted IIndexed
-                                             -nth]]))
+            [clojure.lang
+              [exceptions :refer [new-illegal-state-error]]
+              [protocols  :refer [IChunk ICounted IIndexed
+                                  -nth]]]))
 
 (declare make-array-chunk)
 
