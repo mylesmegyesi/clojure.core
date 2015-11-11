@@ -44,3 +44,4 @@
           (let [entry (first s)]
             (recur (assoc mp (key entry) (val entry)) (next s)))
           mp))))
+
