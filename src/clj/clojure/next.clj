@@ -811,14 +811,21 @@
 
 (require '[clojure.lang.chunk-buffer :refer :all])
 
-(defn ^:static ^clojure.lang.chunk_buffer.ChunkBuffer chunk-buffer ^clojure.lang.chunk_buffer.ChunkBuffer [capacity]
+(defn ^clojure.lang.chunk_buffer.ChunkBuffer chunk-buffer ^clojure.lang.chunk_buffer.ChunkBuffer [capacity]
   (make-chunk-buffer capacity))
 
-(defn ^:static chunk-append [^clojure.lang.chunk_buffer.ChunkBuffer b o]
+(defn chunk-append [^clojure.lang.chunk_buffer.ChunkBuffer b o]
   (-add b o))
 
-(defn ^:static chunk [^clojure.lang.chunk_buffer.ChunkBuffer b]
+(defn chunk [^clojure.lang.chunk_buffer.ChunkBuffer b]
   (-chunk b))
+
+(require '[clojure.lang.chunked-cons :refer [make-chunked-cons]])
+
+(defn chunk-cons [chunk rest]
+  (if (zero? (count chunk))
+    rest
+    (make-chunked-cons chunk rest)))
 
 (require '[clojure.lang.enumeration-seq :refer [make-enumeration-seq]])
 
