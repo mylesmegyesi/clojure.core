@@ -1,5 +1,5 @@
 (ns clojure.lang.atom
-  (:refer-clojure :only [apply cons defn defn- deftype fn let loop if-not into])
+  (:refer-clojure :only [apply cons defn defn- deftype fn let loop if-not])
   (:require [clojure.lang.atomic-ref :refer [new-atomic-ref ref-set!
                                              ref-get ref-compare-and-set!]]
             [clojure.lang.exceptions :refer [new-illegal-state-error]]

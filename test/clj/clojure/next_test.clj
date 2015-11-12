@@ -167,6 +167,18 @@
       (deref fut)
       (is (future-done? fut)))))
 
+(deftest into-test
+  (testing "put all of one collection into another"
+    (let [to (array-map 1 2)
+          from (hash-map 3 4)]
+      (is (= (array-map 1 2 3 4) (into to from)))))
+
+  (testing "IEditableCollections retain their meta"
+    (let [coll (vector 1 2 3)
+          meta-coll (with-meta coll {:so :meta})
+          res (into meta-coll (vector 4 5 6))]
+      (is (= {:so :meta} (meta res))))))
+
 (deftest time-test
   (testing "displaying time elapsed with evaluating an expression in milliseconds"
     (let [out-str (with-out-str (time (+ 1 1)))]

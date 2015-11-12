@@ -1,8 +1,8 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding cond declare defmacro defmulti defmethod defn defn-
-                         extend-type fn if-let let require satisfies? range dotimes
-                         doseq for list list* load loop format pr-str into butlast when when-let])
+                         extend-type dotimes fn if-let let require satisfies? range
+                         doseq for list list* load loop format pr-str butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
             [clojure.lang.exceptions :refer [new-assertion-error new-argument-error new-exception new-out-of-bounds-exception]]
@@ -946,6 +946,11 @@
 (defn pop! [coll]
   (-pop! coll))
 
+(defn into [to from]
+  (if (satisfies? IEditableCollection to)
+    (with-meta (persistent! (reduce conj! (transient to) from)) (meta to))
+    (reduce conj to from)))
+
 (require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq? 'make-subvec]])
 
 (defn vector [& args]
@@ -1150,7 +1155,7 @@
   ([atm f] (-swap! atm f []))
   ([atm f x] (-swap! atm f [x]))
   ([atm f x y] (-swap! atm f [x y]))
-  ([atm f x y & args] (-swap! atm f (into [x y] args))))
+  ([atm f x y & args] (-swap! atm f (clojure.core/into [x y] args))))
 
 (require ['clojure.lang.agent :refer ['new-agent 'agent-get-error 'agent-restart 'agent-set-error-handler 'agent-get-error-handler
                                       'action-release-pending-sends
