@@ -30,7 +30,13 @@
       (is (= 3 (second r)))))
 
   (testing "rest of an empty lazy seq"
-    (is (= EMPTY-LIST (rest (lazy-seq))))))
+    (is (= EMPTY-LIST (rest (lazy-seq)))))
+
+  (testing "realizing a lazy seq"
+    (let [l (lazy-seq (test-seqable '(1 2 3)))]
+      (is (not (realized? l)))
+      (seq l)
+      (is (realized? l)))))
 
 (defn repeatedly-true []
   (test-seqable '(true (lazy-seq (repeatedly-true)))))

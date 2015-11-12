@@ -1,5 +1,5 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let map reify subs var-set])
+  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let reify subs var-set])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.lang.exceptions              :refer [new-exception]]
@@ -30,7 +30,7 @@
 
   (testing "takes variable args and still returns the return value"
     (let [constant-fn (constantly :val)]
-      (map #(is (= :val (apply constant-fn %)))
+      (clojure.core/map #(is (= :val (apply constant-fn %)))
         [[] [1] [1 2] [1 2 3]]))))
 
 (deftest when-not-test

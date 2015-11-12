@@ -1,7 +1,7 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert*
                          apply binding cond declare defmacro defmulti defmethod defn defn-
-                         extend-type fn if-let let require satisfies? range
+                         extend-type fn if-let let require satisfies? range dotimes
                          doseq for list list* load loop format pr-str into butlast when when-let])
   (:require [clojure.lang.equivalence]
             [clojure.lang.object     :as    platform-object]
@@ -928,20 +928,6 @@
   ([m k & ks]
    (dissoc-seq (-dissoc m k) (seq ks))))
 
-(defn reduce
-  ([f coll]
-   (if-let [s (seq coll)]
-     (reduce f (first s) (next s))
-     (f)))
-  ([f v coll]
-    (loop [s coll
-           acc v]
-      (if (nil? s)
-        acc
-        (let [next-s (seq s)
-              next-acc (f acc (first next-s))]
-          (recur (next next-s) next-acc))))))
-
 (defn transient [coll]
   (-as-transient coll))
 
@@ -986,6 +972,33 @@
 
 (defn chunked-seq? [cs]
   (is-chunked-seq? cs))
+
+(defn reduce
+  ([f coll]
+   (if-let [s (seq coll)]
+     (reduce f (first s) (next s))
+     (f)))
+  ([f v coll]
+    (loop [s coll
+           acc v]
+      (if (nil? s)
+        acc
+        (let [next-s (seq s)
+              next-acc (f acc (first next-s))]
+          (recur (next next-s) next-acc))))))
+
+(defn map
+  ([f coll]
+    (lazy-seq
+      (when-let [s (seq coll)]
+        (if (chunked-seq? s)
+          (let [c (chunk-first s)
+                size (int (count c))
+                b (chunk-buffer size)]
+            (dotimes [i size]
+                (chunk-append b (f (nth c i))))
+            (chunk-cons (chunk b) (map f (chunk-rest s))))
+          (cons (f (first s)) (map f (rest s))))))))
 
 (require ['clojure.lang.persistent-hash-map :refer ['new-hash-map 'EMPTY-HASH-MAP]])
 

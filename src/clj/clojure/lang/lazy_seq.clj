@@ -4,7 +4,7 @@
             [clojure.lang.deftype     :refer [deftype]]
             [clojure.lang.equivalence :as    equiv]
             [clojure.lang.object      :as    platform-object]
-            [clojure.lang.protocols   :refer [ICounted ILazySeq IMeta IObj ISeq ISeqable ISequential
+            [clojure.lang.protocols   :refer [ICounted ILazySeq IMeta IObj IPending ISeq ISeqable ISequential
                                               -sval -seq -first -next -more]]
             [clojure.next             :refer :all]))
 
@@ -42,6 +42,10 @@
   IObj
   (-with-meta [this new-meta]
     (make-lazy-seq new-meta f sv s))
+
+  IPending
+  (-is-realized? [this]
+    (nil? f))
 
   ISequential
 
