@@ -1,12 +1,18 @@
 (ns clojure.lang.lazy-seq
   (:refer-clojure :only [declare defn defn- let list locking loop])
-  (:require [clojure.lang.aseq        :refer [seq-equal?]]
-            [clojure.lang.deftype     :refer [deftype]]
-            [clojure.lang.equivalence :as    equiv]
-            [clojure.lang.object      :as    platform-object]
-            [clojure.lang.protocols   :refer [ICounted ILazySeq IMeta IObj IPending ISeq ISeqable ISequential
-                                              -sval -seq -first -next -more]]
+  (:require [clojure.lang
+              [aseq        :refer [seq->array seq-equal?]]
+              [collection  :as    coll]
+              [deftype     :refer [deftype]]
+              [equivalence :as    equiv]
+              [exceptions  :refer [new-unsupported-error]]
+              [hash        :as    hash-code]
+              [object      :as    platform-object]
+              [protocols   :refer [ICounted ILazySeq IMeta IObj IPending ISeq ISeqable ISequential
+                                   -sval -seq -first -next -more]]]
             [clojure.next             :refer :all]))
+
+(coll/import-collection-type)
 
 (declare make-lazy-seq)
 
@@ -80,7 +86,60 @@
 
   platform-object/base-object
   (equiv/equals-method [this other]
-    (seq-equal? this other)))
+    (seq-equal? this other))
+
+  (hash-code/hash-method [this]
+    (let [s (seq this)]
+      (if (nil? s)
+        1
+        (hash-code/hash-code s))))
+
+  coll/base-collection
+  (coll/add-method [this other]
+    (throw (new-unsupported-error)))
+
+  (coll/add-all-method [this others]
+    (throw (new-unsupported-error)))
+
+  (coll/clear-method [this]
+    (throw (new-unsupported-error)))
+
+  (coll/contains?-method [this item]
+    (loop [s (seq this)]
+      (if s
+        (if (= item (first s))
+          true
+          (recur (next s)))
+        false)))
+
+  (coll/contains-all?-method [this items]
+    (loop [s (seq items)]
+      (if s
+        (if (not (coll/contains? this (first s)))
+          false
+          (recur (next s)))
+        true)))
+
+  (coll/is-empty?-method [this]
+    (nil? (seq this)))
+
+  (coll/remove-method [this other]
+    (throw (new-unsupported-error)))
+
+  (coll/remove-all-method [this others]
+    (throw (new-unsupported-error)))
+
+  (coll/retain-all-method [this others]
+    (throw (new-unsupported-error)))
+
+  (coll/size-method [this]
+    (count this))
+
+  (coll/to-array-method [this]
+    (seq->array this))
+
+  (coll/to-array-method [this arr]
+    (seq->array this arr)))
 
 (defn make-lazy-seq
   ([-fn]

@@ -1,7 +1,8 @@
 (ns clojure.lang.platform.persistent-vector-test
   (:refer-clojure :only [let])
-  (:require [clojure.test :refer :all]
-            [clojure.next :refer :all])
+  (:require [clojure.test                 :refer :all]
+            [clojure.lang.persistent-list :refer [list]]
+            [clojure.next                 :refer :all])
   (:import [java.util ArrayList]))
 
 (deftest sub-vec-collection-test
