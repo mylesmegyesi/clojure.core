@@ -30,6 +30,9 @@
 (defmacro number? [x]
   `(instance? Number ~x))
 
+(defmacro ->num [x]
+  `(. Cast (castToNumber ~x)))
+
 (defmacro bit-not [x]
   `(. BitOps (numberBitNot ~x)))
 

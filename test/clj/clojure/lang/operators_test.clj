@@ -90,6 +90,11 @@
 (def float-types [double float bigdec])
 (def types (concat int-types float-types))
 
+(deftest num-test
+  (testing "all types can be number cast"
+    (doseq [t types]
+      (is (number? (num (t 0)))))))
+
 (deftest byte-test
   (testing "raises an error when cast from less than min byte"
     (is (= -128 (byte -128)))
