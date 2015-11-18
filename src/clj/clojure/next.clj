@@ -150,6 +150,9 @@
 (defn number? [x]
   (platform-numbers/number? x))
 
+(defn num [x]
+  (platform-numbers/->num x))
+
 (defmacro when-not-nil [x y & body]
   ^:private
   `(let [x-nil?# (nil? ~x)

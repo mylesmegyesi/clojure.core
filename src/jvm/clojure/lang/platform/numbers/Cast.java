@@ -7,6 +7,22 @@ import clojure.lang.platform.Ratio;
 
 public final class Cast {
 
+  public static Number castToNumber(Object x) {
+    return (Number) x;
+  }
+
+  public static Number castToNumber(long x) {
+    return Long.valueOf(x);
+  }
+
+  public static Number castToNumber(float x) {
+    return Float.valueOf(x);
+  }
+
+  public static Number castToNumber(double x) {
+    return Double.valueOf(x);
+  }
+
   public static byte castToByte(Object x) {
     if (x instanceof Byte) {
       return ((Byte) x).byteValue();
