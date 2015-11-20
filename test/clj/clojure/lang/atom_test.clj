@@ -1,5 +1,5 @@
 (ns clojure.lang.atom-test
-  (:refer-clojure :only [apply assoc fn defmacro defn dorun dotimes first flatten let partition pcalls range repeat sort vec])
+  (:refer-clojure :only [apply assoc fn defmacro defn dorun dotimes first flatten let partition pcalls range repeat vec])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all :exclude [first assoc repeat]]
             [clojure.support.exception-assertions :refer [illegal-state-error-is-thrown?]]))
@@ -93,7 +93,7 @@
                     i1 (rand-int vec-size)
                     i2 (rand-int vec-size)]
                 (swap-items-in atm v1 v2 i1 i2))))))
-      (is (= (range distinct-items) (sort (flatten (deref atm)))))))
+      (is (= (range distinct-items) (clojure.core/sort (flatten (deref atm)))))))
 
   (defn pinc! [atm nthreads niters]
     (dorun (apply pcalls

@@ -2,7 +2,7 @@
   (:refer-clojure :only [cond cons defmacro defn dotimes let loop when while])
   (:require [clojure.next :refer :all :exclude [cons]])
   (:import [java.lang.reflect Array]
-           [java.util ArrayList Collection Map]))
+           [java.util Arrays ArrayList Collection Map]))
 
 (def object-array-type (Class/forName "[Ljava.lang.Object;"))
 
@@ -20,6 +20,9 @@
       (Array/newInstance c dimarray))))
 
 (def EMPTY-ARRAY (make-array Object 0))
+
+(defn array-sort [^java.util.Comparator comparator arr]
+  (Arrays/sort arr comparator))
 
 (defmacro array-set! [arr idx v]
   `(Array/set ~arr ~idx ~v))
