@@ -185,6 +185,8 @@
       :else
         (make-subvec (-assoc-n -v (+ -start n) x) -start (inc -end) -meta)))
 
+  ISequential
+
   ISeqable
   (-seq [this]
     (if (> (count this) 0)
@@ -577,6 +579,8 @@
   IObj
   (-with-meta [this new-meta]
     (make-vector new-meta -length -shift -root -tail))
+
+  ISequential
 
   ISeqable
   (-seq [this]

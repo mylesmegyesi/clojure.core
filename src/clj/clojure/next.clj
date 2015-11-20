@@ -1068,6 +1068,15 @@
           (-compare-to x y)))
       -1)))
 
+(defn sort
+  ([coll] (sort compare coll))
+  ([comparator coll]
+    (if (nil? (seq coll))
+      (clojure.lang.persistent-list/list)
+      (let [arr (to-array coll)]
+       (arr/array-sort comparator arr)
+       (seq arr)))))
+
 (require ['clojure.lang.persistent-sorted-map :refer ['make-sorted-map]])
 
 (defn sorted-map-by [compare-fn & args]

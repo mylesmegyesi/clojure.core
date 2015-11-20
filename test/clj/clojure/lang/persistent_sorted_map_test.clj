@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-sorted-map-test
-  (:refer-clojure :only [conj defn- let loop rand-nth remove reduce repeatedly sort])
+  (:refer-clojure :only [conj defn- let loop rand-nth remove reduce repeatedly])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-list       :refer [EMPTY-LIST]]
@@ -67,15 +67,15 @@
     (let [keyvals (repeatedly 100 #(rand-int 999))
           m1 (reduce #(assoc %1 %2 %2) (sorted-map) keyvals)
           [ks removed-ks] (random-partition keyvals 25)
-          uniq-ks (clojure.core/distinct ks)
+          uniq-ks (distinct ks)
           m2 (reduce #(dissoc %1 %2) m1 removed-ks)]
-      (is (= (clojure.core/count uniq-ks) (count m2)))
+      (is (= (count uniq-ks) (count m2)))
       (loop [expected-ks (sort uniq-ks)
              mseq (seq m2)]
         (if expected-ks
           (do
-            (is (= (clojure.core/first expected-ks) (key (first mseq))))
-            (recur (clojure.core/next expected-ks) (next mseq))))))))
+            (is (= (first expected-ks) (key (first mseq))))
+            (recur (next expected-ks) (next mseq))))))))
 
 (deftest sorted-map-seq-test
   (testing "seq return nil when the map is empty"
