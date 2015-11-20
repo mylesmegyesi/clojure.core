@@ -83,11 +83,36 @@
       (is (nil? (aget arr 2)))
       (is (= 42 (aget arr 3))))))
 
-(deftest vector-hash-test
+(deftest subvector-hash-test
   (testing "vector hash"
     (is (= 30817 (.hashCode (subvec (vector nil 1 2 3) 1))))
     (is (= -366456230 (.hashCode (subvec (vector nil :foo :bar :baz) 1))))
     (is (= 32 (.hashCode (subvec (vector nil (vector)) 1))))))
+
+(deftest subvector-equality-test
+  (testing "identical vectors are equal to each other"
+    (let [v (subvec (vector 1) 0)]
+      (is (.equals v v))))
+
+  (testing "non-identical sequentials with the same elements in the same order are equal"
+    (is (.equals (subvec (vector 1 2 3) 0) (vector 1 2 3)))
+    (is (.equals (subvec (vector 1 2 3) 0) (list 1 2 3))))
+
+  (testing "vectors with different elements are not equal"
+    (is (not (.equals (subvec (vector 1 2 3) 0) (vector 1 2))))))
+
+(deftest subvector-iterator-test
+  (testing "remove is not supported"
+    (is (thrown? UnsupportedOperationException (.remove (.iterator (subvec (vector 0 1 2) 0))))))
+
+  (testing "next and has next"
+    (let [v (subvec (vector 0 1) 0)
+          iter (.iterator v)]
+      (is (.hasNext iter))
+      (is (= 0 (.next iter)))
+      (is (.hasNext iter))
+      (is (= 1 (.next iter)))
+      (is (not (.hasNext iter))))))
 
 (deftest vector-collection-test
   (testing "add is not supported on vectors"
@@ -175,4 +200,29 @@
     (is (= 30817 (.hashCode (vector 1 2 3))))
     (is (= -366456230 (.hashCode (vector :foo :bar :baz))))
     (is (= 32 (.hashCode (vector (vector)))))))
+
+(deftest vector-equality-test
+  (testing "identical vectors are equal to each other"
+    (let [v (vector)]
+      (is (.equals v v))))
+
+  (testing "non-identical sequentials with the same elements in the same order are equal"
+    (is (.equals (vector 1 2 3) (vector 1 2 3)))
+    (is (.equals (vector 1 2 3) (list 1 2 3))))
+
+  (testing "vectors with different elements are not equal"
+    (is (not (.equals (vector 1 2 3) (vector 1 2))))))
+
+(deftest vector-iterator-test
+  (testing "remove is not supported"
+    (is (thrown? UnsupportedOperationException (.remove (.iterator (vector 0 1 2))))))
+
+  (testing "next and has next"
+    (let [v (vector 0 1)
+          iter (.iterator v)]
+      (is (.hasNext iter))
+      (is (= 0 (.next iter)))
+      (is (.hasNext iter))
+      (is (= 1 (.next iter)))
+      (is (not (.hasNext iter))))))
 
