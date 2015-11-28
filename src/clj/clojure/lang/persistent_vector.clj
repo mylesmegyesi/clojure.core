@@ -7,6 +7,8 @@
               [aseq            :refer [defseq seq->array seq-hash]]
               [collection      :as    coll]
               [deftype         :refer [deftype]]
+              [enumerable      :refer [enumerable? enumerable-equals?] :as enum]
+              [equivalence     :as    equiv]
               [exceptions      :refer [new-argument-error new-out-of-bounds-exception
                                        new-illegal-access-error new-illegal-state-error
                                        new-unsupported-error]]
@@ -121,6 +123,15 @@
 
 (declare make-subvec)
 
+(defn- vector-equals? [v other]
+  (cond
+    (identical? v other)
+      true
+    (enumerable? other)
+      (enumerable-equals? v other)
+    :else
+      (= (seq v) (seq other))))
+
 (deftype SubVector [-v -start -end -meta ^:unsynchronized-mutable -hash]
   IAssociative
   (-assoc [this k v]
@@ -185,6 +196,9 @@
       :else
         (make-subvec (-assoc-n -v (+ -start n) x) -start (inc -end) -meta)))
 
+  (-array-for [this i]
+    (-array-for -v i))
+
   ISequential
 
   ISeqable
@@ -240,11 +254,18 @@
   (coll/to-array-method [this arr]
     (seq->array (seq this) arr))
 
+  enum/base-enumerator
+  (enum/enumerable-method [this]
+    (enum/new-ranged-iterator this -start -end))
+
   obj/base-object
   (hash-code/hash-method [this]
     (when (= -hash -1)
       (set! -hash (seq-hash (seq this))))
-    -hash))
+    -hash)
+
+  (equiv/equals-method [this other]
+    (vector-equals? this other)))
 
 (defn make-subvec [v start end mta]
   (if (instance? SubVector v)
@@ -645,11 +666,18 @@
   (coll/to-array-method [this arr]
     (seq->array (seq this) arr))
 
+  enum/base-enumerator
+  (enum/enumerable-method [this]
+    (enum/new-ranged-iterator this 0 (count this)))
+
   obj/base-object
   (hash-code/hash-method [this]
     (when (= -hash -1)
       (set! -hash (seq-hash (seq this))))
-    -hash))
+    -hash)
+
+  (equiv/equals-method [this other]
+    (vector-equals? this other)))
 
 (defn- make-vector [meta length shift root arr]
   (PersistentVector. meta length shift root arr -1))

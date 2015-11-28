@@ -7,6 +7,7 @@
               [equivalence]
               [persistent-list :refer [EMPTY-LIST]]
               [protocols       :refer [IIndexedSeq IPersistentCollection
+                                       IPersistentVector
                                        ICounted IObj IMeta
                                        ISeq ISeqable ISequential]]])
   (:import [java.lang.reflect Array]
