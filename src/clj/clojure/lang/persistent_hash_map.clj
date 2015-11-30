@@ -571,9 +571,7 @@
               (set! -root node))
             (when (not (nil? (get-value -leaf-flag)))
               (set! -count (dec -count))))
-          this)))
-
-  )
+          this))))
 
 (defn make-transient-hash-map [root count has-nil? nil-value]
   (TransientHashMap. (new-atomic-ref (thread-reference)) root count has-nil? nil-value (BoxedValue. nil)))

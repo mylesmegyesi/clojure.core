@@ -158,6 +158,9 @@
 (defprotocol ITransientMap
   (-dissoc! [this value]))
 
+(defprotocol ITransientSet
+  (-disj! [this x]))
+
 (defprotocol ITransientVector
   (-assoc-n! [this index value])
   (-pop! [this]))

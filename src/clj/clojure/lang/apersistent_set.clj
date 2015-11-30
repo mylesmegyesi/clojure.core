@@ -42,11 +42,15 @@
 (defn set-hash [items-seq]
   (reduce #(+ %1 (hash %2)) 0 items-seq))
 
-(defmacro defset [type gen-next]
+(defmacro defset [type gen-next gen-transient]
   (list 'clojure.lang.deftype/deftype type '[-map]
     'clojure.lang.protocols.ICounted
     (list '-count '[this]
       (list 'clojure.next/count '-map))
+
+    'clojure.lang.protocols.IEditableCollection
+    (list '-as-transient '[this]
+      (list gen-transient (list 'transient '-map)))
 
     'clojure.lang.protocols.ILookup
     (list '-lookup '[this x default]
