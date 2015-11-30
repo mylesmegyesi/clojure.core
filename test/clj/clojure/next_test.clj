@@ -1,5 +1,5 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval let reify subs var-set])
+  (:refer-clojure :only [*assert* apply binding defmacro deftype eval fn let reify subs var-set])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.lang.exceptions              :refer [new-exception]]
@@ -187,4 +187,18 @@
   (testing "time returns the result of the expression"
     (with-out-str
       (is (= 2 (time (+ 1 1)))))))
+
+(deftest fnil-test
+  (testing "fnil with non nil arguments will use the arguments"
+    (is (= 2 ((fnil #(inc %) 0) 1)))
+    (is (= 2 ((fnil #(+ %1 %2) 0 0) 1 1)))
+    (is (= 3 ((fnil #(+ %1 %2 %3) 0 0 0) 1 1 1))))
+
+  (testing "fnil with nil arguments will use the arguments"
+    (is (= 1 ((fnil #(inc %) 0) nil)))
+    (is (= 1 ((fnil #(+ %1 %2) 0 0) nil 1)))
+    (is (= 0 ((fnil #(+ %1 %2 %3) 0 0 0) nil nil nil))))
+
+  (testing "fnil can take non-defaulted arguments"
+    (is (= 6 ((fnil (fn [& args] (apply + args)) 1 2 3) nil nil 1 2)))))
 
