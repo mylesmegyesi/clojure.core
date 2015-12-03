@@ -19,6 +19,11 @@
       (is (= 0 (count zero-size)))
       (is (= 2 (count two-size)))))
 
+  (testing "counting after dissoc!"
+    (let [t (transient (constructor :k :v))
+          updated-t (dissoc! t :k)]
+      (is (zero? (count updated-t)))))
+
   (testing "count raises an error if the transient has been made persistent"
     (let [t (transient (constructor))]
       (persistent! t)

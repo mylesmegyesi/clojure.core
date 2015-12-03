@@ -54,9 +54,14 @@
   (node-assoc      [this shift hash key val added-leaf])
   (node-assoc-ref  [this edit shift hash key val added-leaf])
   (node-dissoc     [this shift hash key])
+  (node-dissoc-ref [this edit shift hash key removed-leaf])
   (node-find       [this shift hash key not-found])
   (node-seq        [this])
   (set-array!      [this new-arr]))
+
+(defprotocol ^:private Bitmapped
+  (get-bitmap  [this])
+  (set-bitmap! [this new-bitmap]))
 
 (declare EMPTY-BitmapIndexedNode)
 (declare new-bitmap-node)
@@ -144,6 +149,17 @@
     (acopy arr ZERO new-arr ZERO two*i)
     (acopy arr (* TWO (inc i)) new-arr two*i (- new-size two*i))
     new-arr))
+
+(defn- edit-and-remove-pair [this edit bit i]
+  (if (= (get-bitmap this) bit)
+    nil
+    (let [editable (ensure-editable this edit)
+          arr (get-array editable)]
+      (set-bitmap! (get-bitmap editable) (bit-or (get-bitmap editable) bit))
+      (acopy arr (* 2 (inc i)) arr (* i 2) (- (alength arr) (* 2 (inc i))))
+      (aset arr (- (alength arr) 2) nil)
+      (aset arr (dec (alength arr)) nil)
+      editable)))
 
 (defseq ^:private NodeSeq [meta arr i s]
   ICounted
@@ -246,10 +262,6 @@
 
 (defn- new-hash-collision-node [edit hash count array]
   (HashCollisionNode. edit hash count array))
-
-(defprotocol ^:private Bitmapped
-  (get-bitmap  [this])
-  (set-bitmap! [this new-bitmap]))
 
 (deftype ^:private BitmapIndexedNode [edit ^:unsynchronized-mutable bitmap ^:unsynchronized-mutable arr]
   Bitmapped
@@ -428,10 +440,34 @@
             :else
             this)))))
 
-  (node-seq [this]
-    (new-node-seq arr))
+  (node-dissoc-ref [this edit shift hash key removed-leaf]
+    (let [bit (bit-pos hash shift)]
+      (if (= (bit-and bitmap bit) ZERO)
+        this
+        (let [idx (bit-index bitmap bit)
+              key-or-nil (aget arr (* TWO idx))
+              val-or-node (aget arr (inc (* TWO idx)))]
+          (cond
+            (nil? key-or-nil)
+              (let [n (node-dissoc-ref val-or-node edit (+ FIVE shift) hash key removed-leaf)]
+                (cond
+                  (= n val-or-node)
+                    this
+                  (not (nil? n))
+                    (edit-and-set! this edit (* TWO idx) nil (inc (* TWO idx)) n)
+                  (= bitmap bit)
+                    nil
+                  :else
+                    (edit-and-remove-pair this edit bit idx)))
+            (= key key-or-nil)
+              (do
+                (set-value! removed-leaf removed-leaf)
+                (edit-and-remove-pair this edit bit idx))
+            :else
+              this)))))
 
-  )
+  (node-seq [this]
+    (new-node-seq arr)))
 
 (defn- new-bitmap-node [edit bitmap arr]
   (BitmapIndexedNode. edit bitmap arr))
@@ -530,7 +566,7 @@
       :else
         (do
           (set-value! -leaf-flag nil)
-          (let [node (node-dissoc -root ZERO (hash k) k)]
+          (let [node (node-dissoc-ref -root -edit ZERO (hash k) k -leaf-flag)]
             (when (not= node -root)
               (set! -root node))
             (when (not (nil? (get-value -leaf-flag)))
