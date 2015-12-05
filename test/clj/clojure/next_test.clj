@@ -58,7 +58,7 @@
   (testing "assert raises an assertion error if the test fails"
     (assertion-error-is-thrown? #"Assert failed" (assert (= 1 2))))
 
-  (testing "assert does not raise an assertion error if the test fails"
+  (testing "assert does not raise an assertion error if the test passes"
     (is (nil? (assert (= 1 1)))))
 
   (testing "assert raises an assertion error with a message"
