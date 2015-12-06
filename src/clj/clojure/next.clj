@@ -874,6 +874,24 @@
      (recur (conj coll x) (first xs) (next xs))
      (conj coll x))))
 
+(defn fnil
+  ([f x]
+    (fn
+      ([a] (f (if (nil? a) x a)))
+      ([a b] (f (if (nil? a) x a) b))
+      ([a b c] (f (if (nil? a) x a) b c))
+      ([a b c & ds] (apply f (if (nil? a) x a) b c ds))))
+  ([f x y]
+    (fn
+      ([a b] (f (if (nil? a) x a) (if (nil? b) y b)))
+      ([a b c] (f (if (nil? a) x a) (if (nil? b) y b) c))
+      ([a b c & ds] (apply f (if (nil? a) x a) (if (nil? b) y b) c ds))))
+  ([f x y z]
+    (fn
+      ([a b] (f (if (nil? a) x a) (if (nil? b) y b)))
+      ([a b c] (f (if (nil? a) x a) (if (nil? b) y b) (if (nil? c) z c)))
+      ([a b c & ds] (apply f (if (nil? a) x a) (if (nil? b) y b) (if (nil? c) z c) ds)))))
+
 (defn disj
   ([s] s)
   ([s x]
