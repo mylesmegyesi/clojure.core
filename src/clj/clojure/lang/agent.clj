@@ -61,12 +61,6 @@
           (let [act (first s)]
             (-enqueue (-agent act) act)))))))
 
-(defn agent-set-error-handler [agnt error-fn]
-  (-set-error-handler agnt error-fn))
-
-(defn agent-get-error-handler [agnt]
-  (-error-handler agnt))
-
 (defn- do-action-run2 [action agnt error]
   (let [nxt (loop [popped false
                    nxt nil]
@@ -133,9 +127,6 @@
 (defn agent-get-error [agnt]
   (-error (ref-get (-action-queue agnt))))
 
-(defn agent-restart [agnt new-state options]
-  (-restart agnt new-state options))
-
 (declare new-action)
 
 (deftype Agent [^:volatile-mutable -state
@@ -143,7 +134,7 @@
                 ^:unsynchronized-mutable -meta
                 ^:volatile-mutable -validator
                 ^:volatile-mutable -watches
-                ^:volatile-mutalbe -error-mode
+                ^:volatile-mutable -error-mode
                 -action-queue]
 
   IAgent
@@ -155,6 +146,9 @@
     (set! -error-handler f))
 
   (-error-mode [this] -error-mode)
+
+  (-set-error-mode [this k]
+    (set! -error-mode k))
 
   (-enqueue [this action]
     (let [p (loop [queued false

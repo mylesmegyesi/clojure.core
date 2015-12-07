@@ -62,6 +62,14 @@
       (send agt (fn [_] (sleep 100)))
       (is (false? (await-for 1 agt)))))
 
+  (testing "error-mode is :fail by default"
+    (is (= :fail (error-mode (agent 0)))))
+
+  (testing "get and set error-mode"
+    (let [agt (agent 0)]
+      (set-error-mode! agt :foobar)
+      (is (= :foobar (error-mode agt)))))
+
   (testing "throws runtime exception if agent does not need a restart"
     (let [agt (agent 0)]
       (runtime-exception-is-thrown? #"Agent does not need a restart" (restart-agent agt 1))))

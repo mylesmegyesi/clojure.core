@@ -1187,7 +1187,7 @@
   ([atm f x y] (-swap! atm f [x y]))
   ([atm f x y & args] (-swap! atm f (clojure.core/into [x y] args))))
 
-(require ['clojure.lang.agent :refer ['new-agent 'agent-get-error 'agent-restart 'agent-set-error-handler 'agent-get-error-handler
+(require ['clojure.lang.agent :refer ['new-agent 'agent-get-error
                                       'action-release-pending-sends
                                       'pooled-executor 'solo-executor]])
 (require ['clojure.lang.thread :as 'threading])
@@ -1242,14 +1242,20 @@
     (list error)))
 
 (defn set-error-handler! [agnt error-fn]
-  (agent-set-error-handler agnt error-fn))
+  (-set-error-handler agnt error-fn))
 
 (defn error-handler [agnt]
-  (agent-get-error-handler agnt))
+  (-error-handler agnt))
 
 (defn restart-agent [agnt new-state & options]
   (let [opts (apply hash-map options)]
-    (agent-restart agnt new-state opts)))
+    (-restart agnt new-state opts)))
+
+(defn set-error-mode! [agnt err-mode]
+  (-set-error-mode agnt err-mode))
+
+(defn error-mode [agnt]
+  (-error-mode agnt))
 
 (defmacro io! [& body]
   (let [message (when (string? (first body)) (first body))
