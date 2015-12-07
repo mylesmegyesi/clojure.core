@@ -1561,7 +1561,7 @@
   (apply pr more)
   (platform-newline)
   (when *flush-on-newline*
-    (platform-flush)))
+    (flush)))
 
 (defn print [& more]
   (binding [*print-readably* nil]

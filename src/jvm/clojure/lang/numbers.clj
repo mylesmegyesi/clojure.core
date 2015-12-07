@@ -201,12 +201,12 @@
   `(let [x# ~x]
      (cond
        (instance? BigInt x#) x#
-       (instance? BigInteger x#) (BigInt/fromBigInteger x#)
-       (decimal? x#) (bigint (.toBigInteger ^BigDecimal x#))
-       (float? x#) (bigint (. BigDecimal valueOf (->double x#)))
+       (instance? BigInteger x#) (BigInt/fromBigInteger ^BigInteger x#)
+       (decimal? x#) (bigint (.toBigInteger ^BigDecimal ^BigDecimal x#))
+       (float? x#) (bigint (. BigDecimal valueOf ^Double (->double x#)))
        (ratio? x#) (bigint (.bigIntegerValue ^Ratio x#))
-       (clojure.core/number? x#) (BigInt/valueOf (->long x#))
-       :else (bigint (BigInteger. x#)))))
+       (clojure.core/number? x#) (BigInt/valueOf ^Long (->long x#))
+       :else (bigint (BigInteger. ^String x#)))))
 
 (defmacro ->biginteger [x]
   `(let [x# ~x]
@@ -214,21 +214,22 @@
        (instance? BigInteger x#) x#
        (instance? BigInt x#) (.toBigInteger ^BigInt x#)
        (decimal? x#) (.toBigInteger ^BigDecimal x#)
-       (float? x#) (.toBigInteger (. BigDecimal valueOf (->double x#)))
+       (float? x#) (.toBigInteger (. BigDecimal valueOf ^Double (->double x#)))
        (ratio? x#) (.bigIntegerValue ^Ratio x#)
-       (clojure.core/number? x#) (BigInteger/valueOf (->long x#))
-       :else (BigInteger. x#))))
+       (clojure.core/number? x#) (BigInteger/valueOf ^Long (->long x#))
+       :else (BigInteger. ^String x#))))
 
 (defmacro ->bigdec [x]
   `(let [x# ~x]
      (cond
        (decimal? x#) x#
-       (float? x#) (. BigDecimal valueOf (->double x#))
-       (ratio? x#) (/ (BigDecimal. (.getNumerator ^Ratio x#)) (.getDenominator ^Ratio x#))
+       (float? x#) (. BigDecimal valueOf ^Double (->double x#))
+       (ratio? x#) (/ (BigDecimal. ^BigInteger (.getNumerator ^Ratio x#))
+                      ^BigInteger (.getDenominator ^Ratio x#))
        (instance? BigInt x#) (.toBigDecimal ^BigInt x#)
        (instance? BigInteger x#) (BigDecimal. ^BigInteger x#)
-       (clojure.core/number? x#) (BigDecimal/valueOf (->long x#))
-       :else (BigDecimal. x#))))
+       (clojure.core/number? x#) (BigDecimal/valueOf ^Long (->long x#))
+       :else (BigDecimal. ^String x#))))
 
 (defmacro < [x y]
   `(. Comparison (lessThan ~x ~y)))
@@ -254,7 +255,7 @@
             d (BigInteger. (.toString (/ denominator gcd)))]
         (Ratio. n d)))))
 
-(defn unsafe-cast-int [i]
+(defn unsafe-cast-int [^Number i]
   (.intValue i))
 
 (defn- long-hash-code [lpart]

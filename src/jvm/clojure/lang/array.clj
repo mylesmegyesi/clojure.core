@@ -2,15 +2,15 @@
   (:refer-clojure :only [cond cons defmacro defn dotimes let loop when while])
   (:require [clojure.next :refer :all :exclude [cons]])
   (:import [java.lang.reflect Array]
-           [java.util Arrays ArrayList Collection Map]))
+           [java.util Arrays ArrayList Collection Iterator Map]))
 
 (def object-array-type (Class/forName "[Ljava.lang.Object;"))
 
 (defn get-array-type [arr]
-  (.getComponentType (.getClass arr)))
+  (.getComponentType ^Class (.getClass ^Object arr)))
 
 (defn make-array
-  ([^Class c size]
+  ([^Class c ^Integer size]
     (Array/newInstance c size))
   ([^Class c d ds]
     (let [dims (cons d ds)
@@ -67,24 +67,24 @@
       (instance? object-array-type coll#)
         coll#
       (instance? Collection coll#)
-        (.toArray coll#)
+        (.toArray ^Collection coll#)
       (instance? Iterable coll#)
         (let [ret# (ArrayList.)
-              iter# (.iterator coll#)]
-          (while (.hasNext iter#)
-            (.add ret# (.next iter#)))
+              iter# (.iterator ^Iterable coll#)]
+          (while (.hasNext ^Iterator iter#)
+            (.add ret# (.next ^Iterator iter#)))
           (.toArray ret#))
       (instance? Map coll#)
-        (.toArray (.entrySet coll#))
+        (.toArray (.entrySet ^Map coll#))
       (instance? String coll#)
-        (let [chrs# (.toCharArray coll#)
+        (let [chrs# (.toCharArray ^String coll#)
               len# (array-length chrs#)
               ret# (make-array Object len#)]
           (loop [i# 0]
             (when (< i# len#)
               (do (array-set! ret# i# (array-get chrs# i#)) (recur (inc i#)))))
           ret#)
-      (.isArray (.getClass coll#))
+      (.isArray ^Class (.getClass ^Object coll#))
         (let [s# (seq coll#)
               len# (count s#)
               ret# (make-array Object len#)]

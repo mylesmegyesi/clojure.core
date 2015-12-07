@@ -12,10 +12,10 @@
   `(ThreadLocal.))
 
 (defmacro get-local-state [state]
-  `(.get ~state))
+  `(.get ^ThreadLocal ~state))
 
 (defmacro set-local-state [state v]
-  `(.set ~state ~v))
+  `(.set ^ThreadLocal ~state ~v))
 
 (defmacro thread-reference []
   `(. Thread currentThread))
