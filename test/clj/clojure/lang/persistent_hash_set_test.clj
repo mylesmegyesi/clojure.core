@@ -187,3 +187,49 @@
     (is (= 2 (first (next (seq (hash-set 1 2)))))))
 
   )
+
+(deftest transient-hash-set-test
+  (testing "count of a transient set"
+    (let [t0 (transient (hash-set))
+          t1 (transient (hash-set 1))
+          t2 (transient (hash-set 1 2))]
+      (is (= 0 (count t0)))
+      (is (= 1 (count t1)))
+      (is (= 2 (count t2)))))
+
+  (testing "lookup an element in the set"
+    (let [t (transient (hash-set :foo :bar))]
+      (is (nil? (get t :baz)))
+      (is (= :foo (get t :foo)))))
+
+  (testing "check if a set contains an element"
+    (let [t (transient (hash-set :foo :bar))]
+      (is (false? (contains? t :baz)))
+      (is (true? (contains? t :foo)))))
+
+  (testing "conj! an element that does not belong to the set"
+    (let [t (transient (hash-set))
+          updated-t (conj! t :foo)]
+      (is (= 1 (count updated-t)))
+      (is (true? (contains? updated-t :foo)))))
+
+  (testing "conj! an element that does belong to the set"
+    (let [t (transient (hash-set :foo))
+          updated-t (conj! t :foo)]
+      (is (= 1 (count updated-t)))))
+
+  (testing "disj! an element that does not belong to the set"
+    (let [t (transient (hash-set :foo))
+          updated-t (disj! t :bar)]
+      (is (= 1 (count updated-t)))
+      (is (true? (contains? updated-t :foo)))))
+
+  (testing "disj! an element that does belong to the set"
+    (let [t (transient (hash-set :foo))
+          updated-t (disj! t :foo)]
+      (is (= 0 (count updated-t)))))
+
+  (testing "make a set persistent"
+    (let [hs (persistent! (transient (hash-set :foo)))]
+      (is (= 1 (count hs))))))
+

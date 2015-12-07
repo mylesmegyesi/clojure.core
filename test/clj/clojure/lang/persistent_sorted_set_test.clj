@@ -204,6 +204,5 @@
           seq3 (next seq2)]
       (is (= 3 (first seq1)))
       (is (= 2 (first seq2)))
-      (is (= 1 (first seq3)))))
+      (is (= 1 (first seq3))))))
 
-  )
