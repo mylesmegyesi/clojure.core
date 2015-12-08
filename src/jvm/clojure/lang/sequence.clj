@@ -122,7 +122,7 @@
 (defseq ^:private StringSeq [-string -i -meta]
   ICounted
   (-count [this]
-    (- (.length -string) -i))
+    (- (.length ^String -string) -i))
 
   IIndexedSeq
   (-index [this] -i)
@@ -144,11 +144,11 @@
 
   ISeq
   (-first [this]
-    (let [chr (.charAt -string -i)]
+    (let [chr (.charAt ^String -string ^Integer -i)]
       (. Character (valueOf chr))))
 
   (-next [this]
-    (if (< (inc -i) (.length -string))
+    (if (< (inc -i) (.length ^String -string))
       (make-string-seq -string (inc -i) -meta)
       nil))
 

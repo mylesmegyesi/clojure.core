@@ -12,9 +12,9 @@
       (.size ^Collection obj)
     (instance? Map obj)
       (.size ^Map obj)
-    (.isArray (.getClass obj))
+    (.isArray ^Class (.getClass ^Object obj))
       (. Array getLength obj)
     :else
       (let [msg (str "count not supported on this type: "
-                     (.getSimpleName (.getClass obj)))]
-        (throw (UnsupportedOperationException. msg)))))
+                     (.getSimpleName ^Class (.getClass ^Object obj)))]
+        (throw (UnsupportedOperationException. ^String msg)))))

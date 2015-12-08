@@ -31,7 +31,7 @@
     (get-groups matcher)))
 
 (defn regex-seq [pattern s]
-  (let [m (make-matcher pattern s)]
+  (let [m ^Matcher (make-matcher pattern s)]
     ((fn step []
        (when (. m find)
          (cons (get-groups m) (lazy-seq (step))))))))
