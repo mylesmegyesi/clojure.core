@@ -1166,6 +1166,19 @@
                    xs seen)))]
     (step coll (hash-set))))
 
+(defn distinct?
+  ([x] true)
+  ([x y] (not (= x y)))
+  ([x y & more]
+    (if (not= x y)
+      (loop [s (hash-set x y) [x & etc :as xs] more]
+        (if xs
+          (if (contains? s x)
+            false
+            (recur (conj s x) etc))
+          true))
+      false)))
+
 (defn get-validator [this]
   (-get-validator this))
 

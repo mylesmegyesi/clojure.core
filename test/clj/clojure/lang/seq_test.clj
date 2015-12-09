@@ -165,3 +165,19 @@
   (testing "sorting an unsorted two element seq with custom comparator"
     (is (= (sort #(> %1 %2) (list 1 2)) (list 2 1)))))
 
+(deftest distinct?-test
+  (testing "a single element is distinct"
+    (is (distinct? 1)))
+
+  (testing "two equal elements are not distinct"
+    (is (not (distinct? 1 1))))
+
+  (testing "two unequal elements are distinct"
+    (is (distinct? 1 2)))
+
+  (testing "many elements which occassionally repeat are not distinct"
+    (is (not (distinct? 1 2 3 1 4))))
+
+  (testing "many elements which do not repeat are distinct"
+    (is (distinct? 1 2 3 4))))
+
