@@ -1,5 +1,5 @@
 (ns clojure.next ; eventually, this will be clojure.core
-  (:refer-clojure :only [*assert*
+  (:refer-clojure :only [*assert* complement
                          apply binding cond declare defmacro defmulti defmethod defn defn-
                          extend-type dotimes fn if-let let require satisfies? range
                          doseq for list list* load loop format pr-str butlast when when-let])
@@ -1028,6 +1028,25 @@
                 (chunk-append b (f (nth c i))))
             (chunk-cons (chunk b) (map f (chunk-rest s))))
           (cons (f (first s)) (map f (rest s))))))))
+
+(defn filter [pred coll]
+  (lazy-seq
+    (when-let [s (seq coll)]
+      (if (chunked-seq? s)
+        (let [c (chunk-first s)
+              size (count c)
+              b (chunk-buffer size)]
+          (dotimes [i size]
+              (when (pred (nth c i))
+                (chunk-append b (nth c i))))
+          (chunk-cons (chunk b) (filter pred (chunk-rest s))))
+        (let [f (first s) r (rest s)]
+          (if (pred f)
+            (cons f (filter pred r))
+            (filter pred r)))))))
+
+(defn remove [pred coll]
+  (filter (complement pred) coll))
 
 (require ['clojure.lang.persistent-hash-map :refer ['new-hash-map 'EMPTY-HASH-MAP]])
 

@@ -124,6 +124,30 @@
       (is (= 3 (count res)))
       (is (realized? res)))))
 
+(deftest filter-test
+  (testing "filtering a nil collection returns an empty lazy seq"
+    (let [sq (filter even? nil)]
+      (is (not (realized? sq)))
+      (is (empty? sq))))
+
+  (testing "filtering elements of a seq"
+    (let [sq (filter even? (list 1 2 3 4))]
+      (is (= 2 (count sq)))
+      (is (= 2 (first sq)))
+      (is (= 4 (second sq))))))
+
+(deftest remove-test
+  (testing "removing a nil collection returns an empty lazy seq"
+    (let [sq (remove even? nil)]
+      (is (not (realized? sq)))
+      (is (empty? sq))))
+
+  (testing "removing elements of a seq"
+    (let [sq (remove even? (list 1 2 3 4))]
+      (is (= 2 (count sq)))
+      (is (= 1 (first sq)))
+      (is (= 3 (second sq))))))
+
 (deftest nth-test
   (testing "find the nth of a seq"
     (let [s (list 1 2 3)]

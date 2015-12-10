@@ -1,5 +1,5 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [apply concat defmacro defn doseq reify let list list* remove resolve])
+  (:refer-clojure :only [apply concat defmacro defn doseq reify let list list* resolve])
   (:require [clojure.test                         :refer :all]
             [clojure.lang.protocols               :refer [IEquivalence]]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?
@@ -877,7 +877,7 @@
     (is (not (>= 5 4 3 3 1 2)))))
 
 (defn conversion-test [test conversion]
-  (let [test-without-question-mark (apply str (remove #(= \? %) (str test)))]
+  (let [test-without-question-mark (apply str (clojure.core/remove #(= \? %) (str test)))]
     (testing (str test " converts an integer to a type of " test-without-question-mark)
       (is (@(resolve test) (@(resolve conversion) 42))))
 
