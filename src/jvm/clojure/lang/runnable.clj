@@ -1,5 +1,5 @@
 (ns clojure.lang.runnable
-  (:refer-clojure :only [defmacro fn extend-type let remove])
+  (:refer-clojure :only [defmacro fn extend-type let])
   (:require [clojure.next :refer :all]))
 
 (defmacro defrunnable [type & body]
@@ -8,7 +8,7 @@
                    (if (and (clojure.core/seq? item) (= (first item) '-run))
                      item
                      acc)) body)
-        bdy (remove #(= %1 run-fn) body)]
+        bdy (clojure.core/remove #(= %1 run-fn) body)]
     `(clojure.core/deftype ~type ^{:private true}
        ~@bdy
        Runnable

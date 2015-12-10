@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-sorted-map-test
-  (:refer-clojure :only [conj defn- let loop rand-nth remove reduce repeatedly])
+  (:refer-clojure :only [conj defn- let loop rand-nth reduce repeatedly])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-list       :refer [EMPTY-LIST]]
@@ -59,7 +59,7 @@
         [c removed-c]
         (let [rand-elem (rand-nth c)]
           (recur
-            (remove #(= rand-elem %) c)
+            (clojure.core/remove #(= rand-elem %) c)
             (conj removed-c rand-elem)
             (dec counter))))))
 
