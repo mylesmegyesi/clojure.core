@@ -566,6 +566,12 @@
   ([arr i i2 & vs]
     (apply aset-double (aget arr i) i2 vs)))
 
+(defn aset-boolean
+  ([arr i v]
+    (arr/array-set-boolean! arr i (boolean v)))
+  ([arr i i2 & vs]
+    (apply aset-boolean (aget arr i) i2 vs)))
+
 (defn alength [arr]
   (arr/array-length arr))
 

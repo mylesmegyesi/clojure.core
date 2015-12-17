@@ -4,6 +4,7 @@
             [clojure.next                         :refer :all]
             [clojure.lang.object                  :as    obj]
             [clojure.lang.numbers                 :as    numbers]
+            [clojure.lang.primitive-array         :as    prim-arr]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?
                                                           class-cast-exception-is-thrown?
                                                           out-of-bounds-exception-is-thrown?]]
@@ -51,7 +52,7 @@
       (aset-fn arr 0 v)
       (is (= v (aget arr 0)))))
 
-  (testing (str "an illegal argument error is thrown if the array is not a" t " array")
+  (testing (str "an illegal argument error is thrown if the array is not a " t " array")
     (let [arr (object-array 1)]
       (argument-error-is-thrown? #"" (aset-fn arr 0 v))))
 
@@ -81,6 +82,23 @@
 
 (deftest aset-double-test
   (aset-type-test aset-double numbers/platform-native-double 42.0))
+
+; The boolean cast method always returns a boolean
+; so we must skip the class cast exception test
+(deftest aset-boolean-test
+  (testing "set a boolean value in an array"
+    (let [arr (make-array prim-arr/platform-native-boolean 1)]
+      (aset-boolean arr 0 true)
+      (is (= true (aget arr 0)))))
+
+  (testing "an illegal argument error is thrown if the array is not a boolean array"
+    (let [arr (object-array 1)]
+      (argument-error-is-thrown? #"" (aset-boolean 0 true))))
+
+  (testing "a value can be set in a nested boolean array"
+    (let [arr (make-array prim-arr/platform-native-boolean 1 1)]
+      (aset-boolean arr 0 0 true)
+      (is (= true (aget (aget arr 0) 0))))))
 
 (deftest alength-test
   (testing "returns the length of the array"

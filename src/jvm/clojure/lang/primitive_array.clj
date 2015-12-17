@@ -4,8 +4,9 @@
             [clojure.lang.protocols :refer [ISeq]])
   (:import  [clojure.lang.platform PrimitiveArray]))
 
-(def platform-boolean Boolean)
-(def platform-char    Character)
+(def platform-boolean        Boolean)
+(def platform-native-boolean Boolean/TYPE)
+(def platform-char           Character)
 
 (defmacro to-booleans [arr]
   `(PrimitiveArray/castToBooleans ~arr))
