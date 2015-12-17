@@ -61,6 +61,9 @@
 (defmacro array-set-double! [arr idx v]
   `(Array/setDouble ~arr ~idx ~v))
 
+(defmacro array-set-boolean! [arr idx v]
+  `(Array/setBoolean ~arr ~idx ~v))
+
 (defmacro to-array [coll]
   `(let [coll# ~coll]
      (cond
