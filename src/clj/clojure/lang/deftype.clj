@@ -1,5 +1,5 @@
 (ns clojure.lang.deftype
-  (:refer-clojure :only [cond class? defmacro defn- macroexpand-1 fn last let list* list? map resolve str symbol symbol? ->])
+  (:refer-clojure :only [cond class? defmacro defn- macroexpand-1 not fn last let list* list? instance? map or resolve seq? str symbol symbol? vector? ->])
   (:require [clojure.string          :refer [split]]
             [clojure.lang.exceptions :refer [platform-try exception new-exception]]))
 
@@ -24,7 +24,7 @@
   (let [b (map #(cond
                   (symbol? %)
                     (symbol->Class (do-resolve %) %)
-                  (list? %)
+                  (or (list? %) (instance? clojure.lang.Cons %))
                     (macroexpand-1 %)
                   :else
                     %)

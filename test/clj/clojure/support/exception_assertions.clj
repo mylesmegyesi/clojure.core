@@ -9,6 +9,9 @@
 (defmacro arithmetic-exception-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? arithmetic-exception msg body)))
 
+(defmacro arity-exception-is-thrown? [msg & body]
+  (list 'is (list* 'thrown-with-msg? arity-exception msg body)))
+
 (defmacro assertion-error-is-thrown? [msg & body]
   (list 'is (list* 'thrown-with-msg? assertion-error msg body)))
 
