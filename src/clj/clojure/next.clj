@@ -251,6 +251,9 @@
 (defn bigdec [x]
   (platform-numbers/->bigdec x))
 
+(defn char [x]
+  (platform-numbers/->char x))
+
 (defn bit-shift-right [n shift]
   (platform-numbers/bit-shift-right n shift))
 

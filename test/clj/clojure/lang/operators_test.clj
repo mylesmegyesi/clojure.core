@@ -189,11 +189,27 @@
 
 (deftest unchecked-double-test
   (doseq [t types]
-    (testing (str "can cast form " t " via unchecked-double")
+    (testing (str "can cast from " t " via unchecked-double")
       (is (= (double 0) (unchecked-double (t 0))))))
 
   (testing "truncated when cast from more than min float"
     (is (= 0.0 (unchecked-double 4.9E-325M)))))
+
+(def larger-than-char-types [byte short int long bigint
+                             biginteger double float bigdec])
+
+(deftest char-test
+  (doseq [t types]
+    (testing (str "can cast from " t " via char")
+      (is (= (char 0) (char (t 0))))))
+
+  (doseq [t larger-than-char-types]
+    (testing (str "can not cast " t " from larger than max char value")
+      (argument-error-is-thrown? #"" (char (t 65536)))))
+
+  (doseq [t types]
+    (testing (str "can not cast " t " from less than min char value")
+      (argument-error-is-thrown? #"" (char (t -1))))))
 
 (deftest bit-shift-right-test
   (testing "returns for a numbers and a shift"
