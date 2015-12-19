@@ -18,3 +18,6 @@
 (defn class [^Object x]
   (if-let [cx x] (.getClass cx)))
 
+(defn class-name [^Object x]
+  (if-let [cx x] (.getSimpleName ^Class (.getClass cx))))
+

@@ -79,6 +79,9 @@
 (defn rational? [x]
   (or (integer? x) (ratio? x) (decimal? x)))
 
+(defn fn? [f]
+  (satisfies? IFn f))
+
 (defn associative? [x]
   (satisfies? IAssociative x))
 

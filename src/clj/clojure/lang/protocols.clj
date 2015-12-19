@@ -61,6 +61,30 @@
 
 (defprotocol IFloat)
 
+(defprotocol IFn
+  (-invoke
+    [this]
+    [this arg1]
+    [this arg1 arg2]
+    [this arg1 arg2 arg3]
+    [this arg1 arg2 arg3 arg4]
+    [this arg1 arg2 arg3 arg4 arg5]
+    [this arg1 arg2 arg3 arg4 arg5 arg6]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17 arg18]
+    [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17 arg18 arg19])
+  (-apply-to [this args]))
+
 (defprotocol IHash
   "This protocol should not be directly used in a deftype. It should only
   be used to override an existing platform hash method."

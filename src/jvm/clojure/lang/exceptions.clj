@@ -1,4 +1,5 @@
-(ns clojure.lang.exceptions)
+(ns clojure.lang.exceptions
+  (:import [clojure.lang.platform ArityException]))
 
 (def argument-error IllegalArgumentException)
 
@@ -9,6 +10,11 @@
 
 (defmacro new-arithmetic-exception [& args]
   (list* 'new arithmetic-exception args))
+
+(def arity-exception ArityException)
+
+(defmacro new-arity-exception [& args]
+  (list* 'new arity-exception args))
 
 (def assertion-error AssertionError)
 

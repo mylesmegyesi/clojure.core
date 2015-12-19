@@ -1,6 +1,8 @@
 (ns clojure.lang.runnable
-  (:refer-clojure :only [defmacro fn extend-type let])
+  (:refer-clojure :only [defmacro fn extend-type let list*])
   (:require [clojure.next :refer :all]))
+
+(def base-runnable Runnable)
 
 (defmacro defrunnable [type & body]
   (let [run-fn (reduce
@@ -13,6 +15,9 @@
        ~@bdy
        Runnable
        (run ~@(rest run-fn)))))
+
+(defmacro runnable-method [bindings & body]
+  (list* 'run bindings body))
 
 (defmacro invoke-execute
   ([executor] `(.execute ^Runnable ~executor))
