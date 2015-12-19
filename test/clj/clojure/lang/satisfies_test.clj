@@ -92,3 +92,13 @@
     (testing (str number " is a number")
       (is (number? number)))))
 
+(deftype TestFn []
+  IFn)
+
+(deftest fn?-test
+  (testing "returns if the object satisfies IFn"
+    (is (fn? (TestFn.))))
+
+  (testing "returns false otherwise"
+    (is (not (fn? :foo)))))
+
