@@ -17,11 +17,11 @@
                                        bit-and bit-or bit-xor bit-shift-left unsigned-bit-shift-right bit-count
                                        + inc * - dec]]
               [thread          :refer [thread-reference]]
-              [protocols       :refer [IAssociative ICounted ILookup IEditableCollection
+              [protocols       :refer [IAssociative ICounted ILookup IFn IEditableCollection
                                        IMeta IObj IPersistentCollection IPersistentMap
                                        ISeqable ISeq ISeqable ISequential
                                        ITransientAssociative ITransientCollection ITransientMap
-                                       -assoc!]]]
+                                       -assoc! -lookup]]]
             [clojure.next :refer :all :exclude [bit-and bit-or bit-xor bit-shift-left
                                                 unsigned-bit-shift-right + inc * - dec]]))
 
@@ -606,6 +606,17 @@
   ICounted
   (-count [this] -count)
 
+  IEditableCollection
+  (-as-transient [this]
+    (make-transient-hash-map -root -count -has-nil? -nil-value))
+
+  IFn
+  (-invoke [this k]
+    (-lookup this k nil))
+
+  (-invoke [this k not-found]
+    (-lookup this k not-found))
+
   ILookup
   (-lookup [this key not-found]
     (cond
@@ -615,10 +626,6 @@
       (node-find -root ZERO (->bitnum (hash key)) key not-found)
       :else
       not-found))
-
-  IEditableCollection
-  (-as-transient [this]
-    (make-transient-hash-map -root -count -has-nil? -nil-value))
 
   IMeta
   (-meta [this] -meta)

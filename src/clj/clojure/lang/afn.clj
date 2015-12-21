@@ -1,5 +1,5 @@
 (ns clojure.lang.afn
-  (:refer-clojure :only [apply cond case concat defn defn- defmacro fn let list loop range some vec])
+  (:refer-clojure :only [apply cond case concat defn defn- defmacro fn gensym let list loop range reverse some vec ->>])
   (:require [clojure.next :refer :all]
             [clojure.lang
               [callable          :as    call]
@@ -15,16 +15,19 @@
     (throw (new-arity-exception i n))))
 
 (defn- find-relevant-methods [body]
-  (reduce
-    (fn [[stripped-body relevant-methods] line]
-      (cond
-        (= 'IFn line)
-           [stripped-body relevant-methods]
-        (and (seq? line) (= '-invoke (first line)))
-           [stripped-body (clojure.core/conj relevant-methods line)]
-        :else
-           [(clojure.core/conj stripped-body line) relevant-methods]))
-    [(list) (list)] body))
+  (->>
+    (reduce
+      (fn [[stripped-body relevant-methods] line]
+        (cond
+          (= 'IFn line)
+             [stripped-body relevant-methods]
+          (and (clojure.core/seq? line) (= '-invoke (first line)))
+             [stripped-body (clojure.core/conj relevant-methods line)]
+          :else
+             [(clojure.core/conj stripped-body line) relevant-methods]))
+      [(list) (list)] body)
+    (map reverse)
+    vec))
 
 (defn- contains-arity? [relevant-methods arity]
   (some #(= (count (next (first (next %)))) arity) relevant-methods))
@@ -74,8 +77,7 @@
 
 (defmacro deffn [t bindings & body]
   (if (some #(= 'IFn %) body)
-    (let [[relevant-methods stripped-body] (find-relevant-methods body)
-          this-sym (gensym "this")
+    (let [[stripped-body relevant-methods] (find-relevant-methods body)
           ifn-methods (add-missing-arities relevant-methods)]
       `(let [this-sym# (gensym "this")
              args-sym# (gensym "args")]
