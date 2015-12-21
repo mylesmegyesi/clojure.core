@@ -1,6 +1,7 @@
 (ns clojure.lang.persistent-array-map
   (:refer-clojure :only [apply cond declare defn defn- let loop when if-let ->])
   (:require [clojure.lang
+              [afn             :refer [deffn]]
               [apersistent-map :refer [map-cons map-equals? map-hash]]
               [array           :refer [array-copy]]
               [aseq            :refer [defseq]]
@@ -13,12 +14,12 @@
               [map-entry       :refer [new-map-entry]]
               [object          :as    obj]
               [persistent-list :refer [EMPTY-LIST]]
-              [protocols       :refer [ICounted ILookup IAssociative
+              [protocols       :refer [ICounted ILookup IAssociative IFn
                                        IPersistentCollection IPersistentMap
                                        IMeta IObj ISeq ISeqable ISequential
                                        IEditableCollection ITransientCollection
                                        ITransientAssociative ITransientMap
-                                       -assoc!]]
+                                       -assoc! -lookup]]
               [thread          :refer [thread-reference]]]
             [clojure.next :refer :all]))
 
@@ -139,7 +140,7 @@
   (when (not= 0 count)
     (PersistentArrayMapSeq. arr count position)))
 
-(deftype PersistentArrayMap [-arr -size -count -meta]
+(deffn PersistentArrayMap [-arr -size -count -meta]
   IAssociative
   (-assoc [this k v]
     (if-let [idx (index-of -arr -size k)] ; key exists
@@ -166,6 +167,13 @@
   IEditableCollection
   (-as-transient [this]
     (make-transient-array-map -arr))
+
+  IFn
+  (-invoke [this k]
+    (-lookup this k nil))
+
+  (-invoke [this k not-found]
+    (-lookup this k not-found))
 
   ILookup
   (-lookup [this k not-found]

@@ -3,7 +3,7 @@
   (:require [clojure.test                         :refer :all]
             [clojure.lang.persistent-list         :refer [EMPTY-LIST]]
             [clojure.lang.comparison]
-            [clojure.lang.protocols               :refer [IComparable IEquivalence IHash]]
+            [clojure.lang.protocols               :refer [IComparable IEquivalence IHash -invoke]]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?]]
             [clojure.next                         :refer :all]))
 
@@ -366,6 +366,18 @@
   (testing "something other than a map returns false"
     (is (not (map? 1)))))
 
+(defn map-function-invocation-test [constructor]
+  (testing "invoking a map will get the value for the argument key"
+    (let [m (constructor :k :v)]
+      (is (= :v (-invoke m :k)))
+      (is (= :v (-invoke m :k "not found")))))
+
+  (testing "invoking a map with a key it does not have will return nil without a not-found argument"
+    (is (nil? (-invoke (constructor) :k))))
+
+  (testing "invoking a map with a key it does note have will return the not-found argument"
+    (is (= "not found" (-invoke (constructor) :k "not found")))))
+
 (defn map-test [class-name constructor]
   (map-creation-test class-name constructor)
   (map-empty-test constructor)
@@ -376,7 +388,8 @@
   (map-equivalence-test constructor)
   (map-meta-test constructor)
   (map-hash-test constructor)
-  (map-satisfies-test constructor))
+  (map-satisfies-test constructor)
+  (map-function-invocation-test constructor))
 
 (deftest keys-test
   (testing "returns nil if there are no entries"

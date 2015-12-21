@@ -452,6 +452,15 @@
         (>= b (first more)))
       false)))
 
+(require ['clojure.lang.show :refer ['build-string]])
+
+(defn str
+  ([] "")
+  ([x]
+   (if (nil? x) "" (-show x)))
+  ([x & more]
+   (build-string (cons x more))))
+
 (require ['clojure.lang.size :refer ['platform-count]])
 
 (defn count [obj]
@@ -1381,15 +1390,7 @@
   (future-submission/is-done? f))
 
 (require ['clojure.lang.hash :refer ['hash-combine]])
-(require ['clojure.lang.show :refer ['build-string]])
 (require ['clojure.lang.symbol :as 'sym])
-
-(defn str
-  ([] "")
-  ([x]
-   (if (nil? x) "" (-show x)))
-  ([x & more]
-   (build-string (cons x more))))
 
 (defn symbol? [x]
   (sym/is-symbol? x))
