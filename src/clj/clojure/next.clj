@@ -14,7 +14,7 @@
    :minor       6
    :incremental 0})
 
-(declare cons str seq first next reduce not)
+(declare cons str seq reduce not vector)
 
 (defn clojure-version []
   (str (:major *clojure-version*) "."
@@ -452,6 +452,27 @@
         (>= b (first more)))
       false)))
 
+(defn transient [coll]
+  (-as-transient coll))
+
+(defn persistent! [coll]
+  (-persistent coll))
+
+(defn conj! [coll x]
+  (-conj! coll x))
+
+(defn disj! [coll x]
+  (-disj! coll x))
+
+(defn assoc! [coll index x]
+  (-assoc! coll index x))
+
+(defn dissoc! [coll index]
+  (-dissoc! coll index))
+
+(defn pop! [coll]
+  (-pop! coll))
+
 (require ['clojure.lang.show :refer ['build-string]])
 
 (defn str
@@ -507,6 +528,7 @@
     (cond
       (satisfies? IIndexed coll) (-nth coll n not-found)
       (satisfies? ISequential coll) (nth-sequential coll n not-found))))
+
 
 (require '[clojure.lang.primitive-array :refer :all])
 
@@ -848,6 +870,42 @@
     rest
     (make-chunked-cons chunk rest)))
 
+(defn conj
+  ([] [])
+  ([coll] coll)
+  ([coll x] (-cons coll x))
+  ([coll x & xs]
+   (if xs
+     (recur (conj coll x) (first xs) (next xs))
+     (conj coll x))))
+
+(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq? 'make-subvec]])
+
+(defn vector [& args]
+  (let [arg-seq (seq args)
+        empty-transient (-as-transient EMPTY-VECTOR)]
+    (if arg-seq
+      (loop [xs arg-seq v empty-transient]
+        (if xs
+          (recur (next xs) (-conj! v (first xs)))
+          (-persistent v)))
+      (-persistent empty-transient))))
+
+(defn subvec
+  ([v start]
+    (subvec v start (count v)))
+  ([v start end]
+    (cond
+      (or (> start end) (< start 0) (> end (count v)))
+        (throw (new-out-of-bounds-exception))
+      (= start end)
+        EMPTY-VECTOR
+      :else
+        (make-subvec v start end nil))))
+
+(defn chunked-seq? [cs]
+  (is-chunked-seq? cs))
+
 (require '[clojure.lang.enumeration-seq :refer [make-enumeration-seq]])
 
 (defn enumeration-seq [iter]
@@ -882,15 +940,6 @@
 (defn repeatedly
   ([f] (lazy-seq (cons (f) (repeatedly f))))
   ([n f] (take n (repeatedly f))))
-
-(defn conj
-  ([] [])
-  ([coll] coll)
-  ([coll x] (-cons coll x))
-  ([coll x & xs]
-   (if xs
-     (recur (conj coll x) (first xs) (next xs))
-     (conj coll x))))
 
 (defn fnil
   ([f x]
@@ -967,58 +1016,10 @@
   ([m k & ks]
    (dissoc-seq (-dissoc m k) (seq ks))))
 
-(defn transient [coll]
-  (-as-transient coll))
-
-(defn persistent! [coll]
-  (-persistent coll))
-
-(defn conj! [coll x]
-  (-conj! coll x))
-
-(defn disj! [coll x]
-  (-disj! coll x))
-
-(defn assoc! [coll index x]
-  (-assoc! coll index x))
-
-(defn dissoc! [coll index]
-  (-dissoc! coll index))
-
-(defn pop! [coll]
-  (-pop! coll))
-
 (defn into [to from]
   (if (satisfies? IEditableCollection to)
     (with-meta (persistent! (reduce conj! (transient to) from)) (meta to))
     (reduce conj to from)))
-
-(require ['clojure.lang.persistent-vector :refer ['EMPTY-VECTOR 'is-chunked-seq? 'make-subvec]])
-
-(defn vector [& args]
-  (let [arg-seq (seq args)
-        empty-transient (-as-transient EMPTY-VECTOR)]
-    (if arg-seq
-      (loop [xs arg-seq v empty-transient]
-        (if xs
-          (recur (next xs) (-conj! v (first xs)))
-          (-persistent v)))
-      (-persistent empty-transient))))
-
-(defn subvec
-  ([v start]
-    (subvec v start (count v)))
-  ([v start end]
-    (cond
-      (or (> start end) (< start 0) (> end (count v)))
-        (throw (new-out-of-bounds-exception))
-      (= start end)
-        EMPTY-VECTOR
-      :else
-        (make-subvec v start end nil))))
-
-(defn chunked-seq? [cs]
-  (is-chunked-seq? cs))
 
 (defn reduce
   ([f coll]

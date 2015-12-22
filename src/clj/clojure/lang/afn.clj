@@ -7,7 +7,6 @@
               [exceptions        :refer :all]
               [object            :refer [class-name]]
               [runnable          :as    run]
-              [persistent-vector :as v]
               [protocols         :refer [IFn -invoke -apply-to]]]))
 
 (defn throw-arity [i c]
@@ -16,7 +15,7 @@
 
 (defn- find-relevant-methods [body]
   (->>
-    (reduce
+    (clojure.core/reduce
       (fn [[stripped-body relevant-methods] line]
         (cond
           (= 'IFn line)
@@ -26,7 +25,7 @@
           :else
              [(clojure.core/conj stripped-body line) relevant-methods]))
       [(list) (list)] body)
-    (map reverse)
+    (clojure.core/map reverse)
     vec))
 
 (defn- contains-arity? [relevant-methods arity]
@@ -35,7 +34,7 @@
 (defn- add-missing-arities [relevant-methods]
   (concat
     relevant-methods
-    (reduce
+    (clojure.core/reduce
       (fn [new-methods i]
         (if (contains-arity? relevant-methods i)
           new-methods
@@ -66,7 +65,7 @@
     17 (-invoke ifn (nth args 0) (nth args 1) (nth args 2) (nth args 3) (nth args 4) (nth args 5) (nth args 6) (nth args 7) (nth args 8) (nth args 9) (nth args 10) (nth args 11) (nth args 12) (nth args 13) (nth args 14) (nth args 15) (nth args 16))
     18 (-invoke ifn (nth args 0) (nth args 1) (nth args 2) (nth args 3) (nth args 4) (nth args 5) (nth args 6) (nth args 7) (nth args 8) (nth args 9) (nth args 10) (nth args 11) (nth args 12) (nth args 13) (nth args 14) (nth args 15) (nth args 16) (nth args 17))
     (let [remainder-args (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest (rest args))))))))))))))))))
-          empty-transient (transient v/EMPTY-VECTOR)
+          empty-transient (transient (vector))
           remainder-args-vec (if remainder-args
                                (loop [xs remainder-args v empty-transient]
                                  (if xs

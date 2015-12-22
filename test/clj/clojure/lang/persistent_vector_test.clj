@@ -1,7 +1,8 @@
 (ns clojure.lang.persistent-vector-test
   (:refer-clojure :only [apply defn defmacro doseq fn for let range reify])
   (:require [clojure.test                         :refer :all]
-            [clojure.lang.protocols               :refer [IPersistentVector]]
+            [clojure.lang.protocols               :refer [IPersistentVector
+                                                          -invoke]]
             [clojure.support.exception-assertions :refer :all]
             [clojure.next                         :refer :all]))
 
@@ -53,7 +54,7 @@
 
   (testing "throws argument error if key is not an integer"
     (let [new-vec (vector 1 2 3)]
-      (argument-error-is-thrown? #"Key must be an integer"
+      (argument-error-is-thrown? #"Key must be integer"
         (assoc new-vec :a :b))))
 
   (testing "throws out of bounds exception if index is out of bounds"
@@ -85,7 +86,15 @@
     (let [fifty-foos (clojure.core/repeat 50 :foo)
           v (apply vector fifty-foos)]
       (let [result (reduce (fn [acc _] (pop acc)) v fifty-foos)]
-        (is (empty? result))))))
+        (is (empty? result)))))
+
+  (testing "invoking a persistent vector will call nth if the argument is an integer"
+    (let [v (vector 0 1 2)]
+      (is (= 1 (-invoke v 1)))))
+
+  (testing "invoking a persistent vector without an integer argument will result in an argument error"
+    (let [v (vector 0 1 2)]
+      (argument-error-is-thrown? #"Key must be integer" (-invoke v :foo)))))
 
 (deftest sub-vector-test
   (testing "subvec with an equal start and end returns the empty vector"
@@ -136,7 +145,7 @@
 
   (testing "throws argument error if key is not an integer"
     (let [new-vec (subvec (vector 1 2 3) 0)]
-      (argument-error-is-thrown? #"Key must be an integer"
+      (argument-error-is-thrown? #"Key must be integer"
         (assoc new-vec :a :b))))
 
   (testing "throws out of bounds exception if index is out of bounds"
@@ -239,7 +248,14 @@
     (let [v-seq (seq (vector :a :b :C))
           w-meta (with-meta v-seq {:so :meta})]
       (is (= {:so :meta} (meta w-meta)))))
-  )
+
+  (testing "invoking a persistent vector will call nth if the argument is an integer"
+    (let [v (subvec (vector 0 0 1 2) 1)]
+      (is (= 1 (-invoke v 1)))))
+
+  (testing "invoking a persistent vector without an integer argument will result in an argument error"
+    (let [v (subvec (vector 0 1 2) 1)]
+      (argument-error-is-thrown? #"Key must be integer" (-invoke v :foo)))))
 
 (deftest chunked-seq-test?
   (testing "is true for a chunked seq"
@@ -384,4 +400,11 @@
       (let [result (persistent! t)]
         (is (zero? (count result))))))
 
-  )
+  (testing "invoking a persistent vector will call nth if the argument is an integer"
+    (let [v (transient (vector 0 1 2))]
+      (is (= 1 (-invoke v 1)))))
+
+  (testing "invoking a persistent vector without an integer argument will result in an argument error"
+    (let [v (transient (vector 0 1 2))]
+      (argument-error-is-thrown? #"Key must be integer" (-invoke v :foo)))))
+
