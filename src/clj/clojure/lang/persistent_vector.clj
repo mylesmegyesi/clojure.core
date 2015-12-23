@@ -2,6 +2,7 @@
   (:refer-clojure :only [cond declare defn- defn defprotocol if-let let loop when ->])
   (:require [clojure.next :refer :all :exclude [bit-shift-left unsigned-bit-shift-right]]
             [clojure.lang
+              [afn             :refer [deffn]]
               [array           :refer [EMPTY-ARRAY]]
               [array-chunk     :refer [make-array-chunk]]
               [aseq            :refer [defseq seq->array seq-hash]]
@@ -32,6 +33,12 @@
 
 (declare EMPTY-VECTOR)
 (declare EMPTY-NODE)
+
+(defn- is-integer? [i]
+  (or (integer? i)
+      (instance? platform-long i)
+      (instance? platform-big-int i)
+      (instance? platform-big-integer i)))
 
 (defseq ChunkedSeq [-vec -node -i -offset -meta]
   IChunkedSeq
@@ -132,12 +139,12 @@
     :else
       (= (seq v) (seq other))))
 
-(deftype SubVector [-v -start -end -meta ^:unsynchronized-mutable -hash]
+(deffn SubVector [-v -start -end -meta ^:unsynchronized-mutable -hash]
   IAssociative
   (-assoc [this k v]
     (if (integer? k)
       (-assoc-n this k v)
-      (throw (new-argument-error "Key must be an integer"))))
+      (throw (new-argument-error "Key must be integer"))))
 
   (-contains-key? [this k]
     (if (integer? k)
@@ -147,6 +154,12 @@
   ICounted
   (-count [this]
     (- -end -start))
+
+  IFn
+  (-invoke [this n]
+    (if (is-integer? n)
+      (nth this (int n))
+      (throw (new-argument-error "Key must be integer"))))
 
   IIndexed
   (-nth [this n]
@@ -379,16 +392,10 @@
           (get-array node))))
     (throw (new-out-of-bounds-exception))))
 
-(defn- is-integer? [i]
-  (or (integer? i)
-      (instance? platform-long i)
-      (instance? platform-big-int i)
-      (instance? platform-big-integer i)))
-
 (declare make-vector)
 (declare make-transient-vec)
 
-(deftype ^:private TransientVector [-meta
+(deffn ^:private TransientVector [-meta
                                     ^:unsynchronized-mutable -length
                                     ^:unsynchronized-mutable -shift
                                     ^:unsynchronized-mutable -root
@@ -397,6 +404,12 @@
   (-count [this]
     (ensure-editable -root)
     -length)
+
+  IFn
+  (-invoke [this n]
+    (if (is-integer? n)
+      (nth this (int n))
+      (throw (new-argument-error "Key must be integer"))))
 
   ILookup
   (-lookup [this k not-found]
@@ -508,7 +521,7 @@
 (defn- make-transient-vec [meta length shift root tail]
   (TransientVector. meta length shift (editable-root root) (editable-tail tail)))
 
-(deftype PersistentVector [-meta -length -shift -root -tail ^:unsynchronized-mutable -hash]
+(deffn PersistentVector [-meta -length -shift -root -tail ^:unsynchronized-mutable -hash]
   IPersistentCollection
   (-cons [this x]
     (if (< (- (->bitnum -length) (->bitnum (tailoff -length))) 32)
@@ -580,7 +593,7 @@
   (-assoc [this k v]
     (if (integer? k)
       (-assoc-n this k v)
-      (throw (new-argument-error "Key must be an integer"))))
+      (throw (new-argument-error "Key must be integer"))))
 
   (-contains-key? [this k]
     (if (integer? k)
@@ -593,6 +606,12 @@
   IEditableCollection
   (-as-transient [this]
     (make-transient-vec -meta -length -shift -root -tail))
+
+  IFn
+  (-invoke [this n]
+    (if (is-integer? n)
+      (nth this (int n))
+      (throw (new-argument-error "Key must be integer"))))
 
   IMeta
   (-meta [this] -meta)
