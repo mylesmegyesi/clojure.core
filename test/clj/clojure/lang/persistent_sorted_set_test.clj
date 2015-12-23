@@ -2,7 +2,7 @@
   (:refer-clojure :only [deftype let])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-set        :refer [difference intersection subset? superset? union]]
-            [clojure.lang.protocols             :refer [IHash]]
+            [clojure.lang.protocols             :refer [IHash -invoke]]
             [clojure.next                       :refer :all]))
 
 (deftest persistent-sorted-set-test
@@ -28,6 +28,11 @@
     (let [s1 (sorted-set 1)]
       (is (= 1 (get s1 1 :default)))
       (is (= :default (get s1 2 :default)))))
+
+  (testing "invoke calls through to get"
+    (let [s (hash-set 1 2 3)]
+      (is (= 2 (-invoke s 2)))
+      (is (nil? (-invoke s 4)))))
 
   (testing "conj an item to a sorted set"
     (let [s1 (sorted-set)

@@ -1,6 +1,7 @@
 (ns clojure.lang.persistent-hash-set
   (:refer-clojure :only [apply declare defn let when])
   (:require [clojure.lang
+              [afn             :refer [deffn]]
               [apersistent-set :refer [defset]]
               [deftype         :refer [deftype]]
               [equivalence]
@@ -17,10 +18,17 @@
 (defn make-hash-set [m]
   (PersistentHashSet. m))
 
-(deftype TransientHashSet [^:unsynchronized-mutable -map]
+(deffn TransientHashSet [^:unsynchronized-mutable -map]
   ICounted
   (-count [this]
     (count -map))
+
+  IFn
+  (-invoke [this x]
+    (get -map x))
+
+  (-invoke [this x not-found]
+    (get -map x not-found))
 
   ILookup
   (-lookup [this x]
