@@ -1,5 +1,5 @@
 (ns clojure.lang.array-test
-  (:refer-clojure :only [char cond defmacro defn- let])
+  (:refer-clojure :only [cond defmacro defn- let])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.lang.object                  :as    obj]

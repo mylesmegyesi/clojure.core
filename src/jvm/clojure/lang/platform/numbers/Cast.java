@@ -306,5 +306,74 @@ public final class Cast {
     return x;
   }
 
+  public static char castToChar(byte x) {
+    char c = (char) x;
+    if (c != x) {
+      throw new IllegalArgumentException("Value out of range for char: " + x);
+    } else {
+      return c;
+    }
+  }
+
+  public static char castToChar(short x) {
+    char c = (char) x;
+    if (c != x) {
+      throw new IllegalArgumentException("Value out of range for char: " + x);
+    } else {
+      return c;
+    }
+  }
+
+  public static char castToChar(char x) {
+    return x;
+  }
+
+  public static char castToChar(int x) {
+    char c = (char) x;
+    if (c != x) {
+      throw new IllegalArgumentException("Value out of range for char: " + x);
+    } else {
+      return c;
+    }
+  }
+
+  public static char castToChar(long x) {
+    char c = (char) x;
+    if (c != x) {
+      throw new IllegalArgumentException("Value out of range for char: " + x);
+    } else {
+      return c;
+    }
+  }
+
+  public static char castToChar(float x) {
+    if (x >= Character.MIN_VALUE && x <= Character.MAX_VALUE) {
+      return (char) x;
+    } else {
+      throw new IllegalArgumentException("Value out of range for char: " + x);
+    }
+  }
+
+  public static char castToChar(double x) {
+    if (x >= Character.MIN_VALUE && x <= Character.MAX_VALUE) {
+      return (char) x;
+    } else {
+      throw new IllegalArgumentException("Value out of range for char: " + x);
+    }
+  }
+
+  public static char castToChar(Object x) {
+    if (x instanceof Character) {
+      return ((Character) x).charValue();
+    } else {
+      long l = ((Number) x).longValue();
+      if (l < Character.MIN_VALUE || l > Character.MAX_VALUE) {
+        throw new IllegalArgumentException("Value out of range for char: " + x);
+      } else {
+        return (char) l;
+      }
+    }
+  }
+
 }
 

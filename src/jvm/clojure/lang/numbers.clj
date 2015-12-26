@@ -231,6 +231,9 @@
        (clojure.core/number? x#) (BigDecimal/valueOf ^Long (->long x#))
        :else (BigDecimal. ^String x#))))
 
+(defmacro ->char [x]
+  `(. Cast (castToChar ~x)))
+
 (defmacro < [x y]
   `(. Comparison (lessThan ~x ~y)))
 
