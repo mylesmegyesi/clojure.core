@@ -21,3 +21,6 @@
 (defn class-name [^Object x]
   (if-let [cx x] (.getSimpleName ^Class (.getClass cx))))
 
+(defn cast [^Class c obj]
+  (. c (cast obj)))
+

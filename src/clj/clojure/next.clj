@@ -805,6 +805,9 @@
 (defn type [x]
   (or (get (meta x) :type) (class x)))
 
+(defn cast [c obj]
+  (platform-object/cast c obj))
+
 (defn contains? [coll k]
   (cond
     (nil? coll) false
