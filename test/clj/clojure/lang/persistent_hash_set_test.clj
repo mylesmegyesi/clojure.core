@@ -2,7 +2,7 @@
   (:refer-clojure :only [deftype let])
   (:require [clojure.test                     :refer :all]
             [clojure.lang.persistent-set      :refer [difference intersection subset? superset? union]]
-            [clojure.lang.protocols           :refer [IHash]]
+            [clojure.lang.protocols           :refer [IHash -invoke]]
             [clojure.next                     :refer :all]))
 
 (deftest persistent-hash-set-test
@@ -28,6 +28,11 @@
     (let [s1 (hash-set 1)]
       (is (= 1 (get s1 1 :default)))
       (is (= :default (get s1 2 :default)))))
+
+  (testing "invoke calls through to get"
+    (let [s (hash-set 1 2 3)]
+      (is (= 2 (-invoke s 2)))
+      (is (nil? (-invoke s 4)))))
 
   (testing "conj an item to a hash set"
     (let [s1 (hash-set)
@@ -231,5 +236,15 @@
 
   (testing "make a set persistent"
     (let [hs (persistent! (transient (hash-set :foo)))]
-      (is (= 1 (count hs))))))
+      (is (= 1 (count hs)))))
+
+  (testing "invoke calls through to get"
+    (let [t (transient (hash-set 1 2 3))]
+      (is (= 2 (get t 2)))
+      (is (= 2 (get t 2 "not found")))))
+
+  (testing "invoke when the key is not found"
+    (let [t (transient (hash-set 1 2 3))]
+      (is (nil? (get t 4)))
+      (is (= "not found" (get t 4 "not found"))))))
 

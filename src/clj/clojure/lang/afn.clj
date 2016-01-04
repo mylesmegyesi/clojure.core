@@ -18,7 +18,7 @@
     (clojure.core/reduce
       (fn [[stripped-body relevant-methods] line]
         (cond
-          (= 'IFn line)
+          (or (= 'IFn line) (= 'clojure.lang.protocols.IFn line))
              [stripped-body relevant-methods]
           (and (clojure.core/seq? line) (= '-invoke (first line)))
              [stripped-body (clojure.core/conj relevant-methods line)]
@@ -75,7 +75,7 @@
           (-invoke ifn (nth args 0) (nth args 1) (nth args 2) (nth args 3) (nth args 4) (nth args 5) (nth args 6) (nth args 7) (nth args 8) (nth args 9) (nth args 10) (nth args 11) (nth args 12) (nth args 13) (nth args 14) (nth args 15) (nth args 16) (nth args 17)remainder-args-vec))))
 
 (defmacro deffn [t bindings & body]
-  (if (some #(= 'IFn %) body)
+  (if (some #(or (= 'IFn %) (= 'clojure.lang.protocols.IFn %)) body)
     (let [[stripped-body relevant-methods] (find-relevant-methods body)
           ifn-methods (add-missing-arities relevant-methods)]
       `(let [this-sym# (gensym "this")

@@ -1,6 +1,7 @@
 (ns clojure.lang.persistent-sorted-set
   (:refer-clojure :only [apply declare defn fn])
   (:require [clojure.lang
+              [afn             :refer [deffn]]
               [apersistent-set :refer [defset]]
               [deftype]
               [equivalence]
