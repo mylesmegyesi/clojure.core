@@ -1,5 +1,5 @@
 (ns clojure.lang.future-submission
-  (:refer-clojure :only [concat defmacro first list let symbol reify])
+  (:refer-clojure :only [defmacro first list let symbol reify])
   (:require [clojure.next :refer :all :exclude [first]]
             [clojure.lang.agent])
   (:import [java.util.concurrent TimeoutException TimeUnit Future]))
@@ -29,7 +29,7 @@
 
 (defmacro deffuture [type bindings & body]
   (let [future-submission (first bindings)]
-    (concat
+    (clojure.core/concat
       (list 'clojure.core/deftype type bindings
         'java.util.concurrent.Future
         (list 'get ['this] (list '.get ^Future future-submission))

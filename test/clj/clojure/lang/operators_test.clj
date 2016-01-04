@@ -1,5 +1,5 @@
 (ns clojure.lang.operators-test
-  (:refer-clojure :only [apply concat defmacro defn doseq reify let list list* resolve])
+  (:refer-clojure :only [apply defmacro defn doseq reify let list list* resolve])
   (:require [clojure.test                         :refer :all]
             [clojure.lang.protocols               :refer [IEquivalence]]
             [clojure.support.exception-assertions :refer [argument-error-is-thrown?
@@ -88,7 +88,7 @@
 
 (def int-types [byte short int long bigint biginteger])
 (def float-types [double float bigdec])
-(def types (concat int-types float-types))
+(def types (clojure.core/concat int-types float-types))
 
 (deftest num-test
   (testing "all types can be number cast"

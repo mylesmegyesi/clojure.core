@@ -2,7 +2,7 @@
   (:refer-clojure :only [defn fn let])
   (:require [clojure.test                 :refer :all]
             [clojure.next                 :refer :all]
-            [clojure.lang.persistent-list :refer [EMPTY-LIST]]
+            [clojure.lang.persistent-list :refer [EMPTY-LIST list]]
             [clojure.support.test-seq     :refer [test-seq test-seqable]]))
 
 (deftest lazy-seq-test
@@ -140,4 +140,21 @@
       (is (= 1 (nth d 0)))
       (is (= 2 (nth d 1)))
       (is (= 3 (nth d 2))))))
+
+(deftest concat-test
+  (testing "concat with no args creates an empty lazy seq"
+    (let [s (concat)]
+      (is (not (realized? s)))
+      (is (empty? s))
+      (is (realized? s))))
+
+  (testing "concat arbitrary seqables"
+    (let [s (concat (vector 1 2) (list 3 4))]
+      (is (= 4 (count s)))
+      (is (= 1 (first s)))
+      (is (= 2 (first (next s))))
+      (is (= 3 (first (next (next s)))))
+      (is (= 4 (first (next (next (next s))))))
+      (is (nil? (first (next (next (next (next s)))))))))
+  )
 

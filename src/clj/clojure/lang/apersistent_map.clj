@@ -1,5 +1,5 @@
 (ns clojure.lang.apersistent-map
-  (:refer-clojure :only [cond concat defmacro defn let loop list list* ->])
+  (:refer-clojure :only [cond defn let loop])
   (:require [clojure.lang.exceptions  :refer [new-argument-error]]
             [clojure.lang.key-value   :refer [platform-map-entry-type]]
             [clojure.next             :refer :all]))
