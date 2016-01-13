@@ -1,5 +1,5 @@
 (ns clojure.lang.apersistent-set
-  (:refer-clojure :only [apply defmacro defn defn- let list loop])
+  (:refer-clojure :only [apply defmacro defn defn- let list list* loop])
   (:require [clojure.next :refer :all]))
 
 (defn make-pairs [xs]
@@ -42,15 +42,11 @@
 (defn set-hash [items-seq]
   (reduce #(+ %1 (hash %2)) 0 items-seq))
 
-(defmacro defset [type gen-next gen-transient]
-  (list 'clojure.lang.afn/deffn type '[-map]
+(defmacro defset [type gen-next & body]
+  (list* 'clojure.lang.afn/deffn type '[-map]
     'clojure.lang.protocols.ICounted
     (list '-count '[this]
       (list 'clojure.next/count '-map))
-
-    'clojure.lang.protocols.IEditableCollection
-    (list '-as-transient '[this]
-      (list gen-transient (list 'transient '-map)))
 
     'clojure.lang.protocols.IFn
     (list '-invoke '[this x]
@@ -97,5 +93,7 @@
       (list 'clojure.lang.apersistent-set/set-equals? '-map 'other))
 
     (list 'clojure.lang.hash/hash-method '[this]
-      (list clojure.lang.apersistent-set/set-hash (list 'seq 'this)))))
+      (list clojure.lang.apersistent-set/set-hash (list 'seq 'this)))
+
+    body))
 

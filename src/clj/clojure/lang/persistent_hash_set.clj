@@ -13,7 +13,10 @@
 (declare make-hash-set
          make-transient-hash-set)
 
-(defset PersistentHashSet make-hash-set make-transient-hash-set)
+(defset PersistentHashSet make-hash-set
+  clojure.lang.protocols.IEditableCollection
+  (-as-transient [this]
+    (clojure.lang.persistent-hash-set/make-transient-hash-set (transient -map))))
 
 (defn make-hash-set [m]
   (PersistentHashSet. m))

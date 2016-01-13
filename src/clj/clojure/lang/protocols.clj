@@ -172,6 +172,8 @@
 (defprotocol IShow
   (-show [this]))
 
+(defprotocol ISorted)
+
 (defprotocol ITransientAssociative
   (-assoc! [this k v]))
 

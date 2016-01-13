@@ -109,6 +109,9 @@
 (defn string? [s]
   (instance? platform-object/platform-string s))
 
+(defn sorted? [s]
+  (satisfies? ISorted s))
+
 (defn first [s]
   (-first (seq s)))
 

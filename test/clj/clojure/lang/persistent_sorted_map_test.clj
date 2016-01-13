@@ -7,7 +7,10 @@
             [clojure.next                       :refer :all :exclude [reduce conj repeatedly]]))
 
 (deftest sorted-map-test
-  (map-test "PersistentTreeMap" sorted-map))
+  (map-test "PersistentTreeMap" sorted-map)
+         
+  (testing "is a sorted object"
+    (is (true? (sorted? (sorted-map))))))
 
 (deftest sorted-map-rebalance-test
   (testing "assoc to an existing key"
