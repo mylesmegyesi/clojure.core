@@ -14,7 +14,7 @@
               [persistent-list :refer [EMPTY-LIST]]
               [protocols       :refer [ICounted ILookup IMeta IObj IFn
                                        IAssociative IPersistentCollection IPersistentMap
-                                       ISeq ISeqable ISequential
+                                       ISeq ISeqable ISequential ISorted
                                        -lookup]]]
             [clojure.next :refer :all]))
 
@@ -465,7 +465,9 @@
 
   enum/base-enumerator
   (enum/enumerable-method [this]
-    (enum/new-seq-iterator (seq this))))
+    (enum/new-seq-iterator (seq this)))
+
+  ISorted)
 
 (defn- new-sorted-map [root cnt compare-fn mta]
   (PersistentTreeMap. root cnt compare-fn mta))

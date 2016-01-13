@@ -96,9 +96,21 @@
   IFn)
 
 (deftest fn?-test
-  (testing "returns if the object satisfies IFn"
+  (testing "returns true if the object satisfies IFn"
     (is (fn? (TestFn.))))
 
   (testing "returns false otherwise"
     (is (not (fn? :foo)))))
+
+(deftype TestSorted []
+  ISorted)
+
+(deftest sorted?-test
+  (testing "returns true if the object satisfies ISorted"
+    (is (sorted? (TestSorted.))))
+
+  (testing "returns false otherwise"
+    (is (not (sorted? :foo)))))
+
+
 

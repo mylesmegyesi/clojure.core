@@ -6,6 +6,9 @@
             [clojure.next                       :refer :all]))
 
 (deftest persistent-sorted-set-test
+  (testing "is a sorted object"
+    (is (true? (sorted? (sorted-set)))))
+
   (testing "an empty sorted set does not contains? an item"
     (let [s1 (sorted-set)]
       (is (not (contains? s1 :anything)))))

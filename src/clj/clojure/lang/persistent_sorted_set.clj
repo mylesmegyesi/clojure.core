@@ -14,7 +14,7 @@
 (declare make-sorted-set
          make-transient-sorted-set)
 
-(defset PersistentSortedSet make-sorted-set (fn [_] (throw (new-class-cast-exception "PersistentTreeSet cannot be cast to IEditableCollection"))))
+(defset PersistentSortedSet make-sorted-set clojure.lang.protocols.ISorted)
 
 (defn make-sorted-set [m]
   (PersistentSortedSet. m))
