@@ -1,7 +1,8 @@
 (ns clojure.lang.random-test
   (:refer-clojure :only [let some])
-  (:require [clojure.test :refer :all]
-            [clojure.next :refer :all]))
+  (:require [clojure.test                 :refer :all]
+            [clojure.next                 :refer :all]
+            [clojure.lang.persistent-list :refer [list]]))
 
 (deftest rand-test
   (testing "returns a floating point number"
@@ -26,3 +27,14 @@
   (testing "accepting an upper bound"
     (let [rands (clojure.core/repeatedly 20 #(rand-int 42))]
       (is (some #(>= % 1) rands)))))
+
+(deftest rand-nth-test
+  (testing "rand-nth returns the only entry for one element collections"
+    (is (= :first (rand-nth (list :first)))))
+
+  (testing "rand-nth returns one of a collections entries"
+    (let [ret (rand-nth (list :first :second :third))]
+      (is (or (= :first ret)
+              (= :second ret)
+              (= :third ret))))))
+

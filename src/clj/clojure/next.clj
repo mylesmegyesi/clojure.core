@@ -840,6 +840,9 @@
 (defn rand-int [n]
   (int (rand n)))
 
+(defn rand-nth [coll]
+  (nth coll (rand-int (count coll))))
+
 (require ['clojure.lang.aseq])
 (require ['clojure.lang.seqable])
 
