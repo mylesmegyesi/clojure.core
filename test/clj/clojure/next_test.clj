@@ -1,5 +1,5 @@
 (ns clojure.next-test
-  (:refer-clojure :only [*assert* apply binding defmacro deftype eval fn let reify subs var-set])
+  (:refer-clojure :only [*assert* apply binding defmacro deftype doseq eval fn let reify subs var-set])
   (:require [clojure.test                         :refer :all]
             [clojure.next                         :refer :all]
             [clojure.lang.exceptions              :refer [new-exception]]
@@ -201,4 +201,16 @@
 
   (testing "fnil can take non-defaulted arguments"
     (is (= 6 ((fnil (fn [& args] (apply + args)) 1 2 3) nil nil 1 2)))))
+
+(deftest munge-test
+  (testing "munge legit hacker names"
+    (is (= "$$$__LBRACK_legit_h4xxx_RBRACK__$$$" (munge "$$$_[legit-h4xxx]_$$$"))))
+
+  (testing "munge legit hacker names as a symbol"
+    (is (= (symbol "$$$__LBRACK_legit_h4xxx_RBRACK__$$$")
+           (munge (symbol "$$$_[legit-h4xxx]_$$$")))))
+
+  (doseq [[c s] [["!" "_BANG_"] ["\"" "_DOUBLEQUOTE_"] ["#" "_SHARP_"] ["%" "_PERCENT_"] ["&" "_AMPERSAND_"] ["'" "_SINGLEQUOTE_"] ["-" "_"] ["*" "_STAR_"] ["+" "_PLUS_"] ["/" "_SLASH_"] [":" "_COLON_"] ["<" "_LT_"] ["=" "_EQ_"] [">" "_GT_"] ["?" "_QMARK_"] ["@" "_CIRCA_"] ["[" "_LBRACK_"] ["\\" "_BSLASH_"] ["]" "_RBRACK_"] ["^" "_CARET_"] ["{" "_LBRACE_"] ["|" "_BAR_"] ["}" "_RBRACE_"] ["~" "_TILDE_"]]]
+    (testing (str c " maps to " s)
+      (is (= s (munge c))))))
 

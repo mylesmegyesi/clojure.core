@@ -1,5 +1,5 @@
 (ns clojure.lang.persistent-sorted-map-test
-  (:refer-clojure :only [conj defn- let loop rand-nth reduce repeatedly])
+  (:refer-clojure :only [conj defn- let loop reduce repeatedly])
   (:require [clojure.test                       :refer :all]
             [clojure.lang.persistent-map-test   :refer [map-test]]
             [clojure.lang.persistent-list       :refer [EMPTY-LIST]]
@@ -8,7 +8,7 @@
 
 (deftest sorted-map-test
   (map-test "PersistentTreeMap" sorted-map)
-         
+
   (testing "is a sorted object"
     (is (true? (sorted? (sorted-map))))))
 

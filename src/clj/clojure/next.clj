@@ -1,6 +1,6 @@
 (ns clojure.next ; eventually, this will be clojure.core
   (:refer-clojure :only [*assert* complement
-                         apply binding cond declare defmacro defmulti defmethod defn defn-
+                         apply binding case cond declare defmacro defmulti defmethod defn defn-
                          extend-type dotimes fn if-let let require satisfies? range
                          doseq for list list* load loop format pr-str butlast when when-let])
   (:require [clojure.lang.equivalence]
@@ -1445,6 +1445,39 @@
      (throw (Exception. "Can't create symbol with nil name")))
    (sym/new-symbol ns name (if ns (str ns "/" name) name)
                (hash (hash-combine (hash name) (hash ns))) nil)))
+
+(defn- munge-char [c]
+  (case c
+    \! "_BANG_"
+    \" "_DOUBLEQUOTE_"
+    \# "_SHARP_"
+    \% "_PERCENT_"
+    \& "_AMPERSAND_"
+    \' "_SINGLEQUOTE_"
+    \- "_"
+    \* "_STAR_"
+    \+ "_PLUS_"
+    \/ "_SLASH_"
+    \: "_COLON_"
+    \< "_LT_"
+    \= "_EQ_"
+    \> "_GT_"
+    \? "_QMARK_"
+    \@ "_CIRCA_"
+    \[ "_LBRACK_"
+    \\ "_BSLASH_"
+    \] "_RBRACK_"
+    \^ "_CARET_"
+    \{ "_LBRACE_"
+    \| "_BAR_"
+    \} "_RBRACE_"
+    \~ "_TILDE_"
+    c))
+
+(defn munge [s]
+  (let [f (if (symbol? s) symbol str)
+        s (build-string (map #(munge-char %) (seq (str s))))]
+    (f s)))
 
 (require ['clojure.lang.atomic-counter :refer ['new-atomic-counter 'get-and-increment-atomic-counter]])
 
