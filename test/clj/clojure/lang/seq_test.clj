@@ -189,6 +189,28 @@
   (testing "sorting an unsorted two element seq with custom comparator"
     (is (= (sort #(> %1 %2) (list 1 2)) (list 2 1)))))
 
+(deftest sort-by-test
+  (testing "returns empty seq if the seq argument is nil"
+    (is (= (sort-by identity nil) (list))))
+
+  (testing "sort-by an empty seq returns an empty seq"
+    (is (= (sort-by identity (vector)) (list))))
+
+  (testing "sort-by with a one element seq is equal to itself"
+    (is (= (sort-by identity (list 1)) (list 1))))
+
+  (testing "sorting an unsorted seq with the default comparator"
+    (is (= (sort-by identity (list 2 1)) (list 1 2))))
+
+  (testing "sorting an unsorted seq with a custom comparator"
+    (is (= (sort-by identity #(> %1 %2) (list 1 2)) (list 2 1))))
+
+  (testing "sorting an unsorted seq with a custom key-fn"
+    (is (= (sort-by #(* % -1) (list 1 2)) (list 2 1))))
+
+  (testing "sorting an unsorted seq with a custom key-fn and a custom comparator"
+    (is (= (sort-by #(* % -1) #(> %1 %2) (list 1 2)) (list 1 2)))))
+
 (deftest distinct?-test
   (testing "a single element is distinct"
     (is (distinct? 1)))
