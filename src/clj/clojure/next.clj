@@ -1694,6 +1694,9 @@
       ~@body
       (str o#))))
 
+(defn print-str [& strs]
+  (with-out-str (apply print strs)))
+
 (defmacro with-open [bindings & body]
   (assert-args
      (clojure.core/vector? bindings) "a vector for its binding"

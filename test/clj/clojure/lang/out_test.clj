@@ -44,6 +44,10 @@
       (is (nil? (println "foo")))
       (is (nil? (println "foo" "bar" "baz"))))))
 
+(deftest print-str-test
+  (testing "print to a string"
+    (is (= "1 foo b a r {:a 2}" (print-str 1 "foo" \b \a \r (hash-map (keyword "a") 2))))))
+
 (deftest pr-test
   (testing "pr for a :default meta type that is not an IObj"
     (let [obj (reify
