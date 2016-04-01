@@ -1172,6 +1172,11 @@
        (arr/array-sort comparator arr)
        (seq arr)))))
 
+(defn sort-by
+  ([kfn coll] (sort-by kfn compare coll))
+  ([kfn c coll]
+    (sort #(c (kfn %1) (kfn %2)) coll)))
+
 (require ['clojure.lang.persistent-sorted-map :refer ['make-sorted-map]])
 
 (defn sorted-map-by [compare-fn & args]
