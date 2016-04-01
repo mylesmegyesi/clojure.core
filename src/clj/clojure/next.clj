@@ -945,6 +945,14 @@
       (when (pred (first s))
         (cons (first s) (take-while pred (next s)))))))
 
+(defn drop-while [pred coll]
+  (let [step (fn [pred coll]
+               (let [s (seq coll)]
+                 (if (and s (pred (first s)))
+                   (recur pred (rest s))
+                   s)))]
+    (lazy-seq (step pred coll))))
+
 (defn repeat
   ([x] (lazy-seq (cons x (repeat x))))
   ([n x] (take n (repeat x))))
@@ -1734,5 +1742,4 @@
   (-nth
     ([this n] nil)
     ([this n default] default)))
-
 
