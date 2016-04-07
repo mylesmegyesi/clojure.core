@@ -2,6 +2,7 @@
   (:refer-clojure :only [cond defn let loop])
   (:require [clojure.lang.exceptions  :refer [new-argument-error]]
             [clojure.lang.key-value   :refer [platform-map-entry-type]]
+            [clojure.lang.protocols   :refer [-assoc]]
             [clojure.next             :refer :all]))
 
 (defn map-hash [m]
@@ -32,16 +33,16 @@
 (defn map-cons [m o]
   (cond
     (instance? platform-map-entry-type o)
-      (assoc m (key o) (val o))
+      (-assoc m (key o) (val o))
     (vector? o)
       (if (= (count o) 2)
-        (assoc m (nth o 0) (nth o 1))
+        (-assoc m (nth o 0) (nth o 1))
         (throw (new-argument-error "Vector arg to map conj must be a pair")))
     :else
       (loop [mp m
              s (seq o)]
         (if s
           (let [entry (first s)]
-            (recur (assoc mp (key entry) (val entry)) (next s)))
+            (recur (-assoc mp (key entry) (val entry)) (next s)))
           mp))))
 
