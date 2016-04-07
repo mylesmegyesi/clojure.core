@@ -38,5 +38,11 @@
   (testing "count of nil is 0"
     (is (zero? (count nil))))
 
+  (testing "assoc nil returns a map of the key and value"
+    (is (= (array-map "k" "v") (assoc nil "k" "v"))))
+
+  (testing "assoc nil returns a map of the key value pairs"
+    (is (= (array-map "k1" "v1" "k2" "v2") (assoc nil "k1" "v1" "k2" "v2"))))
+
   (testing "the type of nil is nil"
     (is (nil? (type nil)))))

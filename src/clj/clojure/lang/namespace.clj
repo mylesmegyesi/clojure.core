@@ -1,5 +1,5 @@
 (ns clojure.lang.namespace
-  (:refer-clojure :only [defn defn- assoc get-in if-let let assoc-in atom reduce fn val key -> select-keys doseq contains? format apply dissoc get set concat keys update-in])
+  (:refer-clojure :only [defn defn- assoc if-let let atom reduce fn val key -> select-keys doseq contains? format apply dissoc get set concat keys update-in])
   (:require [clojure.lang.var        :refer [-alter-var-root make-var make-unbound]]
             [clojure.next            :refer :all :exclude [concat get contains? key keys val assoc dissoc atom reduce]]))
 
@@ -9,7 +9,7 @@
                             :ns       ns-sym}))
 
 (defn find-ns [namespaces ns-sym]
-  (get-in namespaces [ns-sym :ns]))
+  (clojure.core/get-in namespaces [ns-sym :ns]))
 
 (defn the-ns [namespaces namespace-sym]
   (if-let [ns-sym (find-ns namespaces namespace-sym)]
@@ -19,7 +19,7 @@
 (def ns-name the-ns)
 
 (defn- resolve-alias [namespaces in-ns-sym alias]
-  (get-in namespaces [in-ns-sym :aliases alias]))
+  (clojure.core/get-in namespaces [in-ns-sym :aliases alias]))
 
 (defn alias [namespaces to-ns-sym alias target-ns-sym]
   (let [to-ns (the-ns namespaces to-ns-sym)
@@ -28,7 +28,7 @@
       (if (= existing-alias target-ns-sym)
         namespaces
         (throw (Exception. (str "Alias " alias " already exists in namespace " to-ns ", aliasing " existing-alias))))
-      (assoc-in namespaces
+      (clojure.core/assoc-in namespaces
                 [to-ns :aliases alias]
                 target-ns))))
 
@@ -39,7 +39,7 @@
         root (atom nil)
         v (make-var (or (meta sym) {}) -ns sym root)]
     (-alter-var-root v (make-unbound v))
-    (assoc-in namespaces [-ns :mappings sym] v)))
+    (clojure.core/assoc-in namespaces [-ns :mappings sym] v)))
 
 (defn ns-resolve [namespaces -in-ns sym]
   (let [ns-sym (if-let [ns-part (namespace sym)]
@@ -47,7 +47,7 @@
                    (or (resolve-alias namespaces -in-ns ns-sym)
                        ns-sym))
                  (the-ns namespaces -in-ns))]
-    (get-in namespaces [ns-sym :mappings (symbol (name sym))])))
+    (clojure.core/get-in namespaces [ns-sym :mappings (symbol (name sym))])))
 
 (defn -def
   ([namespaces ns-sym sym]
@@ -62,7 +62,7 @@
      new-namespaces)))
 
 (defn ns-map [namespaces namespace-sym]
-  (get-in namespaces [(the-ns namespaces namespace-sym) :mappings]))
+  (clojure.core/get-in namespaces [(the-ns namespaces namespace-sym) :mappings]))
 
 (defn- interned-in-ns? [namespace-sym var]
   (= namespace-sym (symbol (namespace var))))
@@ -113,7 +113,7 @@
     (filter-not-interned namespace-sym)))
 
 (defn ns-aliases [namespaces namespace-sym]
-  (get-in namespaces [(the-ns namespaces namespace-sym) :aliases]))
+  (clojure.core/get-in namespaces [(the-ns namespaces namespace-sym) :aliases]))
 
 (defn- filter-includes [mappings includes]
   (if includes
@@ -145,7 +145,7 @@
 (defn- add-to-ns [mappings namespaces to-ns]
   (reduce
     (fn [namespaces entry]
-      (assoc-in namespaces [to-ns :mappings (key entry)] (val entry)))
+      (clojure.core/assoc-in namespaces [to-ns :mappings (key entry)] (val entry)))
     namespaces
     mappings))
 

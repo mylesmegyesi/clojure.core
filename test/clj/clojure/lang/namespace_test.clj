@@ -1,5 +1,5 @@
 (ns clojure.lang.namespace-test
-  (:refer-clojure :only [defn -> let get-in set keys get assoc-in])
+  (:refer-clojure :only [defn -> let set keys get])
   (:require [clojure.test           :refer :all]
             [clojure.lang.namespace :refer :all]
             [clojure.next           :refer :all :exclude [get keys]]))
@@ -61,7 +61,7 @@
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
                        (intern (symbol "test-ns") (symbol "something")))
-          something-var (get-in namespaces [(symbol "test-ns") :mappings (symbol "something")])]
+          something-var (clojure.core/get-in namespaces [(symbol "test-ns") :mappings (symbol "something")])]
       (is (instance? clojure.lang.var.Var something-var))
       (is (instance? clojure.lang.var.Unbound @(.root something-var)))
       (is (identical? something-var (.var @(.root something-var))))
@@ -140,7 +140,7 @@
   (testing "resolves a symbol in a namespace"
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (intern (symbol "test-ns") (symbol "something")))
-          created (get-in namespaces [(symbol "test-ns") :mappings (symbol "something")])
+          created (clojure.core/get-in namespaces [(symbol "test-ns") :mappings (symbol "something")])
           resolved (ns-resolve namespaces (symbol "test-ns") (symbol "something"))]
       (is (identical? created resolved))))
 
@@ -156,7 +156,7 @@
     (let [namespaces (-> (create-ns (empty-ns-map) (symbol "test-ns"))
                        (create-ns (symbol "other-ns"))
                        (intern (symbol "other-ns") (symbol "something")))
-          created (get-in namespaces [(symbol "other-ns") :mappings (symbol "something")])
+          created (clojure.core/get-in namespaces [(symbol "other-ns") :mappings (symbol "something")])
           resolved (ns-resolve namespaces (symbol "test-ns") (symbol "other-ns/something"))]
       (is (identical? created resolved))))
 
@@ -171,7 +171,7 @@
                        (create-ns (symbol "other-ns"))
                        (intern (symbol "other-ns") (symbol "something"))
                        (alias (symbol "test-ns") (symbol "some-other") (symbol "other-ns")))
-          created (get-in namespaces [(symbol "other-ns") :mappings (symbol "something")])
+          created (clojure.core/get-in namespaces [(symbol "other-ns") :mappings (symbol "something")])
           resolved (ns-resolve namespaces (symbol "test-ns") (symbol "some-other/something"))]
       (is (identical? created resolved))))
 
@@ -182,8 +182,8 @@
                        (create-ns (symbol "some-other"))
                        (intern (symbol "some-other") (symbol "something"))
                        (alias (symbol "test-ns") (symbol "some-other") (symbol "other-ns")))
-          other-ns-something (get-in namespaces [(symbol "other-ns") :mappings (symbol "something")])
-          some-other-something (get-in namespaces [(symbol "some-other") :mappings (symbol "something")])
+          other-ns-something (clojure.core/get-in namespaces [(symbol "other-ns") :mappings (symbol "something")])
+          some-other-something (clojure.core/get-in namespaces [(symbol "some-other") :mappings (symbol "something")])
           resolved (ns-resolve namespaces (symbol "test-ns") (symbol "some-other/something"))]
       (is (identical? other-ns-something
                       (ns-resolve namespaces (symbol "test-ns") (symbol "some-other/something"))))
@@ -390,8 +390,8 @@
                        (intern (symbol "test-ns") (symbol "pub2"))
                        (intern (symbol "test-ns") (with-meta (symbol "priv1") {:private true}))
                        (intern (symbol "test-ns") (with-meta (symbol "priv2") {:private true})))
-          other-ns-pub1 (get-in namespaces [(symbol "other-ns") :mappings (symbol "pub1")])
-          namespaces (assoc-in namespaces [(symbol "test-ns") :mappings (symbol "pub3")] other-ns-pub1)
+          other-ns-pub1 (clojure.core/get-in namespaces [(symbol "other-ns") :mappings (symbol "pub1")])
+          namespaces (clojure.core/assoc-in namespaces [(symbol "test-ns") :mappings (symbol "pub3")] other-ns-pub1)
           pubs (ns-publics namespaces (symbol "test-ns"))
           pub1-var (get pubs (symbol "pub1"))
           pub2-var (get pubs (symbol "pub2"))]

@@ -14,7 +14,7 @@
    :minor       6
    :incremental 0})
 
-(declare cons str seq reduce not vector)
+(declare cons hash-map str seq reduce not vector)
 
 (defn clojure-version []
   (str (:major *clojure-version*) "."
@@ -1037,29 +1037,6 @@
 (defn vals [m]
   (new-val-seq (seq m)))
 
-(defn assoc-seq [m kvs]
-  (if kvs
-    (let [n (next kvs)]
-      (recur (-assoc m (first kvs) (first n)) (next n)))
-    m))
-
-(defn assoc
-  ([m k v]
-   (-assoc m k v))
-  ([m k v & kvs]
-   (assoc-seq (-assoc m k v) (seq kvs))))
-
-(defn- dissoc-seq [m ks]
-  (if ks
-    (recur (-dissoc m (first ks)) (next ks))
-    m))
-
-(defn dissoc
-  ([m] m)
-  ([m k] (-dissoc m k))
-  ([m k & ks]
-   (dissoc-seq (-dissoc m k) (seq ks))))
-
 (defn into [to from]
   (if (satisfies? IEditableCollection to)
     (with-meta (persistent! (reduce conj! (transient to) from)) (meta to))
@@ -1073,7 +1050,7 @@
   ([f v coll]
     (loop [s coll
            acc v]
-      (if (nil? s)
+      (if (empty? s)
         acc
         (let [next-s (seq s)
               next-acc (f acc (first next-s))]
@@ -1111,6 +1088,64 @@
 (defn remove [pred coll]
   (filter (complement pred) coll))
 
+(require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
+
+(defn array-map [& args]
+  (let [sargs (seq args)
+        size (count sargs)]
+    (if (even? size)
+      (new-array-map (into-array sargs) size (/ size 2) nil)
+      (throw (new-argument-error
+               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
+                       size))))))
+
+(defn assoc-seq [m kvs]
+  (if kvs
+    (let [n (next kvs)]
+      (recur (-assoc m (first kvs) (first n)) (next n)))
+    m))
+
+(defn assoc
+  ([m k v]
+    (if (nil? m)
+      (array-map k v)
+      (-assoc m k v)))
+  ([m k v & kvs]
+    (if (nil? m)
+      (assoc-seq (array-map k v) (seq kvs))
+      (assoc-seq (-assoc m k v) (seq kvs)))))
+
+(defn- dissoc-seq [m ks]
+  (if ks
+    (recur (-dissoc m (first ks)) (next ks))
+    m))
+
+(defn dissoc
+  ([m] m)
+  ([m k] (-dissoc m k))
+  ([m k & ks]
+   (dissoc-seq (-dissoc m k) (seq ks))))
+
+(defn get-in
+  ([coll ks] (reduce get coll ks))
+  ([coll ks not-found]
+    (loop [sentinel (platform-object/new-base-object)
+           coll coll
+           ks (seq ks)]
+      (if ks
+        (let [next-coll (get coll (first ks) sentinel)]
+          (if (identical? sentinel next-coll)
+            not-found
+            (recur sentinel next-coll (next ks))))
+        coll))))
+
+(defn assoc-in [m ks v]
+  (let [k (first ks)
+        ks (next ks)]
+    (if ks
+      (assoc m k (assoc-in (get m k) ks v))
+      (assoc m k v))))
+
 (require ['clojure.lang.persistent-hash-map :refer ['new-hash-map 'EMPTY-HASH-MAP]])
 
 (defn hash-map [& kvs]
@@ -1126,17 +1161,6 @@
                    (format "PersistentHashMap can only be created with even number of arguments: %s arguments given"
                            size)))))
       EMPTY-HASH-MAP)))
-
-(require ['clojure.lang.persistent-array-map :refer ['new-array-map]])
-
-(defn array-map [& args]
-  (let [sargs (seq args)
-        size (count sargs)]
-    (if (even? size)
-      (new-array-map (into-array sargs) size (/ size 2) nil)
-      (throw (new-argument-error
-               (format "PersistentArrayMap can only be created with even number of arguments: %s arguments given"
-                       size))))))
 
 (require ['clojure.lang.apersistent-set :refer ['make-pairs]])
 (require ['clojure.lang.persistent-hash-set :refer ['make-hash-set]])
