@@ -1,5 +1,5 @@
 (ns clojure.lang.afn
-  (:refer-clojure :only [apply cond case concat defn defn- defmacro fn gensym let list loop range reverse some vec ->>])
+  (:refer-clojure :only [apply concat cond case defn defn- defmacro fn gensym let list loop range reverse some vec ->>])
   (:require [clojure.next :refer :all]
             [clojure.lang
               [callable          :as    call]
@@ -72,7 +72,7 @@
                                    (recur (next xs) (conj! v (first xs)))
                                    (persistent! v)))
                                (persistent! empty-transient))]
-          (-invoke ifn (nth args 0) (nth args 1) (nth args 2) (nth args 3) (nth args 4) (nth args 5) (nth args 6) (nth args 7) (nth args 8) (nth args 9) (nth args 10) (nth args 11) (nth args 12) (nth args 13) (nth args 14) (nth args 15) (nth args 16) (nth args 17)remainder-args-vec))))
+          (-invoke ifn (nth args 0) (nth args 1) (nth args 2) (nth args 3) (nth args 4) (nth args 5) (nth args 6) (nth args 7) (nth args 8) (nth args 9) (nth args 10) (nth args 11) (nth args 12) (nth args 13) (nth args 14) (nth args 15) (nth args 16) (nth args 17) remainder-args-vec))))
 
 (defmacro deffn [t bindings & body]
   (if (some #(or (= 'IFn %) (= 'clojure.lang.protocols.IFn %)) body)
