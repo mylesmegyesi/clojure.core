@@ -1003,6 +1003,35 @@
       ([a b c] (f (if (nil? a) x a) (if (nil? b) y b) (if (nil? c) z c)))
       ([a b c & ds] (apply f (if (nil? a) x a) (if (nil? b) y b) (if (nil? c) z c) ds)))))
 
+(require '[clojure.lang.afn :refer [deffn apply-to]])
+
+(deffn Partial [f args]
+  IFn
+  (-invoke [this] (apply-to f args))
+  (-invoke [this arg] (apply-to f (concat args (vector arg))))
+  (-invoke [this arg1 arg2] (apply-to f (concat args (vector arg1 arg2))))
+  (-invoke [this arg1 arg2 arg3] (apply-to f (concat args (vector arg1 arg2 arg3))))
+  (-invoke [this arg1 arg2 arg3 arg4] (apply-to f (concat args (vector arg1 arg2 arg3 arg4))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17 arg18] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17 arg18))))
+  (-invoke [this arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17 arg18 varargs] (apply-to f (concat args (vector arg1 arg2 arg3 arg4 arg5 arg6 arg7 arg8 arg9 arg10 arg11 arg12 arg13 arg14 arg15 arg16 arg17 arg18) varargs))))
+
+(defn partial
+  ([f] f)
+  ([f & args] (Partial. f args)))
+
 (defn disj
   ([s] s)
   ([s x]
